@@ -1,0 +1,14 @@
+Column,Meaning,Role
+Date,Observation date,Time index
+Zone_ID,Water distribution zone,Feature
+Population,Population served,Feature
+Active_Connections,Active service connections,Feature
+Avg_Temperature_C,Daily average temperature (°C),Feature
+Humidity_pct,Daily average relative humidity (%),Feature
+Rainfall_mm,Daily rainfall (mm),Feature
+Day_of_Week,Day name,Feature
+Is_Weekend,Weekend indicator,Feature
+Is_Holiday,Holiday indicator,Feature
+Month,Month number,Feature
+Season,Season category,Feature
+Water_Demand_kL,Observed daily water demand; forecasting target,Target

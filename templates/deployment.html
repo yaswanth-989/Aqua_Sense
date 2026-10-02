@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Deployment — AquaSense{% endblock %}
+{% block page_title %}Deployment Architecture &amp; REST API{% endblock %}
+{% block page_subtitle %}FastAPI production serving structure and OpenAPI endpoints{% endblock %}
+
+{% block content %}
+<div class="coming-soon-banner">
+  <div class="coming-soon-icon">
+    <i data-lucide="server"></i>
+  </div>
+  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 8</div>
+  <h2 class="coming-soon-title">API Deployment &amp; OpenAPI Spec Coming Soon</h2>
+  <p class="coming-soon-desc">
+    Complete REST serving endpoints (<code>/api/v1/predict/potability</code>, <code>/api/v1/predict/demand</code>, and health check) with Pydantic payload validation will be exposed in Milestone 8.
+  </p>
+  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
+    <span>• FastAPI Automatic OpenAPI / Swagger UI</span>
+    <span>• Structured Request / Response Models</span>
+    <span>• Error Handlers &amp; Boundary Checks</span>
+  </div>
+</div>
+{% endblock %}

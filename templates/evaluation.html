@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Model Evaluation — AquaSense{% endblock %}
+{% block page_title %}Model Evaluation &amp; Benchmarking{% endblock %}
+{% block page_subtitle %}Comparative validation, ROC/PR curves, confusion matrices, and residual diagnostics{% endblock %}
+
+{% block content %}
+<div class="coming-soon-banner">
+  <div class="coming-soon-icon">
+    <i data-lucide="award"></i>
+  </div>
+  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 6</div>
+  <h2 class="coming-soon-title">Model Evaluation Suite Coming Soon</h2>
+  <p class="coming-soon-desc">
+    Rigorous cross-validation, precision-recall analysis, ROC-AUC comparisons, and regression residual diagnostics will be displayed after model training.
+  </p>
+  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
+    <span>• Classification: Precision, Recall, F1, ROC-AUC</span>
+    <span>• Regression: RMSE, MAE, R²</span>
+    <span>• Probability Calibration Diagnostics</span>
+  </div>
+</div>
+{% endblock %}

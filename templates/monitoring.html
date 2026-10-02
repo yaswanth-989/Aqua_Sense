@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Monitoring — AquaSense{% endblock %}
+{% block page_title %}Production Monitoring &amp; Drift Detection{% endblock %}
+{% block page_subtitle %}Real-time distribution tracking, KS test drift metrics, and retraining alerts{% endblock %}
+
+{% block content %}
+<div class="coming-soon-banner">
+  <div class="coming-soon-icon">
+    <i data-lucide="activity"></i>
+  </div>
+  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 9</div>
+  <h2 class="coming-soon-title">Drift Detection &amp; Monitoring Coming Soon</h2>
+  <p class="coming-soon-desc">
+    Automated Kolmogorov-Smirnov (KS) test tracking on input features, prediction distribution drift, and automated retraining trigger logic will be operational in Milestone 9.
+  </p>
+  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
+    <span>• Feature Drift Monitoring (KS-Statistic)</span>
+    <span>• Prediction Distribution Shift</span>
+    <span>• Drift Alerts &amp; Retraining Pipeline</span>
+  </div>
+</div>
+{% endblock %}

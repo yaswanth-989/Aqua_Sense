@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Data Preparation — AquaSense{% endblock %}
+{% block page_title %}Data Preparation &amp; Feature Pipelines{% endblock %}
+{% block page_subtitle %}Leakage-safe imputation, scaling, encoding, and chronological feature generation{% endblock %}
+
+{% block content %}
+<div class="coming-soon-banner">
+  <div class="coming-soon-icon">
+    <i data-lucide="sliders"></i>
+  </div>
+  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 3</div>
+  <h2 class="coming-soon-title">Data Preparation Pipeline Coming Soon</h2>
+  <p class="coming-soon-desc">
+    Leakage-free preprocessing pipelines utilizing Scikit-Learn ColumnTransformers, chronological splits, and zone-level lag/rolling feature engineering will be implemented in Milestone 3.
+  </p>
+  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
+    <span>• Train-Split Imputation</span>
+    <span>• Robust Scaling</span>
+    <span>• Lag &amp; Rolling Demand Features</span>
+  </div>
+</div>
+{% endblock %}
