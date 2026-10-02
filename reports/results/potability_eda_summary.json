@@ -1,0 +1,541 @@
+{
+  "dataset_name": "Water Potability",
+  "sample_count": 3276,
+  "feature_count": 9,
+  "features": [
+    "ph",
+    "Hardness",
+    "Solids",
+    "Chloramines",
+    "Sulfate",
+    "Conductivity",
+    "Organic_carbon",
+    "Trihalomethanes",
+    "Turbidity"
+  ],
+  "target_analysis": {
+    "non_potable_0": 1998,
+    "potable_1": 1278,
+    "non_potable_pct": 60.99,
+    "potable_pct": 39.01,
+    "imbalance_ratio": 1.56
+  },
+  "missing_analysis": [
+    {
+      "feature": "ph",
+      "missing_count": 491,
+      "missing_pct": 14.99,
+      "complete_count": 2785
+    },
+    {
+      "feature": "Hardness",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    },
+    {
+      "feature": "Solids",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    },
+    {
+      "feature": "Chloramines",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    },
+    {
+      "feature": "Sulfate",
+      "missing_count": 781,
+      "missing_pct": 23.84,
+      "complete_count": 2495
+    },
+    {
+      "feature": "Conductivity",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    },
+    {
+      "feature": "Organic_carbon",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    },
+    {
+      "feature": "Trihalomethanes",
+      "missing_count": 162,
+      "missing_pct": 4.95,
+      "complete_count": 3114
+    },
+    {
+      "feature": "Turbidity",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    },
+    {
+      "feature": "Potability",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "complete_count": 3276
+    }
+  ],
+  "univariate_profiles": [
+    {
+      "feature": "ph",
+      "mean": 7.08,
+      "std": 1.59,
+      "min": 0.0,
+      "q25": 6.09,
+      "median": 7.04,
+      "q75": 8.06,
+      "max": 14.0,
+      "skewness": 0.026
+    },
+    {
+      "feature": "Hardness",
+      "mean": 196.37,
+      "std": 32.88,
+      "min": 47.43,
+      "q25": 176.85,
+      "median": 196.97,
+      "q75": 216.67,
+      "max": 323.12,
+      "skewness": -0.039
+    },
+    {
+      "feature": "Solids",
+      "mean": 22014.09,
+      "std": 8768.57,
+      "min": 320.94,
+      "q25": 15666.69,
+      "median": 20927.83,
+      "q75": 27332.76,
+      "max": 61227.2,
+      "skewness": 0.622
+    },
+    {
+      "feature": "Chloramines",
+      "mean": 7.12,
+      "std": 1.58,
+      "min": 0.35,
+      "q25": 6.13,
+      "median": 7.13,
+      "q75": 8.11,
+      "max": 13.13,
+      "skewness": -0.012
+    },
+    {
+      "feature": "Sulfate",
+      "mean": 333.78,
+      "std": 41.42,
+      "min": 129.0,
+      "q25": 307.7,
+      "median": 333.07,
+      "q75": 359.95,
+      "max": 481.03,
+      "skewness": -0.036
+    },
+    {
+      "feature": "Conductivity",
+      "mean": 426.21,
+      "std": 80.82,
+      "min": 181.48,
+      "q25": 365.73,
+      "median": 421.88,
+      "q75": 481.79,
+      "max": 753.34,
+      "skewness": 0.264
+    },
+    {
+      "feature": "Organic_carbon",
+      "mean": 14.28,
+      "std": 3.31,
+      "min": 2.2,
+      "q25": 12.07,
+      "median": 14.22,
+      "q75": 16.56,
+      "max": 28.3,
+      "skewness": 0.026
+    },
+    {
+      "feature": "Trihalomethanes",
+      "mean": 66.4,
+      "std": 16.18,
+      "min": 0.74,
+      "q25": 55.84,
+      "median": 66.62,
+      "q75": 77.34,
+      "max": 124.0,
+      "skewness": -0.083
+    },
+    {
+      "feature": "Turbidity",
+      "mean": 3.97,
+      "std": 0.78,
+      "min": 1.45,
+      "q25": 3.44,
+      "median": 3.96,
+      "q75": 4.5,
+      "max": 6.74,
+      "skewness": -0.008
+    }
+  ],
+  "outlier_profiles": [
+    {
+      "feature": "ph",
+      "q1": 6.09,
+      "q3": 8.06,
+      "iqr": 1.97,
+      "lower_bound": 3.14,
+      "upper_bound": 11.02,
+      "outlier_count": 46,
+      "outlier_pct": 1.65
+    },
+    {
+      "feature": "Hardness",
+      "q1": 176.85,
+      "q3": 216.67,
+      "iqr": 39.82,
+      "lower_bound": 117.13,
+      "upper_bound": 276.39,
+      "outlier_count": 83,
+      "outlier_pct": 2.53
+    },
+    {
+      "feature": "Solids",
+      "q1": 15666.69,
+      "q3": 27332.76,
+      "iqr": 11666.07,
+      "lower_bound": -1832.42,
+      "upper_bound": 44831.87,
+      "outlier_count": 47,
+      "outlier_pct": 1.43
+    },
+    {
+      "feature": "Chloramines",
+      "q1": 6.13,
+      "q3": 8.11,
+      "iqr": 1.99,
+      "lower_bound": 3.15,
+      "upper_bound": 11.1,
+      "outlier_count": 61,
+      "outlier_pct": 1.86
+    },
+    {
+      "feature": "Sulfate",
+      "q1": 307.7,
+      "q3": 359.95,
+      "iqr": 52.25,
+      "lower_bound": 229.32,
+      "upper_bound": 438.33,
+      "outlier_count": 41,
+      "outlier_pct": 1.64
+    },
+    {
+      "feature": "Conductivity",
+      "q1": 365.73,
+      "q3": 481.79,
+      "iqr": 116.06,
+      "lower_bound": 191.65,
+      "upper_bound": 655.88,
+      "outlier_count": 11,
+      "outlier_pct": 0.34
+    },
+    {
+      "feature": "Organic_carbon",
+      "q1": 12.07,
+      "q3": 16.56,
+      "iqr": 4.49,
+      "lower_bound": 5.33,
+      "upper_bound": 23.3,
+      "outlier_count": 25,
+      "outlier_pct": 0.76
+    },
+    {
+      "feature": "Trihalomethanes",
+      "q1": 55.84,
+      "q3": 77.34,
+      "iqr": 21.49,
+      "lower_bound": 23.61,
+      "upper_bound": 109.58,
+      "outlier_count": 33,
+      "outlier_pct": 1.06
+    },
+    {
+      "feature": "Turbidity",
+      "q1": 3.44,
+      "q3": 4.5,
+      "iqr": 1.06,
+      "lower_bound": 1.85,
+      "upper_bound": 6.09,
+      "outlier_count": 19,
+      "outlier_pct": 0.58
+    }
+  ],
+  "target_correlations": [
+    {
+      "feature": "Solids",
+      "correlation_with_target": 0.0337,
+      "abs_correlation": 0.0337
+    },
+    {
+      "feature": "Organic_carbon",
+      "correlation_with_target": -0.03,
+      "abs_correlation": 0.03
+    },
+    {
+      "feature": "Chloramines",
+      "correlation_with_target": 0.0238,
+      "abs_correlation": 0.0238
+    },
+    {
+      "feature": "Sulfate",
+      "correlation_with_target": -0.0236,
+      "abs_correlation": 0.0236
+    },
+    {
+      "feature": "Hardness",
+      "correlation_with_target": -0.0138,
+      "abs_correlation": 0.0138
+    },
+    {
+      "feature": "Conductivity",
+      "correlation_with_target": -0.0081,
+      "abs_correlation": 0.0081
+    },
+    {
+      "feature": "Trihalomethanes",
+      "correlation_with_target": 0.0071,
+      "abs_correlation": 0.0071
+    },
+    {
+      "feature": "ph",
+      "correlation_with_target": -0.0036,
+      "abs_correlation": 0.0036
+    },
+    {
+      "feature": "Turbidity",
+      "correlation_with_target": 0.0016,
+      "abs_correlation": 0.0016
+    }
+  ],
+  "mutual_information": [
+    {
+      "feature": "Sulfate",
+      "mutual_information": 0.0162
+    },
+    {
+      "feature": "ph",
+      "mutual_information": 0.0117
+    },
+    {
+      "feature": "Organic_carbon",
+      "mutual_information": 0.0099
+    },
+    {
+      "feature": "Hardness",
+      "mutual_information": 0.0074
+    },
+    {
+      "feature": "Conductivity",
+      "mutual_information": 0.0049
+    },
+    {
+      "feature": "Solids",
+      "mutual_information": 0.0
+    },
+    {
+      "feature": "Chloramines",
+      "mutual_information": 0.0
+    },
+    {
+      "feature": "Trihalomethanes",
+      "mutual_information": 0.0
+    },
+    {
+      "feature": "Turbidity",
+      "mutual_information": 0.0
+    }
+  ],
+  "grouped_stats": [
+    {
+      "feature": "ph",
+      "mean_non_potable": 7.09,
+      "mean_potable": 7.07,
+      "diff": -0.01
+    },
+    {
+      "feature": "Hardness",
+      "mean_non_potable": 196.73,
+      "mean_potable": 195.8,
+      "diff": -0.93
+    },
+    {
+      "feature": "Solids",
+      "mean_non_potable": 21777.49,
+      "mean_potable": 22383.99,
+      "diff": 606.5
+    },
+    {
+      "feature": "Chloramines",
+      "mean_non_potable": 7.09,
+      "mean_potable": 7.17,
+      "diff": 0.08
+    },
+    {
+      "feature": "Sulfate",
+      "mean_non_potable": 334.56,
+      "mean_potable": 332.57,
+      "diff": -2.0
+    },
+    {
+      "feature": "Conductivity",
+      "mean_non_potable": 426.73,
+      "mean_potable": 425.38,
+      "diff": -1.35
+    },
+    {
+      "feature": "Organic_carbon",
+      "mean_non_potable": 14.36,
+      "mean_potable": 14.16,
+      "diff": -0.2
+    },
+    {
+      "feature": "Trihalomethanes",
+      "mean_non_potable": 66.3,
+      "mean_potable": 66.54,
+      "diff": 0.24
+    },
+    {
+      "feature": "Turbidity",
+      "mean_non_potable": 3.97,
+      "mean_potable": 3.97,
+      "diff": 0.0
+    }
+  ],
+  "correlation_matrix": {
+    "ph": {
+      "ph": 1.0,
+      "Hardness": 0.0821,
+      "Solids": -0.0893,
+      "Chloramines": -0.0343,
+      "Sulfate": 0.0182,
+      "Conductivity": 0.0186,
+      "Organic_carbon": 0.0435,
+      "Trihalomethanes": 0.0034,
+      "Turbidity": -0.0391,
+      "Potability": -0.0036
+    },
+    "Hardness": {
+      "ph": 0.0821,
+      "Hardness": 1.0,
+      "Solids": -0.0469,
+      "Chloramines": -0.0301,
+      "Sulfate": -0.1069,
+      "Conductivity": -0.0239,
+      "Organic_carbon": 0.0036,
+      "Trihalomethanes": -0.013,
+      "Turbidity": -0.0144,
+      "Potability": -0.0138
+    },
+    "Solids": {
+      "ph": -0.0893,
+      "Hardness": -0.0469,
+      "Solids": 1.0,
+      "Chloramines": -0.0701,
+      "Sulfate": -0.1718,
+      "Conductivity": 0.0138,
+      "Organic_carbon": 0.0102,
+      "Trihalomethanes": -0.0091,
+      "Turbidity": 0.0195,
+      "Potability": 0.0337
+    },
+    "Chloramines": {
+      "ph": -0.0343,
+      "Hardness": -0.0301,
+      "Solids": -0.0701,
+      "Chloramines": 1.0,
+      "Sulfate": 0.0272,
+      "Conductivity": -0.0205,
+      "Organic_carbon": -0.0127,
+      "Trihalomethanes": 0.0171,
+      "Turbidity": 0.0024,
+      "Potability": 0.0238
+    },
+    "Sulfate": {
+      "ph": 0.0182,
+      "Hardness": -0.1069,
+      "Solids": -0.1718,
+      "Chloramines": 0.0272,
+      "Sulfate": 1.0,
+      "Conductivity": -0.0161,
+      "Organic_carbon": 0.0308,
+      "Trihalomethanes": -0.0303,
+      "Turbidity": -0.0112,
+      "Potability": -0.0236
+    },
+    "Conductivity": {
+      "ph": 0.0186,
+      "Hardness": -0.0239,
+      "Solids": 0.0138,
+      "Chloramines": -0.0205,
+      "Sulfate": -0.0161,
+      "Conductivity": 1.0,
+      "Organic_carbon": 0.021,
+      "Trihalomethanes": 0.0013,
+      "Turbidity": 0.0058,
+      "Potability": -0.0081
+    },
+    "Organic_carbon": {
+      "ph": 0.0435,
+      "Hardness": 0.0036,
+      "Solids": 0.0102,
+      "Chloramines": -0.0127,
+      "Sulfate": 0.0308,
+      "Conductivity": 0.021,
+      "Organic_carbon": 1.0,
+      "Trihalomethanes": -0.0133,
+      "Turbidity": -0.0273,
+      "Potability": -0.03
+    },
+    "Trihalomethanes": {
+      "ph": 0.0034,
+      "Hardness": -0.013,
+      "Solids": -0.0091,
+      "Chloramines": 0.0171,
+      "Sulfate": -0.0303,
+      "Conductivity": 0.0013,
+      "Organic_carbon": -0.0133,
+      "Trihalomethanes": 1.0,
+      "Turbidity": -0.0221,
+      "Potability": 0.0071
+    },
+    "Turbidity": {
+      "ph": -0.0391,
+      "Hardness": -0.0144,
+      "Solids": 0.0195,
+      "Chloramines": 0.0024,
+      "Sulfate": -0.0112,
+      "Conductivity": 0.0058,
+      "Organic_carbon": -0.0273,
+      "Trihalomethanes": -0.0221,
+      "Turbidity": 1.0,
+      "Potability": 0.0016
+    },
+    "Potability": {
+      "ph": -0.0036,
+      "Hardness": -0.0138,
+      "Solids": 0.0337,
+      "Chloramines": 0.0238,
+      "Sulfate": -0.0236,
+      "Conductivity": -0.0081,
+      "Organic_carbon": -0.03,
+      "Trihalomethanes": 0.0071,
+      "Turbidity": 0.0016,
+      "Potability": 1.0
+    }
+  }
+}

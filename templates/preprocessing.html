@@ -2,22 +2,370 @@
 
 {% block title %}Data Preparation — AquaSense{% endblock %}
 {% block page_title %}Data Preparation &amp; Feature Pipelines{% endblock %}
-{% block page_subtitle %}Leakage-safe imputation, scaling, encoding, and chronological feature generation{% endblock %}
+{% block page_subtitle %}Leakage-safe imputation, feature transformations, chronological partitioning, and artifact serialization{% endblock %}
 
 {% block content %}
-<div class="coming-soon-banner">
-  <div class="coming-soon-icon">
-    <i data-lucide="sliders"></i>
+<!-- Modern Segmented Tab Switcher -->
+<div class="tab-switcher">
+  <button id="tab-btn-prep-pot" class="tab-btn active" onclick="switchPrepTab('potability')">
+    <i data-lucide="droplet" style="width: 16px; height: 16px;"></i>
+    <span>Potability Pipeline (Task A)</span>
+  </button>
+  <button id="tab-btn-prep-dem" class="tab-btn" onclick="switchPrepTab('demand')">
+    <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
+    <span>Demand Forecasting Pipeline (Task B)</span>
+  </button>
+</div>
+
+<!-- ==================== SECTION 1: POTABILITY PREPROCESSING ==================== -->
+<div id="section-prep-potability">
+  <div class="grid-4" style="margin-bottom: 24px;">
+    <div class="stat-box">
+      <div class="stat-icon">
+        <i data-lucide="split"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ potability_prep.train_samples }}</div>
+        <div class="stat-label">Training Partition</div>
+        <div class="stat-subtext">80.0% Stratified Split</div>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon teal">
+        <i data-lucide="check-square"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ potability_prep.test_samples }}</div>
+        <div class="stat-label">Evaluation Holdout</div>
+        <div class="stat-subtext">20.0% Unseen Test Set</div>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon cyan">
+        <i data-lucide="shield-check"></i>
+      </div>
+      <div>
+        <div class="stat-value">0 Nulls</div>
+        <div class="stat-label">Missing Residuals</div>
+        <div class="stat-subtext">Train-fitted median imputer</div>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon warning">
+        <i data-lucide="cpu"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ potability_prep.scaler_used }}</div>
+        <div class="stat-label">Scaling Transformation</div>
+        <div class="stat-subtext">Mean=0, Unit Variance</div>
+      </div>
+    </div>
   </div>
-  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 3</div>
-  <h2 class="coming-soon-title">Data Preparation Pipeline Coming Soon</h2>
-  <p class="coming-soon-desc">
-    Leakage-free preprocessing pipelines utilizing Scikit-Learn ColumnTransformers, chronological splits, and zone-level lag/rolling feature engineering will be implemented in Milestone 3.
-  </p>
-  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
-    <span>• Train-Split Imputation</span>
-    <span>• Robust Scaling</span>
-    <span>• Lag &amp; Rolling Demand Features</span>
+
+  <!-- Pipeline Design & Integrity Verification -->
+  <div class="grid-2" style="margin-bottom: 24px;">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <i data-lucide="sliders" style="color: var(--primary); width: 18px; height: 18px;"></i>
+            Imputation &amp; Leakage Prevention Architecture
+          </div>
+          <div class="card-subtitle">Train-only parameter fitting protocol</div>
+        </div>
+        <span class="badge-tag success">Verified Safe</span>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
+        To strictly prevent data leakage from the test distribution into model training, all statistical imputers and scalers are fitted exclusively on the training partition:
+      </p>
+      <ul style="font-size: 0.85rem; color: var(--text-main); margin-left: 20px; line-height: 1.8;">
+        <li><strong>Stratification:</strong> Target distribution (61.0% vs 39.0%) preserved identically in train and test splits.</li>
+        <li><strong>Median Imputation:</strong> Median values are calculated on <code>X_train</code> and applied downstream to both splits.</li>
+        <li><strong>Standardization:</strong> Feature centering and variance scaling fitted on <code>train_imputed</code> only.</li>
+        <li><strong>Serialization:</strong> Artifact saved to <code>models/potability/potability_preprocessor.joblib</code> for production inference.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <i data-lucide="scale" style="color: var(--teal); width: 18px; height: 18px;"></i>
+            Class Balance Across Partitions
+          </div>
+          <div class="card-subtitle">Distribution comparison between training and test sets</div>
+        </div>
+        <span class="badge-tag">Stratified</span>
+      </div>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Partition</th>
+              <th>Total Samples</th>
+              <th>Non-Potable (0)</th>
+              <th>Potable (1)</th>
+              <th>Potable Rate (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Training Split (80%)</strong></td>
+              <td>{{ potability_prep.train_samples }}</td>
+              <td>{{ potability_prep.train_class_balance['0'] }}</td>
+              <td>{{ potability_prep.train_class_balance['1'] }}</td>
+              <td><span class="badge-tag success">39.01%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Test Holdout (20%)</strong></td>
+              <td>{{ potability_prep.test_samples }}</td>
+              <td>{{ potability_prep.test_class_balance['0'] }}</td>
+              <td>{{ potability_prep.test_class_balance['1'] }}</td>
+              <td><span class="badge-tag success">39.02%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fitted Parameters Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="database" style="color: var(--primary); width: 18px; height: 18px;"></i>
+          Fitted Imputation Values &amp; Feature Schema
+        </div>
+        <div class="card-subtitle">Exact parameters learned from training data (no lookahead or test exposure)</div>
+      </div>
+      <span class="badge-tag">Fitted Medians</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Feature Name</th>
+            <th>Fitted Training Median</th>
+            <th>Original Missing Count</th>
+            <th>Handling Strategy</th>
+            <th>Processed Target File</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for feat, med in potability_prep.fitted_medians.items() %}
+          <tr>
+            <td><strong>{{ feat }}</strong></td>
+            <td><code>{{ med }}</code></td>
+            <td>
+              {% if feat == 'Sulfate' %}
+              <span class="badge-tag warning">781 (23.8%)</span>
+              {% elif feat == 'ph' %}
+              <span class="badge-tag warning">491 (15.0%)</span>
+              {% elif feat == 'Trihalomethanes' %}
+              <span class="badge-tag warning">162 (4.9%)</span>
+              {% else %}
+              <span class="badge-tag success">0 (Complete)</span>
+              {% endif %}
+            </td>
+            <td>Median Imputation + Standard Scaling</td>
+            <td><code>data/processed/potability_train.csv</code></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<!-- ==================== SECTION 2: DEMAND PREPROCESSING ==================== -->
+<div id="section-prep-demand" style="display: none;">
+  <div class="grid-4" style="margin-bottom: 24px;">
+    <div class="stat-box">
+      <div class="stat-icon teal">
+        <i data-lucide="calendar"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ demand_prep.train_records }}</div>
+        <div class="stat-label">Training Records</div>
+        <div class="stat-subtext">{{ demand_prep.train_date_range[0] }} to {{ demand_prep.train_date_range[1] }}</div>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon">
+        <i data-lucide="calendar-check"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ demand_prep.test_records }}</div>
+        <div class="stat-label">Evaluation Horizon</div>
+        <div class="stat-subtext">{{ demand_prep.test_date_range[0] }} to {{ demand_prep.test_date_range[1] }}</div>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon cyan">
+        <i data-lucide="layers"></i>
+      </div>
+      <div>
+        <div class="stat-value">4 Features</div>
+        <div class="stat-label">Engineered Lags</div>
+        <div class="stat-subtext">t-1, t-7, 7-day MA, 14-day MA</div>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon warning">
+        <i data-lucide="lock"></i>
+      </div>
+      <div>
+        <div class="stat-value">0% Leakage</div>
+        <div class="stat-label">Lookahead Check</div>
+        <div class="stat-subtext">Strictly chronological boundary</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leakage Safety Rules Card -->
+  <div class="grid-2" style="margin-bottom: 24px;">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <i data-lucide="shield-alert" style="color: var(--teal); width: 18px; height: 18px;"></i>
+            Chronological Split &amp; Time-Series Integrity
+          </div>
+          <div class="card-subtitle">Zero data leakage across forecasting horizons</div>
+        </div>
+        <span class="badge-tag teal">Chronological Split</span>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
+        Unlike standard cross-sectional models, demand forecasting must never randomly shuffle rows. Time-aware rules applied:
+      </p>
+      <ul style="font-size: 0.85rem; color: var(--text-main); margin-left: 20px; line-height: 1.8;">
+        <li><strong>Chronological Cutoff:</strong> Observations before <code>2025-01-01</code> form the train set (2 full years across 5 zones); year <code>2025</code> serves as strictly forward evaluation.</li>
+        <li><strong>Zone-Partitioned Shifting:</strong> Lags and rolling windows are calculated strictly within each <code>Zone_ID</code> to prevent cross-zone signal mixing.</li>
+        <li><strong>Warmup Pruning:</strong> Exactly 70 warmup observations (14 days × 5 zones) dropped from initial history so all lag inputs are fully populated.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <i data-lucide="cpu" style="color: var(--primary); width: 18px; height: 18px;"></i>
+            Engineered Forecasting Features
+          </div>
+          <div class="card-subtitle">Historical indicators informing next-day water consumption</div>
+        </div>
+        <span class="badge-tag">Feature Pipeline</span>
+      </div>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Feature Symbol</th>
+              <th>Mathematical Formulation</th>
+              <th>Forecasting Utility</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code>Demand_Lag_1</code></strong></td>
+              <td>$Demand_{t-1}$</td>
+              <td>Short-term momentum &amp; yesterday's baseline</td>
+            </tr>
+            <tr>
+              <td><strong><code>Demand_Lag_7</code></strong></td>
+              <td>$Demand_{t-7}$</td>
+              <td>Weekly seasonal cycle (same day last week)</td>
+            </tr>
+            <tr>
+              <td><strong><code>Demand_Rolling_7</code></strong></td>
+              <td>$\frac{1}{7} \sum_{i=1}^{7} Demand_{t-i}$</td>
+              <td>7-day moving average demand smoothed trend</td>
+            </tr>
+            <tr>
+              <td><strong><code>Demand_Rolling_14</code></strong></td>
+              <td>$\frac{1}{14} \sum_{i=1}^{14} Demand_{t-i}$</td>
+              <td>Bi-weekly demand baseline capturing seasonal shift</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Artifacts and Datasets Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="file-check" style="color: var(--primary); width: 18px; height: 18px;"></i>
+          Generated Preprocessing Artifacts
+        </div>
+        <div class="card-subtitle">Processed datasets and serialized transformers ready for training</div>
+      </div>
+      <span class="badge-tag success">Ready for Models</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Artifact Role</th>
+            <th>File Path</th>
+            <th>Record Count / Object</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Processed Training Set</strong></td>
+            <td><code>data/processed/demand_train.csv</code></td>
+            <td>3,585 records (2023–2024 across 5 zones)</td>
+            <td><span class="badge-tag success">Verified Clean</span></td>
+          </tr>
+          <tr>
+            <td><strong>Processed Test Set</strong></td>
+            <td><code>data/processed/demand_test.csv</code></td>
+            <td>1,825 records (2025 across 5 zones)</td>
+            <td><span class="badge-tag success">Verified Clean</span></td>
+          </tr>
+          <tr>
+            <td><strong>Fitted Preprocessor Pipeline</strong></td>
+            <td><code>models/demand/demand_preprocessor.joblib</code></td>
+            <td>Scaler + Categorical schema + Zone encodings</td>
+            <td><span class="badge-tag success">Serialized</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchPrepTab(tab) {
+  const potSec = document.getElementById('section-prep-potability');
+  const demSec = document.getElementById('section-prep-demand');
+  const potBtn = document.getElementById('tab-btn-prep-pot');
+  const demBtn = document.getElementById('tab-btn-prep-dem');
+
+  if (tab === 'potability') {
+    potSec.style.display = 'block';
+    demSec.style.display = 'none';
+    potBtn.classList.add('active');
+    demBtn.classList.remove('active');
+  } else {
+    potSec.style.display = 'none';
+    demSec.style.display = 'block';
+    demBtn.classList.add('active');
+    potBtn.classList.remove('active');
+  }
+}
+</script>
 {% endblock %}

@@ -1,0 +1,344 @@
+{
+  "overview": {
+    "dataset_name": "Synthetic Municipal Water Demand",
+    "total_records": 5480,
+    "date_start": "2023-01-01",
+    "date_end": "2025-12-31",
+    "zones_count": 5,
+    "zones": [
+      "Z01",
+      "Z02",
+      "Z03",
+      "Z04",
+      "Z05"
+    ],
+    "overall_mean_demand_kL": 779.06,
+    "overall_min_demand_kL": 405.21,
+    "overall_max_demand_kL": 1546.32,
+    "overall_std_demand_kL": 229.69
+  },
+  "missing_analysis": [
+    {
+      "feature": "Date",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Zone_ID",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Population",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Active_Connections",
+      "missing_count": 32,
+      "missing_pct": 0.58
+    },
+    {
+      "feature": "Avg_Temperature_C",
+      "missing_count": 65,
+      "missing_pct": 1.19
+    },
+    {
+      "feature": "Humidity_pct",
+      "missing_count": 81,
+      "missing_pct": 1.48
+    },
+    {
+      "feature": "Rainfall_mm",
+      "missing_count": 54,
+      "missing_pct": 0.99
+    },
+    {
+      "feature": "Day_of_Week",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Is_Weekend",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Is_Holiday",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Month",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Season",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    },
+    {
+      "feature": "Water_Demand_kL",
+      "missing_count": 0,
+      "missing_pct": 0.0
+    }
+  ],
+  "zone_profiles": [
+    {
+      "zone_id": "Z03",
+      "record_count": 1096,
+      "population": 67516,
+      "mean_connections": 17112.9,
+      "mean_demand_kL": 1102.33,
+      "std_demand_kL": 77.63,
+      "min_demand_kL": 895.12,
+      "median_demand_kL": 1097.32,
+      "max_demand_kL": 1546.32
+    },
+    {
+      "zone_id": "Z05",
+      "record_count": 1096,
+      "population": 60082,
+      "mean_connections": 15288.6,
+      "mean_demand_kL": 931.44,
+      "std_demand_kL": 68.22,
+      "min_demand_kL": 777.7,
+      "median_demand_kL": 926.4,
+      "max_demand_kL": 1478.82
+    },
+    {
+      "zone_id": "Z01",
+      "record_count": 1096,
+      "population": 52076,
+      "mean_connections": 13363.0,
+      "mean_demand_kL": 785.35,
+      "std_demand_kL": 53.93,
+      "min_demand_kL": 650.04,
+      "median_demand_kL": 781.85,
+      "max_demand_kL": 1256.65
+    },
+    {
+      "zone_id": "Z02",
+      "record_count": 1096,
+      "population": 40812,
+      "mean_connections": 10936.2,
+      "mean_demand_kL": 579.79,
+      "std_demand_kL": 39.75,
+      "min_demand_kL": 465.58,
+      "median_demand_kL": 577.62,
+      "max_demand_kL": 846.34
+    },
+    {
+      "zone_id": "Z04",
+      "record_count": 1096,
+      "population": 35169,
+      "mean_connections": 9315.7,
+      "mean_demand_kL": 496.41,
+      "std_demand_kL": 34.99,
+      "min_demand_kL": 405.21,
+      "median_demand_kL": 495.34,
+      "max_demand_kL": 728.45
+    }
+  ],
+  "dow_profiles": [
+    {
+      "day": "Monday",
+      "mean_demand_kL": 770.14,
+      "std_demand_kL": 227.06
+    },
+    {
+      "day": "Tuesday",
+      "mean_demand_kL": 771.59,
+      "std_demand_kL": 227.68
+    },
+    {
+      "day": "Wednesday",
+      "mean_demand_kL": 772.85,
+      "std_demand_kL": 229.72
+    },
+    {
+      "day": "Thursday",
+      "mean_demand_kL": 772.13,
+      "std_demand_kL": 227.17
+    },
+    {
+      "day": "Friday",
+      "mean_demand_kL": 771.2,
+      "std_demand_kL": 227.82
+    },
+    {
+      "day": "Saturday",
+      "mean_demand_kL": 797.25,
+      "std_demand_kL": 231.79
+    },
+    {
+      "day": "Sunday",
+      "mean_demand_kL": 798.32,
+      "std_demand_kL": 235.19
+    }
+  ],
+  "weekend_comparison": {
+    "weekday_mean_kL": 771.58,
+    "weekend_mean_kL": 797.78,
+    "weekend_uplift_kL": 26.2
+  },
+  "month_profiles": [
+    {
+      "month": 1,
+      "month_name": "January",
+      "mean_demand_kL": 755.86,
+      "std_demand_kL": 220.8
+    },
+    {
+      "month": 2,
+      "month_name": "February",
+      "mean_demand_kL": 775.3,
+      "std_demand_kL": 225.39
+    },
+    {
+      "month": 3,
+      "month_name": "March",
+      "mean_demand_kL": 806.22,
+      "std_demand_kL": 237.62
+    },
+    {
+      "month": 4,
+      "month_name": "April",
+      "mean_demand_kL": 822.58,
+      "std_demand_kL": 238.62
+    },
+    {
+      "month": 5,
+      "month_name": "May",
+      "mean_demand_kL": 833.42,
+      "std_demand_kL": 245.32
+    },
+    {
+      "month": 6,
+      "month_name": "June",
+      "mean_demand_kL": 821.91,
+      "std_demand_kL": 241.12
+    },
+    {
+      "month": 7,
+      "month_name": "July",
+      "mean_demand_kL": 799.72,
+      "std_demand_kL": 230.7
+    },
+    {
+      "month": 8,
+      "month_name": "August",
+      "mean_demand_kL": 778.41,
+      "std_demand_kL": 226.05
+    },
+    {
+      "month": 9,
+      "month_name": "September",
+      "mean_demand_kL": 749.65,
+      "std_demand_kL": 218.65
+    },
+    {
+      "month": 10,
+      "month_name": "October",
+      "mean_demand_kL": 735.48,
+      "std_demand_kL": 214.69
+    },
+    {
+      "month": 11,
+      "month_name": "November",
+      "mean_demand_kL": 727.94,
+      "std_demand_kL": 207.67
+    },
+    {
+      "month": 12,
+      "month_name": "December",
+      "mean_demand_kL": 742.14,
+      "std_demand_kL": 215.49
+    }
+  ],
+  "season_profiles": [
+    {
+      "season": "Summer",
+      "mean_demand_kL": 820.72,
+      "std_demand_kL": 240.66
+    },
+    {
+      "season": "Monsoon",
+      "mean_demand_kL": 787.45,
+      "std_demand_kL": 230.6
+    },
+    {
+      "season": "Winter",
+      "mean_demand_kL": 757.25,
+      "std_demand_kL": 220.7
+    },
+    {
+      "season": "Post-Monsoon",
+      "mean_demand_kL": 731.77,
+      "std_demand_kL": 211.19
+    }
+  ],
+  "weather_correlations": {
+    "overall": {
+      "temperature_corr": 0.1323,
+      "humidity_corr": -0.0442,
+      "rainfall_corr": -0.0545
+    },
+    "intra_zone_avg": {
+      "temperature_corr": 0.53
+    }
+  },
+  "zone_outliers": [
+    {
+      "zone_id": "Z01",
+      "q1": 749.78,
+      "q3": 818.52,
+      "iqr": 68.74,
+      "lower_bound": 646.67,
+      "upper_bound": 921.62,
+      "outlier_count": 7,
+      "outlier_pct": 0.64
+    },
+    {
+      "zone_id": "Z02",
+      "q1": 552.5,
+      "q3": 603.87,
+      "iqr": 51.38,
+      "lower_bound": 475.43,
+      "upper_bound": 680.93,
+      "outlier_count": 10,
+      "outlier_pct": 0.91
+    },
+    {
+      "zone_id": "Z03",
+      "q1": 1050.53,
+      "q3": 1152.34,
+      "iqr": 101.81,
+      "lower_bound": 897.82,
+      "upper_bound": 1305.05,
+      "outlier_count": 9,
+      "outlier_pct": 0.82
+    },
+    {
+      "zone_id": "Z04",
+      "q1": 471.53,
+      "q3": 519.44,
+      "iqr": 47.9,
+      "lower_bound": 399.68,
+      "upper_bound": 591.29,
+      "outlier_count": 6,
+      "outlier_pct": 0.55
+    },
+    {
+      "zone_id": "Z05",
+      "q1": 884.55,
+      "q3": 975.1,
+      "iqr": 90.55,
+      "lower_bound": 748.73,
+      "upper_bound": 1110.92,
+      "outlier_count": 12,
+      "outlier_pct": 1.09
+    }
+  ]
+}

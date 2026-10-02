@@ -1,0 +1,45 @@
+{
+  "dataset": "Water Potability",
+  "split_strategy": "Stratified random split (train-only fitting)",
+  "train_samples": 2620,
+  "test_samples": 656,
+  "features_processed": [
+    "ph",
+    "Hardness",
+    "Solids",
+    "Chloramines",
+    "Sulfate",
+    "Conductivity",
+    "Organic_carbon",
+    "Trihalomethanes",
+    "Turbidity"
+  ],
+  "imputation_strategy": "Median (train-fitted)",
+  "fitted_medians": {
+    "ph": 7.04,
+    "Hardness": 196.93,
+    "Solids": 20866.34,
+    "Chloramines": 7.12,
+    "Sulfate": 333.07,
+    "Conductivity": 424.94,
+    "Organic_carbon": 14.21,
+    "Trihalomethanes": 66.57,
+    "Turbidity": 3.97
+  },
+  "scaler_used": "StandardScaler",
+  "missing_remaining_train": 0,
+  "missing_remaining_test": 0,
+  "train_class_balance": {
+    "0": 1598,
+    "1": 1022
+  },
+  "test_class_balance": {
+    "0": 400,
+    "1": 256
+  },
+  "artifacts_saved": [
+    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\potability_train.csv",
+    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\potability_test.csv",
+    "d:\\2-1 Odd sem\\Aqua_Sense\\models\\potability\\potability_preprocessor.joblib"
+  ]
+}

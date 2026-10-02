@@ -1,0 +1,38 @@
+{
+  "dataset": "Synthetic Water Demand",
+  "partition_strategy": "Chronological split (Train < 2025-01-01, Test >= 2025-01-01)",
+  "train_records": 3585,
+  "test_records": 1825,
+  "train_date_range": [
+    "2023-01-15",
+    "2024-12-31"
+  ],
+  "test_date_range": [
+    "2025-01-01",
+    "2025-12-31"
+  ],
+  "engineered_features": [
+    "Demand_Lag_1 (t-1)",
+    "Demand_Lag_7 (t-7)",
+    "Demand_Rolling_7 (7-day MA)",
+    "Demand_Rolling_14 (14-day MA)"
+  ],
+  "imputation_fitted_medians": {
+    "Active_Connections": 13308.5,
+    "Avg_Temperature_C": 27.26,
+    "Humidity_pct": 66.91,
+    "Rainfall_mm": 0.0
+  },
+  "features_total": 19,
+  "target": "Water_Demand_kL",
+  "leakage_checks": {
+    "future_information_in_train": false,
+    "target_in_lag_features": false,
+    "warmup_rows_dropped_total": 70
+  },
+  "artifacts_saved": [
+    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\demand_train.csv",
+    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\demand_test.csv",
+    "d:\\2-1 Odd sem\\Aqua_Sense\\models\\demand\\demand_preprocessor.joblib"
+  ]
+}

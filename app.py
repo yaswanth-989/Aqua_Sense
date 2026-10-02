@@ -3,26 +3,46 @@ AquaSense Application Entry Point
 FastAPI Web and REST Service for AI-Based Water Quality Assessment and Demand Forecasting.
 """
 import os
+import json
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
 from src.data.loader import get_dataset_summaries
+from src.data.validator import get_full_validation_summary
+from src.eda.potability_eda import compute_potability_eda
+from src.eda.demand_eda import compute_demand_eda
+from src.preprocessing.potability_preprocessor import preprocess_potability_data
+from src.preprocessing.demand_preprocessor import preprocess_demand_data
 
 # Initialize Application
 app = FastAPI(
     title="AquaSense AI System",
     description="AI-Based Water Quality Assessment and Demand Forecasting System",
-    version="0.1.0"
+    version="0.2.0"
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+RESULTS_DIR = os.path.join(BASE_DIR, "reports", "results")
 
 # Mount Static Assets & Templates
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
+
+
+def load_or_compute_json(filename: str, compute_func):
+    """Utility to load cached summary JSON or compute dynamically."""
+    filepath = os.path.join(RESULTS_DIR, filename)
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return compute_func()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -42,20 +62,32 @@ async def dashboard_view(request: Request):
 @app.get("/eda", response_class=HTMLResponse)
 async def eda_view(request: Request):
     """Data & Insights (Exploratory Data Analysis) View."""
+    potability_eda = load_or_compute_json("potability_eda_summary.json", compute_potability_eda)
+    demand_eda = load_or_compute_json("demand_eda_summary.json", compute_demand_eda)
     return templates.TemplateResponse(
         request=request,
         name="eda.html",
-        context={"active_page": "eda"}
+        context={
+            "active_page": "eda",
+            "potability_eda": potability_eda,
+            "demand_eda": demand_eda
+        }
     )
 
 
 @app.get("/preprocessing", response_class=HTMLResponse)
 async def preprocessing_view(request: Request):
     """Data Preparation & Feature Pipeline View."""
+    potability_prep = load_or_compute_json("potability_preprocessing_summary.json", preprocess_potability_data)
+    demand_prep = load_or_compute_json("demand_preprocessing_summary.json", preprocess_demand_data)
     return templates.TemplateResponse(
         request=request,
         name="preprocessing.html",
-        context={"active_page": "preprocessing"}
+        context={
+            "active_page": "preprocessing",
+            "potability_prep": potability_prep,
+            "demand_prep": demand_prep
+        }
     )
 
 
@@ -139,7 +171,7 @@ async def health_check():
         return {
             "status": "healthy",
             "system": "AquaSense AI Engine",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "datasets": {
                 "potability_samples": summary["potability"]["rows"],
                 "demand_records": summary["demand"]["rows"],
@@ -151,6 +183,36 @@ async def health_check():
             "status": "degraded",
             "error": str(e)
         }
+
+
+@app.get("/api/v1/validation")
+async def validation_api():
+    """Dataset Schema and Integrity Validation Endpoint."""
+    return get_full_validation_summary()
+
+
+@app.get("/api/v1/eda/potability")
+async def eda_potability_api():
+    """Water Potability Statistical and EDA Summary Endpoint."""
+    return load_or_compute_json("potability_eda_summary.json", compute_potability_eda)
+
+
+@app.get("/api/v1/eda/demand")
+async def eda_demand_api():
+    """Water Demand Statistical and EDA Summary Endpoint."""
+    return load_or_compute_json("demand_eda_summary.json", compute_demand_eda)
+
+
+@app.get("/api/v1/preprocessing/summary")
+async def preprocessing_summary_api():
+    """Data Preprocessing & Split Integrity Audit Endpoint."""
+    from src.data.validator import sanitize_numpy
+    pot_summary = load_or_compute_json("potability_preprocessing_summary.json", preprocess_potability_data)
+    dem_summary = load_or_compute_json("demand_preprocessing_summary.json", preprocess_demand_data)
+    return sanitize_numpy({
+        "potability": pot_summary,
+        "demand": dem_summary
+    })
 
 
 if __name__ == "__main__":
