@@ -1,85 +1,130 @@
 {% extends "base.html" %}
 
-{% block title %}Data &amp; Insights — AquaSense{% endblock %}
-{% block page_title %}Data &amp; Insights (Exploratory Data Analysis){% endblock %}
-{% block page_subtitle %}Comprehensive statistical profiling, distributions, correlation matrices, and temporal patterns{% endblock %}
+{% block title %}EDA — AquaSense{% endblock %}
+{% block page_title %}Exploratory Data Analysis (EDA){% endblock %}
+{% block page_subtitle %}Comprehensive univariate, bivariate, multivariate, spatial, and temporal statistical discovery{% endblock %}
+
+{% block topbar_actions %}
+<span class="header-badge teal">
+  <i data-lucide="check-circle-2" style="width: 14px; height: 14px;"></i>
+  Full EDA Suite Operational
+</span>
+{% endblock %}
 
 {% block content %}
 <!-- Modern Segmented Tab Switcher -->
 <div class="tab-switcher">
   <button id="tab-btn-potability" class="tab-btn active" onclick="switchTab('potability')">
     <i data-lucide="droplet" style="width: 16px; height: 16px;"></i>
-    <span>Water Potability (Task A — Real Data)</span>
+    <span>Water Potability EDA (Task A — Real Data)</span>
   </button>
   <button id="tab-btn-demand" class="tab-btn" onclick="switchTab('demand')">
     <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
-    <span>Municipal Demand (Task B — Synthetic Time-Series)</span>
+    <span>Municipal Demand EDA (Task B — Synthetic Time-Series)</span>
   </button>
 </div>
 
-<!-- ==================== SECTION 1: POTABILITY EDA ==================== -->
+<!-- =======================================================================
+     SECTION 1: WATER POTABILITY EDA (ALL ANALYSES)
+======================================================================= -->
 <div id="section-potability">
-  <!-- KPI Stat Row -->
-  <div class="grid-4" style="margin-bottom: 24px;">
-    <div class="stat-box">
-      <div class="stat-icon">
-        <i data-lucide="database"></i>
+  <!-- Overview Stat Tiles -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Total Water Records</span>
+        <span class="stat-value">{{ potability_eda.sample_count }}</span>
+        <span class="stat-subtext">9 Physicochemical Criteria</span>
       </div>
-      <div>
-        <div class="stat-value">{{ potability_eda.sample_count }}</div>
-        <div class="stat-label">Total Water Samples</div>
-        <div class="stat-subtext">9 Physicochemical Features</div>
-      </div>
+      <div class="stat-icon-wrapper blue"><i data-lucide="database"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon warning">
-        <i data-lucide="alert-triangle"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Non-Potable (Class 0)</span>
+        <span class="stat-value">{{ potability_eda.target_analysis.non_potable_0 }}</span>
+        <span class="stat-subtext">{{ potability_eda.target_analysis.non_potable_pct }}% of Analyzed Water</span>
       </div>
-      <div>
-        <div class="stat-value">{{ potability_eda.target_analysis.non_potable_0 }}</div>
-        <div class="stat-label">Non-Potable (Class 0)</div>
-        <div class="stat-subtext">{{ potability_eda.target_analysis.non_potable_pct }}% of dataset</div>
-      </div>
+      <div class="stat-icon-wrapper amber"><i data-lucide="alert-triangle"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon teal">
-        <i data-lucide="check-circle-2"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Potable (Class 1)</span>
+        <span class="stat-value">{{ potability_eda.target_analysis.potable_1 }}</span>
+        <span class="stat-subtext">{{ potability_eda.target_analysis.potable_pct }}% Safe for Drinking</span>
       </div>
-      <div>
-        <div class="stat-value">{{ potability_eda.target_analysis.potable_1 }}</div>
-        <div class="stat-label">Potable (Class 1)</div>
-        <div class="stat-subtext">{{ potability_eda.target_analysis.potable_pct }}% of dataset</div>
-      </div>
+      <div class="stat-icon-wrapper green"><i data-lucide="check-circle-2"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon cyan">
-        <i data-lucide="help-circle"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Parameters with Nulls</span>
+        <span class="stat-value">3 / 9</span>
+        <span class="stat-subtext">Sulfate (23.8%), pH (15.0%), THM (4.9%)</span>
       </div>
-      <div>
-        <div class="stat-value">3 / 9</div>
-        <div class="stat-label">Features with Nulls</div>
-        <div class="stat-subtext">Sulfate (23.8%), pH (15.0%), THM (4.9%)</div>
-      </div>
+      <div class="stat-icon-wrapper teal"><i data-lucide="help-circle"></i></div>
     </div>
   </div>
 
-  <!-- Interactive Charts Grid -->
+  <!-- 1. Interactive Univariate Visualizer & Histogram -->
+  <div class="card accent-top-blue">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="sliders" style="color: var(--primary);"></i>
+          1. Univariate Statistical Feature Visualizer &amp; Dynamic Histogram
+        </div>
+        <div class="card-subtitle">Select any water quality property to inspect its parametric statistics, skewness, and frequency histogram</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="featureSelect" style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);">Select Feature:</label>
+        <select id="featureSelect" onchange="updateFeatureInspection()" style="padding: 6px 14px; font-size: 0.86rem; font-weight: 600; border-radius: 6px; border: 1.5px solid var(--primary); background: #ffffff; color: var(--text-main); cursor: pointer;">
+          {% for p in potability_eda.univariate_profiles %}
+          <option value="{{ p.feature }}" {% if loop.first %}selected{% endif %}>{{ p.feature }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom: 20px;">
+      <div style="background: var(--surface-alt); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Mean Value</div>
+        <div id="statMean" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);">-</div>
+      </div>
+      <div style="background: var(--surface-alt); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Median (50th Percentile)</div>
+        <div id="statMedian" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);">-</div>
+      </div>
+      <div style="background: var(--surface-alt); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Standard Deviation</div>
+        <div id="statStd" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);">-</div>
+      </div>
+      <div style="background: var(--surface-alt); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">IQR Outlier Bounds</div>
+        <div id="statBounds" style="font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-top: 4px;">-</div>
+      </div>
+    </div>
+
+    <div style="height: 250px;">
+      <canvas id="inspectorHistogramChart"></canvas>
+    </div>
+  </div>
+
+  <!-- 2. Target Distribution & Missing Values -->
   <div class="grid-2" style="margin-bottom: 24px;">
     <div class="card">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="pie-chart" style="color: var(--primary); width: 18px; height: 18px;"></i>
-            Potability Class Balance
+            <i data-lucide="pie-chart" style="color: var(--primary);"></i>
+            2. Potability Target Distribution &amp; Class Balance
           </div>
           <div class="card-subtitle">Verified binary distribution across 3,276 observations</div>
         </div>
-        <span class="badge-tag">Ratio: 1 : {{ potability_eda.target_analysis.imbalance_ratio }}</span>
+        <span class="header-badge">Ratio: 1 : {{ potability_eda.target_analysis.imbalance_ratio }}</span>
       </div>
-      <div style="height: 260px;">
+      <div style="height: 250px;">
         <canvas id="potabilityClassChart"></canvas>
       </div>
     </div>
@@ -88,31 +133,31 @@
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="bar-chart-horizontal" style="color: var(--primary); width: 18px; height: 18px;"></i>
-            Missing Values by Feature (%)
+            <i data-lucide="bar-chart-2" style="color: var(--amber);"></i>
+            3. Data Quality &amp; Missing Observation Rates (%)
           </div>
-          <div class="card-subtitle">Identified missing rates requiring train-only imputation</div>
+          <div class="card-subtitle">Null value prevalence requiring train-only imputation</div>
         </div>
         <span class="badge-tag warning">Null Audit</span>
       </div>
-      <div style="height: 260px;">
+      <div style="height: 250px;">
         <canvas id="potabilityMissingChart"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Mutual Information & Correlations -->
+  <!-- 4. Mutual Information & Pearson Linearity -->
   <div class="grid-2" style="margin-bottom: 24px;">
     <div class="card">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="sparkles" style="color: var(--teal); width: 18px; height: 18px;"></i>
-            Mutual Information Ranking
+            <i data-lucide="sparkles" style="color: var(--teal);"></i>
+            4. Mutual Information Feature Importance Ranking
           </div>
-          <div class="card-subtitle">Non-linear feature dependency with Potability target</div>
+          <div class="card-subtitle">Non-linear predictive signal between chemical properties and water potability</div>
         </div>
-        <span class="badge-tag">Feature Ranking</span>
+        <span class="header-badge teal">Information Gain</span>
       </div>
       <div style="height: 260px;">
         <canvas id="potabilityMIChart"></canvas>
@@ -123,34 +168,34 @@
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="git-commit" style="color: var(--teal); width: 18px; height: 18px;"></i>
-            Target Pearson Correlation
+            <i data-lucide="git-commit" style="color: var(--accent);"></i>
+            5. Linear Correlation with Target (Pearson r)
           </div>
-          <div class="card-subtitle">Linear relationship with Potability class (r-value)</div>
+          <div class="card-subtitle">Linear association between individual properties and potability</div>
         </div>
-        <span class="badge-tag">Linearity</span>
+        <span class="header-badge">Linearity</span>
       </div>
       <div class="data-table-container" style="max-height: 260px; overflow-y: auto;">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Feature</th>
+              <th>Chemical Property</th>
               <th>Pearson r</th>
-              <th>Correlation Strength</th>
+              <th>Operational Interpretation</th>
             </tr>
           </thead>
           <tbody>
             {% for item in potability_eda.target_correlations %}
             <tr>
               <td><strong>{{ item.feature }}</strong></td>
-              <td>{{ item.correlation_with_target }}</td>
+              <td><code>{{ item.correlation_with_target }}</code></td>
               <td>
                 {% if item.abs_correlation > 0.02 %}
-                <span class="badge-tag success">Weak Positive</span>
+                <span class="badge-tag success">Positive Correlation</span>
                 {% elif item.correlation_with_target < 0 %}
-                <span class="badge-tag warning">Weak Negative</span>
+                <span class="badge-tag warning">Inverse Correlation</span>
                 {% else %}
-                <span class="badge-tag">Near Zero</span>
+                <span class="badge-tag">Weak Linear Signal</span>
                 {% endif %}
               </td>
             </tr>
@@ -161,52 +206,205 @@
     </div>
   </div>
 
-  <!-- Univariate Profiling Table -->
-  <div class="card">
+  <!-- 6. Bivariate Target Analysis (t-Test and Differences) -->
+  <div class="card accent-top-teal">
     <div class="card-header">
       <div>
         <div class="card-title">
-          <i data-lucide="table" style="color: var(--primary); width: 18px; height: 18px;"></i>
-          Univariate Statistical Profiles &amp; IQR Outlier Boundaries
+          <i data-lucide="scale" style="color: var(--teal);"></i>
+          6. Bivariate Analysis — Chemical Properties by Potability Class (t-Test &amp; Significance)
         </div>
-        <div class="card-subtitle">Computed parametric statistics and outlier prevalence across complete sensor data</div>
+        <div class="card-subtitle">Comparing mean values in Non-Potable vs Potable water with two-sample independent t-tests</div>
       </div>
-      <span class="badge-tag">Descriptive Statistics</span>
+      <span class="header-badge teal">Hypothesis Testing</span>
     </div>
     <div class="data-table-container">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Feature</th>
+            <th>Parameter</th>
+            <th>Mean (Non-Potable)</th>
+            <th>Mean (Potable)</th>
+            <th>Difference (&Delta;)</th>
+            <th>t-Statistic</th>
+            <th>p-Value</th>
+            <th>Statistical Significance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in potability_eda.bivariate_target_stats %}
+          <tr>
+            <td><strong>{{ b.feature }}</strong></td>
+            <td>{{ b.mean_non_potable }}</td>
+            <td>{{ b.mean_potable }}</td>
+            <td>
+              {% if b.diff > 0 %}
+              <span style="color: var(--teal); font-weight: 600;">+{{ b.diff }}</span>
+              {% else %}
+              <span style="color: var(--amber); font-weight: 600;">{{ b.diff }}</span>
+              {% endif %}
+            </td>
+            <td><code>{{ b.t_statistic }}</code></td>
+            <td><code>{{ b.p_value }}</code></td>
+            <td>
+              {% if b.significant_at_05 %}
+              <span class="badge-tag success">Significant (p &lt; 0.05)</span>
+              {% else %}
+              <span class="badge-tag">No Significant Difference</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 7. Descriptive Numerical Statistics Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="table" style="color: var(--primary);"></i>
+          7. Descriptive Numerical Statistics &amp; Distribution Moments
+        </div>
+        <div class="card-subtitle">Parametric moments: Mean, standard deviation, percentiles, skewness, and kurtosis</div>
+      </div>
+      <span class="header-badge">Descriptive Statistics</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Count</th>
             <th>Mean</th>
-            <th>Std</th>
-            <th>Median</th>
+            <th>Std Dev</th>
             <th>Min</th>
+            <th>25% (Q1)</th>
+            <th>Median (50%)</th>
+            <th>75% (Q3)</th>
             <th>Max</th>
             <th>Skewness</th>
-            <th>IQR Outlier Bounds</th>
-            <th>Outliers (%)</th>
+            <th>Kurtosis</th>
+            <th>Distribution Shape</th>
           </tr>
         </thead>
         <tbody>
           {% for p in potability_eda.univariate_profiles %}
-          {% set o = potability_eda.outlier_profiles[loop.index0] %}
           <tr>
             <td><strong>{{ p.feature }}</strong></td>
+            <td>{{ "{:,}".format(p.count) }}</td>
             <td>{{ p.mean }}</td>
             <td>{{ p.std }}</td>
-            <td>{{ p.median }}</td>
             <td>{{ p.min }}</td>
+            <td>{{ p.q25 }}</td>
+            <td>{{ p.median }}</td>
+            <td>{{ p.q75 }}</td>
             <td>{{ p.max }}</td>
-            <td>{{ p.skewness }}</td>
-            <td><code>[{{ o.lower_bound }}, {{ o.upper_bound }}]</code></td>
+            <td><code>{{ p.skewness }}</code></td>
+            <td><code>{{ p.kurtosis }}</code></td>
+            <td>
+              {% if 'Symmetric' in p.skew_category %}
+              <span class="badge-tag success">{{ p.skew_category }}</span>
+              {% else %}
+              <span class="badge-tag warning">{{ p.skew_category }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 8. Outliers and Physical Bounds Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="alert-circle" style="color: var(--amber);"></i>
+          8. Outlier Detection &amp; Physical Sensor Bounds (Tukey's IQR Method)
+        </div>
+        <div class="card-subtitle">Prevalence of values exceeding [Q1 - 1.5&times;IQR, Q3 + 1.5&times;IQR]</div>
+      </div>
+      <span class="header-badge">Outlier Analysis</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Q1</th>
+            <th>Q3</th>
+            <th>IQR</th>
+            <th>Lower Bound</th>
+            <th>Upper Bound</th>
+            <th>Outliers Count</th>
+            <th>Prevalence (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in potability_eda.outlier_profiles %}
+          <tr>
+            <td><strong>{{ o.feature }}</strong></td>
+            <td>{{ o.q1 }}</td>
+            <td>{{ o.q3 }}</td>
+            <td>{{ o.iqr }}</td>
+            <td><code>{{ o.lower_bound }}</code></td>
+            <td><code>{{ o.upper_bound }}</code></td>
+            <td>{{ o.outlier_count }}</td>
             <td>
               {% if o.outlier_pct > 3.0 %}
-              <span class="badge-tag danger">{{ o.outlier_count }} ({{ o.outlier_pct }}%)</span>
+              <span class="badge-tag danger">{{ o.outlier_pct }}%</span>
               {% elif o.outlier_count > 0 %}
-              <span class="badge-tag warning">{{ o.outlier_count }} ({{ o.outlier_pct }}%)</span>
+              <span class="badge-tag warning">{{ o.outlier_pct }}%</span>
               {% else %}
-              <span class="badge-tag success">0 (0%)</span>
+              <span class="badge-tag success">0%</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 9. Unique Value Counts & Cardinality Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="hash" style="color: var(--accent);"></i>
+          9. Feature Cardinality &amp; Unique Value Counts
+        </div>
+        <div class="card-subtitle">Assessment of continuous vs discrete feature properties</div>
+      </div>
+      <span class="header-badge">Cardinality</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Column Name</th>
+            <th>Data Type</th>
+            <th>Unique Values Count</th>
+            <th>Unique Percentage (%)</th>
+            <th>Data Character</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in potability_eda.unique_counts %}
+          <tr>
+            <td><strong>{{ u.feature }}</strong></td>
+            <td><code>{{ u.dtype }}</code></td>
+            <td>{{ "{:,}".format(u.unique_count) }}</td>
+            <td>{{ u.unique_pct }}%</td>
+            <td>
+              {% if u.feature == 'Potability' %}
+              <span class="badge-tag blue">Binary Target (2 states)</span>
+              {% else %}
+              <span class="badge-tag success">Continuous Sensor Telemetry</span>
               {% endif %}
             </td>
           </tr>
@@ -217,104 +415,98 @@
   </div>
 </div>
 
-<!-- ==================== SECTION 2: DEMAND EDA ==================== -->
+<!-- =======================================================================
+     SECTION 2: MUNICIPAL WATER DEMAND EDA (ALL ANALYSES)
+======================================================================= -->
 <div id="section-demand" style="display: none;">
-  <!-- KPI Stat Row -->
-  <div class="grid-4" style="margin-bottom: 24px;">
-    <div class="stat-box">
-      <div class="stat-icon teal">
-        <i data-lucide="activity"></i>
+  <!-- Quick Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Daily Demand Logs</span>
+        <span class="stat-value">{{ demand_eda.overview.total_records }}</span>
+        <span class="stat-subtext">{{ demand_eda.overview.date_start }} to {{ demand_eda.overview.date_end }}</span>
       </div>
-      <div>
-        <div class="stat-value">{{ demand_eda.overview.total_records }}</div>
-        <div class="stat-label">Daily Demand Logs</div>
-        <div class="stat-subtext">{{ demand_eda.overview.date_start }} to {{ demand_eda.overview.date_end }}</div>
-      </div>
+      <div class="stat-icon-wrapper teal"><i data-lucide="calendar"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon">
-        <i data-lucide="map"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Monitored Zones</span>
+        <span class="stat-value">{{ demand_eda.overview.zones_count }} Zones</span>
+        <span class="stat-subtext">1,096 days per zone (3 years)</span>
       </div>
-      <div>
-        <div class="stat-value">{{ demand_eda.overview.zones_count }} Zones</div>
-        <div class="stat-label">Municipal Coverage</div>
-        <div class="stat-subtext">1,096 days per zone (3 full years)</div>
-      </div>
+      <div class="stat-icon-wrapper blue"><i data-lucide="map"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon cyan">
-        <i data-lucide="gauge"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Daily Mean Demand</span>
+        <span class="stat-value">{{ demand_eda.overview.overall_mean_demand_kL }} kL</span>
+        <span class="stat-subtext">Range: {{ demand_eda.overview.overall_min_demand_kL }} – {{ demand_eda.overview.overall_max_demand_kL }} kL</span>
       </div>
-      <div>
-        <div class="stat-value">{{ demand_eda.overview.overall_mean_demand_kL }} kL</div>
-        <div class="stat-label">Daily Mean Demand</div>
-        <div class="stat-subtext">Min: {{ demand_eda.overview.overall_min_demand_kL }} • Max: {{ demand_eda.overview.overall_max_demand_kL }}</div>
-      </div>
+      <div class="stat-icon-wrapper green"><i data-lucide="gauge"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon warning">
-        <i data-lucide="trending-up"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Weekend Consumption Shift</span>
+        <span class="stat-value">+{{ demand_eda.weekend_comparison.weekend_uplift_kL }} kL</span>
+        <span class="stat-subtext">Weekday: {{ demand_eda.weekend_comparison.weekday_mean_kL }} | Weekend: {{ demand_eda.weekend_comparison.weekend_mean_kL }}</span>
       </div>
-      <div>
-        <div class="stat-value">+{{ demand_eda.weekend_comparison.weekend_uplift_kL }} kL</div>
-        <div class="stat-label">Weekend Demand Uplift</div>
-        <div class="stat-subtext">Weekday: {{ demand_eda.weekend_comparison.weekday_mean_kL }} • Weekend: {{ demand_eda.weekend_comparison.weekend_mean_kL }}</div>
-      </div>
+      <div class="stat-icon-wrapper amber"><i data-lucide="trending-up"></i></div>
     </div>
   </div>
 
-  <!-- Charts Grid -->
+  <!-- Demand Charts Grid -->
   <div class="grid-2" style="margin-bottom: 24px;">
-    <div class="card">
+    <div class="card accent-top-teal">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="bar-chart-2" style="color: var(--teal); width: 18px; height: 18px;"></i>
-            Mean Daily Water Demand by Zone (kL)
+            <i data-lucide="bar-chart-2" style="color: var(--teal);"></i>
+            1. Spatial Analysis — Mean Daily Water Demand by Zone (kL)
           </div>
-          <div class="card-subtitle">Distribution across 5 municipal distribution zones</div>
+          <div class="card-subtitle">Distribution across 5 municipal distribution networks</div>
         </div>
-        <span class="badge-tag teal">Spatial</span>
+        <span class="header-badge teal">Multi-Zone</span>
       </div>
-      <div style="height: 260px;">
+      <div style="height: 250px;">
         <canvas id="demandZoneChart"></canvas>
       </div>
     </div>
 
-    <div class="card">
+    <div class="card accent-top-blue">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="line-chart" style="color: var(--primary); width: 18px; height: 18px;"></i>
-            Monthly Demand Seasonality (kL)
+            <i data-lucide="line-chart" style="color: var(--primary);"></i>
+            2. Temporal Seasonality — Monthly Consumption Trajectory (kL)
           </div>
-          <div class="card-subtitle">Annual consumption trajectory showing peak summer demand</div>
+          <div class="card-subtitle">Annual consumption cycle showing summer demand surge</div>
         </div>
-        <span class="badge-tag">Seasonality</span>
+        <span class="header-badge">Seasonal Trend</span>
       </div>
-      <div style="height: 260px;">
+      <div style="height: 250px;">
         <canvas id="demandMonthChart"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Day of Week & Weather Correlation -->
+  <!-- Weekly Cycle & Weather Impacts -->
   <div class="grid-2" style="margin-bottom: 24px;">
     <div class="card">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="calendar" style="color: var(--accent); width: 18px; height: 18px;"></i>
-            Day of Week Demand Pattern
+            <i data-lucide="calendar" style="color: var(--accent);"></i>
+            3. Weekly Cycle — Day-of-Week Demand Pattern
           </div>
-          <div class="card-subtitle">Systematic consumption shift on Saturdays and Sundays</div>
+          <div class="card-subtitle">Systematic demand escalation during weekend periods</div>
         </div>
-        <span class="badge-tag">Weekly Cycle</span>
+        <span class="header-badge">Weekly Cycle</span>
       </div>
-      <div style="height: 260px;">
+      <div style="height: 250px;">
         <canvas id="demandDowChart"></canvas>
       </div>
     </div>
@@ -323,18 +515,18 @@
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="cloud-sun" style="color: var(--teal); width: 18px; height: 18px;"></i>
-            Meteorological Correlations
+            <i data-lucide="cloud-sun" style="color: var(--teal);"></i>
+            4. Meteorological Sensitivity Analysis
           </div>
-          <div class="card-subtitle">Relationship between weather variables and daily consumption</div>
+          <div class="card-subtitle">Sensitivity of water demand to weather fluctuations</div>
         </div>
-        <span class="badge-tag">Weather Factor</span>
+        <span class="header-badge teal">Weather Signals</span>
       </div>
       <div class="data-table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Meteorological Factor</th>
+              <th>Factor</th>
               <th>Overall Correlation</th>
               <th>Intra-Zone Sensitivity</th>
               <th>Operational Impact</th>
@@ -342,22 +534,22 @@
           </thead>
           <tbody>
             <tr>
-              <td><strong>Daily Avg Temperature (°C)</strong></td>
-              <td>+{{ demand_eda.weather_correlations.overall.temperature_corr }}</td>
-              <td>+{{ demand_eda.weather_correlations.intra_zone_avg.temperature_corr }}</td>
+              <td><strong>Daily Avg Temperature (&deg;C)</strong></td>
+              <td><code>+{{ demand_eda.weather_correlations.overall.temperature_corr }}</code></td>
+              <td><code>+{{ demand_eda.weather_correlations.intra_zone_avg.temperature_corr }}</code></td>
               <td><span class="badge-tag success">Positive Driver (Peak in Summer)</span></td>
             </tr>
             <tr>
               <td><strong>Relative Humidity (%)</strong></td>
-              <td>{{ demand_eda.weather_correlations.overall.humidity_corr }}</td>
+              <td><code>{{ demand_eda.weather_correlations.overall.humidity_corr }}</code></td>
               <td>Negative</td>
-              <td><span class="badge-tag">Slight Suppression</span></td>
+              <td><span class="badge-tag">Mild Negative Offset</span></td>
             </tr>
             <tr>
               <td><strong>Daily Rainfall (mm)</strong></td>
-              <td>{{ demand_eda.weather_correlations.overall.rainfall_corr }}</td>
+              <td><code>{{ demand_eda.weather_correlations.overall.rainfall_corr }}</code></td>
               <td>Negative</td>
-              <td><span class="badge-tag">Outdoor Usage Drop</span></td>
+              <td><span class="badge-tag">Reduced Irrigation Usage</span></td>
             </tr>
           </tbody>
         </table>
@@ -365,31 +557,30 @@
     </div>
   </div>
 
-  <!-- Zone Profiles Table -->
+  <!-- 5. Zone Capacity Table -->
   <div class="card">
     <div class="card-header">
       <div>
         <div class="card-title">
-          <i data-lucide="layers" style="color: var(--primary); width: 18px; height: 18px;"></i>
-          Zone-Level Operational Profiles &amp; Capacity
+          <i data-lucide="layers" style="color: var(--primary);"></i>
+          5. Municipal Zone Operational Characteristics &amp; Capacity
         </div>
-        <div class="card-subtitle">Detailed demographic and volumetric statistics across all 5 municipal zones</div>
+        <div class="card-subtitle">Demographics, connection counts, and volumetric statistics across all 5 distribution zones</div>
       </div>
-      <span class="badge-tag">Multi-Zone Audit</span>
+      <span class="header-badge">Network Capacity</span>
     </div>
     <div class="data-table-container">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Zone ID</th>
-            <th>Population</th>
-            <th>Mean Active Connections</th>
+            <th>Zone Identifier</th>
+            <th>Population Served</th>
+            <th>Active Connections</th>
             <th>Mean Demand (kL)</th>
-            <th>Std Dev (kL)</th>
+            <th>Daily Std Dev</th>
             <th>Min Demand (kL)</th>
-            <th>Median Demand (kL)</th>
             <th>Max Demand (kL)</th>
-            <th>Outliers Count</th>
+            <th>Outliers Flagged</th>
           </tr>
         </thead>
         <tbody>
@@ -402,7 +593,6 @@
             <td><strong>{{ z.mean_demand_kL }}</strong></td>
             <td>{{ z.std_demand_kL }}</td>
             <td>{{ z.min_demand_kL }}</td>
-            <td>{{ z.median_demand_kL }}</td>
             <td>{{ z.max_demand_kL }}</td>
             <td>
               {% if zo.outlier_count > 0 %}
@@ -417,11 +607,129 @@
       </table>
     </div>
   </div>
+
+  <!-- 6. Demand Numerical Profiles Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="table" style="color: var(--primary);"></i>
+          6. Demand Features Descriptive Statistics
+        </div>
+        <div class="card-subtitle">Statistical distribution across demand, temperature, humidity, rainfall, and connections</div>
+      </div>
+      <span class="header-badge">Parametric Summary</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Count</th>
+            <th>Mean</th>
+            <th>Std Dev</th>
+            <th>Min</th>
+            <th>25% (Q1)</th>
+            <th>Median (50%)</th>
+            <th>75% (Q3)</th>
+            <th>Max</th>
+            <th>Skewness</th>
+            <th>Kurtosis</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in demand_eda.univariate_profiles %}
+          <tr>
+            <td><strong>{{ u.feature }}</strong></td>
+            <td>{{ "{:,}".format(u.count) }}</td>
+            <td>{{ u.mean }}</td>
+            <td>{{ u.std }}</td>
+            <td>{{ u.min }}</td>
+            <td>{{ u.q25 }}</td>
+            <td>{{ u.median }}</td>
+            <td>{{ u.q75 }}</td>
+            <td>{{ u.max }}</td>
+            <td><code>{{ u.skewness }}</code></td>
+            <td><code>{{ u.kurtosis }}</code></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
+// Data Store for Interactive Feature Visualizer
+const featureProfiles = {
+  {% for p in potability_eda.univariate_profiles %}
+  {% set o = potability_eda.outlier_profiles[loop.index0] %}
+  "{{ p.feature }}": {
+    mean: "{{ p.mean }}",
+    median: "{{ p.median }}",
+    std: "{{ p.std }}",
+    bounds: "[{{ o.lower_bound }}, {{ o.upper_bound }}]"
+  },
+  {% endfor %}
+};
+
+const featureHistograms = {
+  {% for feat, hist in potability_eda.histograms.items() %}
+  "{{ feat }}": {
+    labels: {{ hist.labels|tojson }},
+    counts: {{ hist.counts|tojson }}
+  },
+  {% endfor %}
+};
+
+let inspectorChart = null;
+
+function updateFeatureInspection() {
+  const sel = document.getElementById("featureSelect");
+  const val = sel.value;
+  const data = featureProfiles[val];
+  if (data) {
+    document.getElementById("statMean").innerText = data.mean;
+    document.getElementById("statMedian").innerText = data.median;
+    document.getElementById("statStd").innerText = data.std;
+    document.getElementById("statBounds").innerText = data.bounds;
+  }
+
+  // Render or update histogram chart
+  const histData = featureHistograms[val];
+  if (histData) {
+    const ctx = document.getElementById("inspectorHistogramChart");
+    if (inspectorChart) {
+      inspectorChart.destroy();
+    }
+    inspectorChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: histData.labels,
+        datasets: [{
+          label: `${val} Distribution Frequency`,
+          data: histData.counts,
+          backgroundColor: '#0284c7',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Observation Frequency' } },
+          x: { title: { display: true, text: `${val} Intervals` } }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+}
+
 function switchTab(tab) {
   const potSec = document.getElementById('section-potability');
   const demSec = document.getElementById('section-demand');
@@ -441,28 +749,28 @@ function switchTab(tab) {
   }
 }
 
-// Render Interactive Chart.js Visualizations
+// Global Chart.js Visualizations
 document.addEventListener("DOMContentLoaded", function() {
+  updateFeatureInspection();
+
   // 1. Potability Class Chart
   const ctxClass = document.getElementById('potabilityClassChart');
   if (ctxClass) {
     new Chart(ctxClass, {
       type: 'doughnut',
       data: {
-        labels: ['Non-Potable (0)', 'Potable (1)'],
+        labels: ['Non-Potable (Class 0)', 'Potable (Class 1)'],
         datasets: [{
           data: [{{ potability_eda.target_analysis.non_potable_0 }}, {{ potability_eda.target_analysis.potable_1 }}],
           backgroundColor: ['#64748b', '#0284c7'],
-          borderWidth: 2,
+          borderWidth: 3,
           borderColor: '#ffffff'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
+        plugins: { legend: { position: 'bottom' } }
       }
     });
   }
@@ -478,9 +786,8 @@ document.addEventListener("DOMContentLoaded", function() {
       data: {
         labels: missLabels,
         datasets: [{
-          label: 'Missing Percentage (%)',
           data: missValues,
-          backgroundColor: missValues.map(v => v > 0 ? '#ef4444' : '#10b981'),
+          backgroundColor: missValues.map(v => v > 0 ? '#f59e0b' : '#10b981'),
           borderRadius: 4
         }]
       },
@@ -534,7 +841,7 @@ document.addEventListener("DOMContentLoaded", function() {
         datasets: [{
           label: 'Mean Demand (kL)',
           data: zoneValues,
-          backgroundColor: '#0284c7',
+          backgroundColor: '#0d9488',
           borderRadius: 6
         }]
       },
@@ -549,7 +856,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // 5. Demand Monthly Seasonality Chart
+  // 5. Demand Monthly Seasonality
   const ctxMonth = document.getElementById('demandMonthChart');
   if (ctxMonth) {
     const monthLabels = [{% for m in demand_eda.month_profiles %}"{{ m.month_name[:3] }}",{% endfor %}];
@@ -574,7 +881,7 @@ document.addEventListener("DOMContentLoaded", function() {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { min: 700, max: 860, title: { display: true, text: 'Monthly Demand (kL)' } }
+          y: { min: 700, max: 860, title: { display: true, text: 'Mean Demand (kL)' } }
         }
       }
     });
@@ -593,7 +900,7 @@ document.addEventListener("DOMContentLoaded", function() {
         datasets: [{
           label: 'Demand (kL)',
           data: dowValues,
-          backgroundColor: ['#64748b', '#64748b', '#64748b', '#64748b', '#64748b', '#0d9488', '#0d9488'],
+          backgroundColor: ['#64748b', '#64748b', '#64748b', '#64748b', '#64748b', '#0284c7', '#0284c7'],
           borderRadius: 4
         }]
       },

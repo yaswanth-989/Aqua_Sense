@@ -9,8 +9,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.data.loader import get_dataset_summaries
-from src.data.validator import get_full_validation_summary
+from src.data.loader import get_dataset_summaries, get_data_loading_inspection
+from src.data.validator import get_full_validation_summary, sanitize_numpy
 from src.eda.potability_eda import compute_potability_eda
 from src.eda.demand_eda import compute_demand_eda
 from src.preprocessing.potability_preprocessor import preprocess_potability_data
@@ -55,6 +55,20 @@ async def dashboard_view(request: Request):
         context={
             "active_page": "dashboard",
             "summary": dataset_summary
+        }
+    )
+
+
+@app.get("/data_loading", response_class=HTMLResponse)
+async def data_loading_view(request: Request):
+    """Data Loading & Schema Inspection View."""
+    inspection = get_data_loading_inspection()
+    return templates.TemplateResponse(
+        request=request,
+        name="data_loading.html",
+        context={
+            "active_page": "data_loading",
+            "inspection": inspection
         }
     )
 
@@ -191,6 +205,12 @@ async def validation_api():
     return get_full_validation_summary()
 
 
+@app.get("/api/v1/data_loading")
+async def data_loading_api():
+    """Data Loading Metadata and Live Preview API Endpoint."""
+    return sanitize_numpy(get_data_loading_inspection())
+
+
 @app.get("/api/v1/eda/potability")
 async def eda_potability_api():
     """Water Potability Statistical and EDA Summary Endpoint."""
@@ -206,7 +226,6 @@ async def eda_demand_api():
 @app.get("/api/v1/preprocessing/summary")
 async def preprocessing_summary_api():
     """Data Preprocessing & Split Integrity Audit Endpoint."""
-    from src.data.validator import sanitize_numpy
     pot_summary = load_or_compute_json("potability_preprocessing_summary.json", preprocess_potability_data)
     dem_summary = load_or_compute_json("demand_preprocessing_summary.json", preprocess_demand_data)
     return sanitize_numpy({

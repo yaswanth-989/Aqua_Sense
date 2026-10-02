@@ -1,12 +1,11 @@
 """
-AquaSense Data Ingestion & Validation Module
-Loads raw datasets without alteration and validates integrity.
+AquaSense Data Ingestion & Inspection Module
+Loads raw datasets without alteration, computes schema metadata, and extracts preview rows.
 """
 import os
 import pandas as pd
-from typing import Dict, Any, Tuple
+from typing import Dict, Any
 
-# Base directories
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 RAW_DATA_DIR = os.path.join(BASE_DIR, "data", "raw")
 
@@ -56,8 +55,65 @@ def get_dataset_summaries() -> Dict[str, Any]:
     }
 
 
+def get_data_loading_inspection() -> Dict[str, Any]:
+    """Detailed metadata and live data preview for the Data Loading page."""
+    pot_df = load_raw_potability_data()
+    dem_df = load_raw_demand_data()
+
+    # Potability column metadata
+    pot_cols = []
+    for col in pot_df.columns:
+        null_cnt = int(pot_df[col].isnull().sum())
+        pot_cols.append({
+            "name": col,
+            "dtype": str(pot_df[col].dtype),
+            "non_null_count": int(pot_df[col].notnull().sum()),
+            "missing_count": null_cnt,
+            "missing_pct": round((null_cnt / len(pot_df)) * 100, 2),
+            "unique_count": int(pot_df[col].nunique())
+        })
+
+    # Demand column metadata
+    dem_cols = []
+    for col in dem_df.columns:
+        null_cnt = int(dem_df[col].isnull().sum())
+        dem_cols.append({
+            "name": col,
+            "dtype": str(dem_df[col].dtype),
+            "non_null_count": int(dem_df[col].notnull().sum()),
+            "missing_count": null_cnt,
+            "missing_pct": round((null_cnt / len(dem_df)) * 100, 2),
+            "unique_count": int(dem_df[col].nunique())
+        })
+
+    # Preview rows (convert NaN to None for clean JSON/Jinja rendering)
+    pot_preview = pot_df.head(10).round(3).where(pd.notnull(pot_df), None).to_dict(orient="records")
+    dem_preview = dem_df.head(10).round(2).where(pd.notnull(dem_df), None).to_dict(orient="records")
+
+    return {
+        "potability": {
+            "total_rows": len(pot_df),
+            "total_columns": len(pot_df.columns),
+            "memory_kb": round(float(pot_df.memory_usage(deep=True).sum()) / 1024, 1),
+            "duplicates": int(pot_df.duplicated().sum()),
+            "columns_info": pot_cols,
+            "preview_rows": pot_preview,
+            "column_names": list(pot_df.columns)
+        },
+        "demand": {
+            "total_rows": len(dem_df),
+            "total_columns": len(dem_df.columns),
+            "memory_kb": round(float(dem_df.memory_usage(deep=True).sum()) / 1024, 1),
+            "duplicates": int(dem_df.duplicated().sum()),
+            "columns_info": dem_cols,
+            "preview_rows": dem_preview,
+            "column_names": list(dem_df.columns)
+        }
+    }
+
+
 if __name__ == "__main__":
-    summary = get_dataset_summaries()
-    print("Potability samples:", summary["potability"]["rows"])
-    print("Demand samples:", summary["demand"]["rows"])
-    print("Zones:", summary["demand"]["zones"])
+    insp = get_data_loading_inspection()
+    print("Potability rows:", insp["potability"]["total_rows"])
+    print("Potability preview count:", len(insp["potability"]["preview_rows"]))
+    print("Demand rows:", insp["demand"]["total_rows"])

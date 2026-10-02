@@ -6,7 +6,7 @@
   <title>{% block title %}AquaSense — AI Water Intelligence{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -28,18 +28,22 @@
     </div>
 
     <nav class="nav-menu">
-      <div class="nav-label">Core Analytics</div>
+      <div class="nav-label">Core Pipeline</div>
       <a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
         <i data-lucide="layout-dashboard"></i>
         <span>Dashboard</span>
       </a>
+      <a href="/data_loading" class="nav-link {% if active_page == 'data_loading' %}active{% endif %}">
+        <i data-lucide="database"></i>
+        <span>Data Loading</span>
+      </a>
       <a href="/eda" class="nav-link {% if active_page == 'eda' %}active{% endif %}">
         <i data-lucide="bar-chart-2"></i>
-        <span>Data &amp; Insights</span>
+        <span>EDA</span>
       </a>
       <a href="/preprocessing" class="nav-link {% if active_page == 'preprocessing' %}active{% endif %}">
         <i data-lucide="sliders"></i>
-        <span>Data Preparation</span>
+        <span>Data Preprocessing</span>
       </a>
       <a href="/linear_models" class="nav-link {% if active_page == 'linear_models' %}active{% endif %}">
         <i data-lucide="trending-up"></i>
@@ -59,7 +63,7 @@
       </a>
       <a href="/prediction" class="nav-link {% if active_page == 'prediction' %}active{% endif %}">
         <i data-lucide="sparkles"></i>
-        <span>Prediction</span>
+        <span>Prediction Portal</span>
       </a>
 
       <div class="nav-divider"></div>
@@ -78,9 +82,9 @@
     <div class="sidebar-footer">
       <div class="status-indicator">
         <span class="status-dot"></span>
-        <span>FastAPI Engine</span>
+        <span>FastAPI Online</span>
       </div>
-      <span style="font-size: 0.72rem; color: #475569;">v0.1.0</span>
+      <span style="font-size: 0.7rem; color: #64748b;">v0.2.0</span>
     </div>
   </aside>
 
@@ -91,9 +95,13 @@
         <h1>{% block page_title %}System Dashboard{% endblock %}</h1>
         <p>{% block page_subtitle %}Water quality assessment &amp; municipal demand forecasting{% endblock %}</p>
       </div>
-      <div class="top-bar-badge">
-        <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
-        <span>System Operational</span>
+      <div class="top-bar-actions">
+        {% block topbar_actions %}
+        <span class="header-badge">
+          <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+          System Operational
+        </span>
+        {% endblock %}
       </div>
     </header>
 

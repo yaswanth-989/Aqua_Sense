@@ -156,13 +156,19 @@ def validate_demand_dataset(df: pd.DataFrame = None) -> Dict[str, Any]:
 
 
 def sanitize_numpy(obj):
-    """Recursively convert numpy types to native Python types for JSON serialization."""
+    """Recursively convert numpy types and NaN values to native Python types/None for JSON compliance."""
+    import math
     if isinstance(obj, dict):
         return {k: sanitize_numpy(v) for k, v in obj.items()}
     elif isinstance(obj, list):
         return [sanitize_numpy(v) for v in obj]
     elif hasattr(obj, "item"):
-        return obj.item()
+        val = obj.item()
+        if isinstance(val, float) and math.isnan(val):
+            return None
+        return val
+    elif isinstance(obj, float) and math.isnan(obj):
+        return None
     return obj
 
 

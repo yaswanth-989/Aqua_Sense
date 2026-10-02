@@ -1,13 +1,18 @@
 """
 AquaSense Municipal Water Demand EDA Module
-Analyzes temporal trends, multi-zone variations, seasonal dynamics,
-weather correlations, and usage patterns on the synthetic demand dataset.
+Comprehensive exploratory analysis covering:
+1. Univariate distributions, skewness, kurtosis, and precomputed histograms.
+2. Temporal trends (Day-of-Week, Monthly seasonality, Weekend uplift).
+3. Spatial multi-zone comparisons and demographic capacity.
+4. Weather correlations (Temperature, Humidity, Rainfall).
+5. Outlier detection across zones using Tukey's IQR boundaries.
 """
 import os
 import sys
 import json
 import numpy as np
 import pandas as pd
+from scipy import stats
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -47,8 +52,9 @@ def compute_demand_eda() -> Dict[str, Any]:
         "overall_std_demand_kL": round(float(df["Water_Demand_kL"].std()), 2)
     }
 
-    # 2. Missing value audit
+    # 2. Missing value audit & unique counts
     missing_analysis = []
+    unique_counts = []
     for col in df.columns:
         if col == "Date_dt":
             continue
@@ -60,7 +66,54 @@ def compute_demand_eda() -> Dict[str, Any]:
             "missing_pct": pct
         })
 
-    # 3. Zone-level demand profiling
+        unq = int(df[col].nunique())
+        unique_counts.append({
+            "feature": col,
+            "unique_count": unq,
+            "unique_pct": round((unq / total_records) * 100, 2),
+            "dtype": str(df[col].dtype)
+        })
+
+    # 3. Univariate numerical statistics & histograms
+    num_cols = ["Water_Demand_kL", "Avg_Temperature_C", "Humidity_pct", "Rainfall_mm", "Active_Connections", "Population"]
+    univariate_profiles = []
+    histograms = {}
+
+    for col in num_cols:
+        s = df[col].dropna()
+        q1 = float(s.quantile(0.25))
+        q3 = float(s.quantile(0.75))
+        iqr = q3 - q1
+        skew_val = float(s.skew())
+        kurt_val = float(stats.kurtosis(s))
+
+        univariate_profiles.append({
+            "feature": col,
+            "count": int(len(s)),
+            "mean": round(float(s.mean()), 2),
+            "std": round(float(s.std()), 2),
+            "min": round(float(s.min()), 2),
+            "q25": round(q1, 2),
+            "median": round(float(s.median()), 2),
+            "q75": round(q3, 2),
+            "max": round(float(s.max()), 2),
+            "iqr": round(iqr, 2),
+            "skewness": round(skew_val, 3),
+            "kurtosis": round(kurt_val, 3)
+        })
+
+        # Precompute 10 histogram bins
+        bin_counts, bin_edges = np.histogram(s, bins=10)
+        bin_labels = [
+            f"{bin_edges[i]:.1f}-{bin_edges[i+1]:.1f}"
+            for i in range(len(bin_counts))
+        ]
+        histograms[col] = {
+            "labels": bin_labels,
+            "counts": [int(c) for c in bin_counts]
+        }
+
+    # 4. Zone-level demand profiling
     zone_profiles = []
     for zone, group in df.groupby("Zone_ID"):
         zone_profiles.append({
@@ -76,7 +129,7 @@ def compute_demand_eda() -> Dict[str, Any]:
         })
     zone_profiles = sorted(zone_profiles, key=lambda x: x["mean_demand_kL"], reverse=True)
 
-    # 4. Day of Week & Weekend Analysis
+    # 5. Day of Week & Weekend Analysis
     dow_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     dow_profiles = []
     for day in dow_order:
@@ -97,7 +150,7 @@ def compute_demand_eda() -> Dict[str, Any]:
         )
     }
 
-    # 5. Seasonal and Monthly Analysis
+    # 6. Monthly & Seasonal Analysis
     month_profiles = []
     for m in range(1, 13):
         sub = df[df["Month"] == m]
@@ -118,7 +171,7 @@ def compute_demand_eda() -> Dict[str, Any]:
         })
     season_profiles = sorted(season_profiles, key=lambda x: x["mean_demand_kL"], reverse=True)
 
-    # 6. Weather Relationships & Intra-zone correlations
+    # 7. Weather Correlations
     weather_corrs = {
         "overall": {
             "temperature_corr": round(float(df[["Avg_Temperature_C", "Water_Demand_kL"]].dropna().corr().iloc[0, 1]), 4),
@@ -127,13 +180,12 @@ def compute_demand_eda() -> Dict[str, Any]:
         },
         "intra_zone_avg": {}
     }
-    # Within each zone (controlling for zone size)
     temp_zone_corrs = []
     for _, zdf in df.groupby("Zone_ID"):
         temp_zone_corrs.append(float(zdf[["Avg_Temperature_C", "Water_Demand_kL"]].dropna().corr().iloc[0, 1]))
     weather_corrs["intra_zone_avg"]["temperature_corr"] = round(float(np.mean(temp_zone_corrs)), 4)
 
-    # 7. Outlier analysis (IQR per zone)
+    # 8. Outliers per zone
     zone_outliers = []
     for zone, group in df.groupby("Zone_ID"):
         dem = group["Water_Demand_kL"]
@@ -157,6 +209,9 @@ def compute_demand_eda() -> Dict[str, Any]:
     demand_summary = {
         "overview": overview,
         "missing_analysis": missing_analysis,
+        "unique_counts": unique_counts,
+        "univariate_profiles": univariate_profiles,
+        "histograms": histograms,
         "zone_profiles": zone_profiles,
         "dow_profiles": dow_profiles,
         "weekend_comparison": weekend_comparison,
@@ -166,48 +221,13 @@ def compute_demand_eda() -> Dict[str, Any]:
         "zone_outliers": zone_outliers
     }
 
-    # Save summary JSON
     with open(os.path.join(RESULTS_DIR, "demand_eda_summary.json"), "w") as f:
         json.dump(demand_summary, f, indent=2)
-
-    # Generate figures
-    _generate_demand_figures(df, zone_profiles, dow_profiles, month_profiles)
 
     return demand_summary
 
 
-def _generate_demand_figures(df: pd.DataFrame, zone_profiles: list, dow_profiles: list, month_profiles: list):
-    """Generate static plots for demand analysis."""
-    plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
-
-    # 1. Zone Comparison
-    fig, ax = plt.subplots(figsize=(7, 4))
-    zones = [z["zone_id"] for z in zone_profiles]
-    means = [z["mean_demand_kL"] for z in zone_profiles]
-    bars = ax.bar(zones, means, color="#0d9488", width=0.55)
-    ax.set_title("Mean Daily Water Demand by Zone (kL)", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Demand (kL)")
-    for b in bars:
-        ax.annotate(f"{b.get_height():.1f}", (b.get_x() + b.get_width() / 2, b.get_height()),
-                    ha="center", va="bottom", fontsize=9)
-    plt.tight_layout()
-    fig.savefig(os.path.join(FIGURES_DIR, "demand_zone_comparison.png"), dpi=150)
-    plt.close(fig)
-
-    # 2. Monthly Trend
-    fig, ax = plt.subplots(figsize=(8, 4))
-    months = [m["month_name"][:3] for m in month_profiles]
-    m_means = [m["mean_demand_kL"] for m in month_profiles]
-    ax.plot(months, m_means, marker="o", color="#0284c7", linewidth=2)
-    ax.set_title("Monthly Water Demand Seasonality", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Mean Demand (kL)")
-    plt.tight_layout()
-    fig.savefig(os.path.join(FIGURES_DIR, "demand_monthly_seasonality.png"), dpi=150)
-    plt.close(fig)
-
-
 if __name__ == "__main__":
-    results = compute_demand_eda()
-    print("Demand EDA computed successfully.")
-    print("Overview:", results["overview"])
-    print("Weekend comparison:", results["weekend_comparison"])
+    res = compute_demand_eda()
+    print("Demand EDA computed successfully with full univariate and seasonal metrics.")
+    print("Sample univariate profile:", res["univariate_profiles"][0])

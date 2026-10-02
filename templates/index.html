@@ -1,172 +1,203 @@
 {% extends "base.html" %}
 
-{% block title %}AquaSense — AI Water Intelligence Dashboard{% endblock %}
-{% block page_title %}AquaSense Overview{% endblock %}
+{% block title %}Dashboard — AquaSense AI{% endblock %}
+{% block page_title %}AquaSense Dashboard{% endblock %}
 {% block page_subtitle %}AI-Based Water Quality Assessment and Demand Forecasting System{% endblock %}
 
 {% block content %}
-<div class="grid-4" style="margin-bottom: 24px;">
-  <div class="stat-box">
-    <div class="stat-icon">
+<!-- Welcome Hero Banner -->
+<div class="welcome-hero">
+  <h1>AquaSense <span>AI Water Intelligence</span> Platform</h1>
+  <p>
+    Enterprise Machine Learning workspace for municipal water authorities: assessing drinking water potability across 9 chemical criteria and forecasting next-day zone consumption across 5 distribution networks.
+  </p>
+  <div class="hero-actions">
+    <a href="/eda" class="btn btn-primary">
+      <i data-lucide="bar-chart-2"></i> Explore Data &amp; Insights
+    </a>
+    <a href="/preprocessing" class="btn btn-secondary">
+      <i data-lucide="sliders"></i> Data Preparation
+    </a>
+    <a href="/api/v1/health" target="_blank" class="btn btn-outline">
+      <i data-lucide="activity"></i> System Diagnostics
+    </a>
+  </div>
+</div>
+
+<!-- Quick Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-info">
+      <span class="stat-label">Water Quality Samples</span>
+      <span class="stat-value">3,276</span>
+      <span class="stat-subtext">Real Physicochemical Data</span>
+    </div>
+    <div class="stat-icon-wrapper blue">
       <i data-lucide="droplet"></i>
     </div>
-    <div>
-      <div class="stat-value">3,276</div>
-      <div class="stat-label">Water Quality Samples</div>
-    </div>
   </div>
 
-  <div class="stat-box">
-    <div class="stat-icon secondary">
+  <div class="stat-card">
+    <div class="stat-info">
+      <span class="stat-label">Daily Demand Logs</span>
+      <span class="stat-value">5,480</span>
+      <span class="stat-subtext">3-Year Temporal Record</span>
+    </div>
+    <div class="stat-icon-wrapper teal">
       <i data-lucide="calendar"></i>
     </div>
-    <div>
-      <div class="stat-value">5,480</div>
-      <div class="stat-label">Demand Records (3 Years)</div>
-    </div>
   </div>
 
-  <div class="stat-box">
-    <div class="stat-icon">
+  <div class="stat-card">
+    <div class="stat-info">
+      <span class="stat-label">Distribution Zones</span>
+      <span class="stat-value">5 Zones</span>
+      <span class="stat-subtext">Zones Z01 through Z05</span>
+    </div>
+    <div class="stat-icon-wrapper amber">
       <i data-lucide="map-pin"></i>
     </div>
-    <div>
-      <div class="stat-value">5 Zones</div>
-      <div class="stat-label">Distribution Zones (Z01–Z05)</div>
-    </div>
   </div>
 
-  <div class="stat-box">
-    <div class="stat-icon secondary">
-      <i data-lucide="layers"></i>
+  <div class="stat-card">
+    <div class="stat-info">
+      <span class="stat-label">Target Pipelines</span>
+      <span class="stat-value">2 Tasks</span>
+      <span class="stat-subtext">Potability &amp; Demand</span>
     </div>
-    <div>
-      <div class="stat-value">2 Pipelines</div>
-      <div class="stat-label">Potability &amp; Demand Tasks</div>
+    <div class="stat-icon-wrapper green">
+      <i data-lucide="workflow"></i>
     </div>
   </div>
 </div>
 
+<!-- Two Core Prediction Tasks -->
 <div class="grid-2" style="margin-bottom: 24px;">
-  <div class="card">
+  <!-- Task A -->
+  <div class="card accent-top-blue">
     <div class="card-header">
       <div>
         <div class="card-title">
-          <i data-lucide="activity" style="color: var(--primary); width: 20px; height: 20px;"></i>
-          Task A: Water Potability Classification
+          <i data-lucide="shield-check" style="color: var(--primary);"></i>
+          Task A: Water Potability Assessment
         </div>
-        <div class="card-subtitle">Real physicochemical drinking water suitability assessment</div>
+        <div class="card-subtitle">Drinking water suitability classification based on physical and chemical properties</div>
       </div>
-      <span class="badge-tag">Binary Classification</span>
+      <span class="header-badge">Binary Classification</span>
     </div>
-    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
-      Predicts whether water is safe for consumption (<code>Potable</code> vs <code>Not Potable</code>) based on 9 measured chemical and physical properties: pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon, Trihalomethanes, and Turbidity.
+    <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+      Analyzes 9 water quality parameters (pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon, Trihalomethanes, and Turbidity) against safety thresholds to determine whether water is safe for human consumption.
     </p>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Attribute</th>
-          <th>Specification</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Data Source</strong></td>
-          <td>Real Water Quality &amp; Potability Dataset</td>
-        </tr>
-        <tr>
-          <td><strong>Dataset File</strong></td>
-          <td><code>data/raw/water_potability.csv</code></td>
-        </tr>
-        <tr>
-          <td><strong>Target Column</strong></td>
-          <td><code>Potability</code> (0 = Non-Potable, 1 = Potable)</td>
-        </tr>
-        <tr>
-          <td><strong>Verified Distribution</strong></td>
-          <td>1,998 Non-Potable (61.0%) / 1,278 Potable (39.0%)</td>
-        </tr>
-        <tr>
-          <td><strong>Pipeline Status</strong></td>
-          <td><span style="color: var(--warning); font-weight: 600;">Data Ingested (Awaiting Milestone 2 EDA)</span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Criteria</th>
+            <th>Specification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Target Label</strong></td>
+            <td><code>Potable</code> (1 = Safe) vs <code>Non-Potable</code> (0 = Unsafe)</td>
+          </tr>
+          <tr>
+            <td><strong>Class Distribution</strong></td>
+            <td>1,998 Non-Potable (61.0%) / 1,278 Potable (39.0%)</td>
+          </tr>
+          <tr>
+            <td><strong>Input Parameters</strong></td>
+            <td>9 Measured Physicochemical Properties</td>
+          </tr>
+          <tr>
+            <td><strong>Data Integrity</strong></td>
+            <td><span class="badge-tag success">Verified Real Observations</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="card">
+  <!-- Task B -->
+  <div class="card accent-top-teal">
     <div class="card-header">
       <div>
         <div class="card-title">
-          <i data-lucide="trending-up" style="color: var(--secondary); width: 20px; height: 20px;"></i>
+          <i data-lucide="trending-up" style="color: var(--teal);"></i>
           Task B: Municipal Water Demand Forecasting
         </div>
-        <div class="card-subtitle">Next-day water demand prediction for utility distribution planning</div>
+        <div class="card-subtitle">Next-day water demand prediction for distribution planning</div>
       </div>
-      <span class="badge-tag">Time-Series Regression</span>
+      <span class="header-badge teal">Time-Series Regression</span>
     </div>
-    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
-      Forecasts daily water demand in kiloliters (<code>Water_Demand_kL</code>) across 5 municipal distribution zones using historical consumption, demographic connections, and meteorological indicators.
+    <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+      Predicts daily water demand in kiloliters (<code>Water_Demand_kL</code>) across 5 municipal distribution zones using historical consumption, active connections, temperature, rainfall, and calendar patterns.
     </p>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Attribute</th>
-          <th>Specification</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Data Source</strong></td>
-          <td>Synthetic Municipal Water Demand Dataset (Documented Synthetic)</td>
-        </tr>
-        <tr>
-          <td><strong>Dataset File</strong></td>
-          <td><code>data/raw/AquaSense_Synthetic_Water_Demand_5475.csv</code></td>
-        </tr>
-        <tr>
-          <td><strong>Target Column</strong></td>
-          <td><code>Water_Demand_kL</code> (Continuous, kL)</td>
-        </tr>
-        <tr>
-          <td><strong>Temporal Span</strong></td>
-          <td>2023-01-01 to 2025-12-31 (1,096 days per zone)</td>
-        </tr>
-        <tr>
-          <td><strong>Pipeline Status</strong></td>
-          <td><span style="color: var(--warning); font-weight: 600;">Data Ingested (Awaiting Milestone 2 EDA)</span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Criteria</th>
+            <th>Specification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Target Variable</strong></td>
+            <td><code>Water_Demand_kL</code> (Daily Volume in Kiloliters)</td>
+          </tr>
+          <tr>
+            <td><strong>Temporal Scope</strong></td>
+            <td>2023-01-01 to 2025-12-31 (1,096 days per zone)</td>
+          </tr>
+          <tr>
+            <td><strong>Spatial Coverage</strong></td>
+            <td>5 Monitored Distribution Zones (Z01–Z05)</td>
+          </tr>
+          <tr>
+            <td><strong>Data Disclosure</strong></td>
+            <td><span class="badge-tag blue">Synthetic Benchmark Data</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
+<!-- Architecture Lifecycle -->
 <div class="card">
   <div class="card-header">
     <div class="card-title">
-      <i data-lucide="workflow" style="color: var(--accent); width: 20px; height: 20px;"></i>
-      AquaSense End-to-End System Pipeline
+      <i data-lucide="git-merge" style="color: var(--accent);"></i>
+      AquaSense Machine Learning Workflow
     </div>
+    <span class="header-badge">End-to-End Pipeline</span>
   </div>
-  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
-    The system follows a strict non-leaking machine learning lifecycle from raw sensor and consumption logs to deployment and monitoring:
-  </p>
-  <div class="grid-4">
-    <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa;">
-      <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: var(--primary);">1. Data Ingestion</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">Raw data safely partitioned into <code>data/raw/</code> without alteration or data mutation.</p>
+  <div class="action-grid" style="margin-bottom: 0;">
+    <div class="action-card">
+      <div class="action-icon">📥</div>
+      <div class="action-title">1. Data Ingestion</div>
+      <div class="action-desc">Raw telemetry safely stored without alteration or mutation.</div>
     </div>
-    <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa;">
-      <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: var(--text-main);">2. Data &amp; Insights</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">Statistical distributions, missingness analysis, correlation matrices, and temporal patterns.</p>
+    <div class="action-card">
+      <div class="action-icon">📊</div>
+      <div class="action-title">2. Data &amp; Insights</div>
+      <div class="action-desc">Parametric distributions, missingness audits, and correlation matrices.</div>
     </div>
-    <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa;">
-      <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: var(--text-main);">3. Model Pipelines</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">Linear regression, gradient descent, regularized models, tree ensembles, and clustering.</p>
+    <div class="action-card">
+      <div class="action-icon">⚙️</div>
+      <div class="action-title">3. Data Preparation</div>
+      <div class="action-desc">Leakage-safe imputation, robust scaling, and historical lag engineering.</div>
     </div>
-    <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa;">
-      <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: var(--text-main);">4. Serving &amp; Drift</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">FastAPI inference endpoints, schema validation, and real input data drift tracking.</p>
+    <div class="action-card">
+      <div class="action-icon">🧠</div>
+      <div class="action-title">4. Model Training</div>
+      <div class="action-desc">Linear baselines, tree ensembles, and unsupervised cluster discovery.</div>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">🚀</div>
+      <div class="action-title">5. Serving &amp; Drift</div>
+      <div class="action-desc">FastAPI inference endpoints with real-time input drift monitoring.</div>
     </div>
   </div>
 </div>

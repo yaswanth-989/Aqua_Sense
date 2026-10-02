@@ -2,7 +2,14 @@
 
 {% block title %}Data Preparation — AquaSense{% endblock %}
 {% block page_title %}Data Preparation &amp; Feature Pipelines{% endblock %}
-{% block page_subtitle %}Leakage-safe imputation, feature transformations, chronological partitioning, and artifact serialization{% endblock %}
+{% block page_subtitle %}Leakage-safe missing value imputation, robust transformations, and time-series feature engineering{% endblock %}
+
+{% block topbar_actions %}
+<span class="header-badge teal">
+  <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+  Zero Lookahead Leakage
+</span>
+{% endblock %}
 
 {% block content %}
 <!-- Modern Segmented Tab Switcher -->
@@ -19,96 +26,94 @@
 
 <!-- ==================== SECTION 1: POTABILITY PREPROCESSING ==================== -->
 <div id="section-prep-potability">
-  <div class="grid-4" style="margin-bottom: 24px;">
-    <div class="stat-box">
-      <div class="stat-icon">
-        <i data-lucide="split"></i>
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Training Partition</span>
+        <span class="stat-value">{{ potability_prep.train_samples }}</span>
+        <span class="stat-subtext">80.0% Stratified Split</span>
       </div>
-      <div>
-        <div class="stat-value">{{ potability_prep.train_samples }}</div>
-        <div class="stat-label">Training Partition</div>
-        <div class="stat-subtext">80.0% Stratified Split</div>
-      </div>
+      <div class="stat-icon-wrapper blue"><i data-lucide="split"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon teal">
-        <i data-lucide="check-square"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Evaluation Holdout</span>
+        <span class="stat-value">{{ potability_prep.test_samples }}</span>
+        <span class="stat-subtext">20.0% Unseen Validation</span>
       </div>
-      <div>
-        <div class="stat-value">{{ potability_prep.test_samples }}</div>
-        <div class="stat-label">Evaluation Holdout</div>
-        <div class="stat-subtext">20.0% Unseen Test Set</div>
-      </div>
+      <div class="stat-icon-wrapper teal"><i data-lucide="check-square"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon cyan">
-        <i data-lucide="shield-check"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Missing Residuals</span>
+        <span class="stat-value">0 Nulls</span>
+        <span class="stat-subtext">100% Imputed on Train</span>
       </div>
-      <div>
-        <div class="stat-value">0 Nulls</div>
-        <div class="stat-label">Missing Residuals</div>
-        <div class="stat-subtext">Train-fitted median imputer</div>
-      </div>
+      <div class="stat-icon-wrapper green"><i data-lucide="shield-check"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon warning">
-        <i data-lucide="cpu"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Scaling Transformation</span>
+        <span class="stat-value">{{ potability_prep.scaler_used }}</span>
+        <span class="stat-subtext">Zero Mean, Unit Variance</span>
       </div>
-      <div>
-        <div class="stat-value">{{ potability_prep.scaler_used }}</div>
-        <div class="stat-label">Scaling Transformation</div>
-        <div class="stat-subtext">Mean=0, Unit Variance</div>
-      </div>
+      <div class="stat-icon-wrapper amber"><i data-lucide="cpu"></i></div>
     </div>
   </div>
 
-  <!-- Pipeline Design & Integrity Verification -->
-  <div class="grid-2" style="margin-bottom: 24px;">
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">
-            <i data-lucide="sliders" style="color: var(--primary); width: 18px; height: 18px;"></i>
-            Imputation &amp; Leakage Prevention Architecture
-          </div>
-          <div class="card-subtitle">Train-only parameter fitting protocol</div>
-        </div>
-        <span class="badge-tag success">Verified Safe</span>
-      </div>
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
-        To strictly prevent data leakage from the test distribution into model training, all statistical imputers and scalers are fitted exclusively on the training partition:
-      </p>
-      <ul style="font-size: 0.85rem; color: var(--text-main); margin-left: 20px; line-height: 1.8;">
-        <li><strong>Stratification:</strong> Target distribution (61.0% vs 39.0%) preserved identically in train and test splits.</li>
-        <li><strong>Median Imputation:</strong> Median values are calculated on <code>X_train</code> and applied downstream to both splits.</li>
-        <li><strong>Standardization:</strong> Feature centering and variance scaling fitted on <code>train_imputed</code> only.</li>
-        <li><strong>Serialization:</strong> Artifact saved to <code>models/potability/potability_preprocessor.joblib</code> for production inference.</li>
-      </ul>
+  <!-- Interactive Action Cards (Inspired by Reference) -->
+  <div class="action-grid">
+    <div class="action-card active-action">
+      <div class="action-icon">📊</div>
+      <div class="action-title">1. Stratified Partitioning</div>
+      <div class="action-desc">Preserves 61.0% vs 39.0% class ratio identically in both sets.</div>
     </div>
 
-    <div class="card">
+    <div class="action-card active-action">
+      <div class="action-icon">🩹</div>
+      <div class="action-title">2. Median Imputation</div>
+      <div class="action-desc">Fitted solely on training observations to guarantee zero test leakage.</div>
+    </div>
+
+    <div class="action-card active-action">
+      <div class="action-icon">⚖️</div>
+      <div class="action-title">3. Feature Standardization</div>
+      <div class="action-desc">Brings all 9 chemical parameters into a standardized scale.</div>
+    </div>
+
+    <div class="action-card active-action">
+      <div class="action-icon">📦</div>
+      <div class="action-title">4. Pipeline Serialization</div>
+      <div class="action-desc">Pretrained transformations saved for consistent real-time serving.</div>
+    </div>
+  </div>
+
+  <!-- Class Balance Verification -->
+  <div class="grid-2" style="margin-bottom: 24px;">
+    <div class="card accent-top-blue">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="scale" style="color: var(--teal); width: 18px; height: 18px;"></i>
+            <i data-lucide="scale" style="color: var(--primary);"></i>
             Class Balance Across Partitions
           </div>
-          <div class="card-subtitle">Distribution comparison between training and test sets</div>
+          <div class="card-subtitle">Exact distribution parity between training and test sets</div>
         </div>
-        <span class="badge-tag">Stratified</span>
+        <span class="header-badge">Stratification</span>
       </div>
       <div class="data-table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Partition</th>
+              <th>Data Split</th>
               <th>Total Samples</th>
               <th>Non-Potable (0)</th>
               <th>Potable (1)</th>
-              <th>Potable Rate (%)</th>
+              <th>Safety Rate (%)</th>
             </tr>
           </thead>
           <tbody>
@@ -130,29 +135,50 @@
         </table>
       </div>
     </div>
+
+    <div class="card accent-top-teal">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <i data-lucide="shield-alert" style="color: var(--teal);"></i>
+            Leakage Prevention Guarantees
+          </div>
+          <div class="card-subtitle">Rigorous statistical boundaries applied during transformation</div>
+        </div>
+        <span class="header-badge teal">Audit Pass</span>
+      </div>
+      <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.6;">
+        To prevent optimistic performance bias, all statistics are learned exclusively from the training split:
+      </p>
+      <ul style="font-size: 0.84rem; color: var(--text-main); margin-left: 20px; line-height: 1.8;">
+        <li><strong>No Test Exposure:</strong> Test set values never influence imputed medians or scaling parameters.</li>
+        <li><strong>Consistent Inference:</strong> The same fitted transformer is loaded during real-time prediction.</li>
+        <li><strong>Zero Dropped Observations:</strong> 100% of samples retained for training and evaluation.</li>
+      </ul>
+    </div>
   </div>
 
-  <!-- Fitted Parameters Table -->
+  <!-- Fitted Parameters Table (NO FILE PATHS) -->
   <div class="card">
     <div class="card-header">
       <div>
         <div class="card-title">
-          <i data-lucide="database" style="color: var(--primary); width: 18px; height: 18px;"></i>
-          Fitted Imputation Values &amp; Feature Schema
+          <i data-lucide="database" style="color: var(--primary);"></i>
+          Water Quality Feature Transformation Schema
         </div>
-        <div class="card-subtitle">Exact parameters learned from training data (no lookahead or test exposure)</div>
+        <div class="card-subtitle">Learned baseline values and handling protocols across all 9 physicochemical parameters</div>
       </div>
-      <span class="badge-tag">Fitted Medians</span>
+      <span class="header-badge">Parameter Schema</span>
     </div>
     <div class="data-table-container">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Feature Name</th>
+            <th>Water Parameter</th>
             <th>Fitted Training Median</th>
-            <th>Original Missing Count</th>
-            <th>Handling Strategy</th>
-            <th>Processed Target File</th>
+            <th>Historical Missingness</th>
+            <th>Transformation Applied</th>
+            <th>Pipeline Status</th>
           </tr>
         </thead>
         <tbody>
@@ -171,8 +197,8 @@
               <span class="badge-tag success">0 (Complete)</span>
               {% endif %}
             </td>
-            <td>Median Imputation + Standard Scaling</td>
-            <td><code>data/processed/potability_train.csv</code></td>
+            <td>Median Imputation + Standard Normalization</td>
+            <td><span class="badge-tag success">Verified Ready</span></td>
           </tr>
           {% endfor %}
         </tbody>
@@ -183,115 +209,132 @@
 
 <!-- ==================== SECTION 2: DEMAND PREPROCESSING ==================== -->
 <div id="section-prep-demand" style="display: none;">
-  <div class="grid-4" style="margin-bottom: 24px;">
-    <div class="stat-box">
-      <div class="stat-icon teal">
-        <i data-lucide="calendar"></i>
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Training Records</span>
+        <span class="stat-value">{{ demand_prep.train_records }}</span>
+        <span class="stat-subtext">{{ demand_prep.train_date_range[0] }} to {{ demand_prep.train_date_range[1] }}</span>
       </div>
-      <div>
-        <div class="stat-value">{{ demand_prep.train_records }}</div>
-        <div class="stat-label">Training Records</div>
-        <div class="stat-subtext">{{ demand_prep.train_date_range[0] }} to {{ demand_prep.train_date_range[1] }}</div>
-      </div>
+      <div class="stat-icon-wrapper teal"><i data-lucide="calendar"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon">
-        <i data-lucide="calendar-check"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Evaluation Horizon</span>
+        <span class="stat-value">{{ demand_prep.test_records }}</span>
+        <span class="stat-subtext">{{ demand_prep.test_date_range[0] }} to {{ demand_prep.test_date_range[1] }}</span>
       </div>
-      <div>
-        <div class="stat-value">{{ demand_prep.test_records }}</div>
-        <div class="stat-label">Evaluation Horizon</div>
-        <div class="stat-subtext">{{ demand_prep.test_date_range[0] }} to {{ demand_prep.test_date_range[1] }}</div>
-      </div>
+      <div class="stat-icon-wrapper blue"><i data-lucide="calendar-check"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon cyan">
-        <i data-lucide="layers"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Engineered Predictors</span>
+        <span class="stat-value">4 Signals</span>
+        <span class="stat-subtext">Lags &amp; Rolling Moving Averages</span>
       </div>
-      <div>
-        <div class="stat-value">4 Features</div>
-        <div class="stat-label">Engineered Lags</div>
-        <div class="stat-subtext">t-1, t-7, 7-day MA, 14-day MA</div>
-      </div>
+      <div class="stat-icon-wrapper amber"><i data-lucide="layers"></i></div>
     </div>
 
-    <div class="stat-box">
-      <div class="stat-icon warning">
-        <i data-lucide="lock"></i>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Lookahead Check</span>
+        <span class="stat-value">0% Leakage</span>
+        <span class="stat-subtext">Strict Chronological Boundary</span>
       </div>
-      <div>
-        <div class="stat-value">0% Leakage</div>
-        <div class="stat-label">Lookahead Check</div>
-        <div class="stat-subtext">Strictly chronological boundary</div>
-      </div>
+      <div class="stat-icon-wrapper green"><i data-lucide="lock"></i></div>
     </div>
   </div>
 
-  <!-- Leakage Safety Rules Card -->
+  <!-- Interactive Action Cards (Inspired by Reference) -->
+  <div class="action-grid">
+    <div class="action-card active-action">
+      <div class="action-icon">⏱️</div>
+      <div class="action-title">1. Chronological Split</div>
+      <div class="action-desc">Observations before 2025 train the model; year 2025 evaluates forecast accuracy.</div>
+    </div>
+
+    <div class="action-card active-action">
+      <div class="action-icon">🔄</div>
+      <div class="action-title">2. Historical Lag Shifts</div>
+      <div class="action-desc">Calculated strictly within each Zone using values prior to day t.</div>
+    </div>
+
+    <div class="action-card active-action">
+      <div class="action-icon">📈</div>
+      <div class="action-title">3. Moving Average Signals</div>
+      <div class="action-desc">7-day and 14-day rolling historical demand windows.</div>
+    </div>
+
+    <div class="action-card active-action">
+      <div class="action-icon">🛡️</div>
+      <div class="action-title">4. Warmup Window Pruned</div>
+      <div class="action-desc">Initial 14 days dropped so all lag signals are 100% complete.</div>
+    </div>
+  </div>
+
+  <!-- Feature Engineering Details -->
   <div class="grid-2" style="margin-bottom: 24px;">
-    <div class="card">
+    <div class="card accent-top-teal">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="shield-alert" style="color: var(--teal); width: 18px; height: 18px;"></i>
-            Chronological Split &amp; Time-Series Integrity
+            <i data-lucide="clock" style="color: var(--teal);"></i>
+            Time-Series Integrity Protocol
           </div>
           <div class="card-subtitle">Zero data leakage across forecasting horizons</div>
         </div>
-        <span class="badge-tag teal">Chronological Split</span>
+        <span class="header-badge teal">Chronological Split</span>
       </div>
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
-        Unlike standard cross-sectional models, demand forecasting must never randomly shuffle rows. Time-aware rules applied:
-      </p>
-      <ul style="font-size: 0.85rem; color: var(--text-main); margin-left: 20px; line-height: 1.8;">
-        <li><strong>Chronological Cutoff:</strong> Observations before <code>2025-01-01</code> form the train set (2 full years across 5 zones); year <code>2025</code> serves as strictly forward evaluation.</li>
-        <li><strong>Zone-Partitioned Shifting:</strong> Lags and rolling windows are calculated strictly within each <code>Zone_ID</code> to prevent cross-zone signal mixing.</li>
-        <li><strong>Warmup Pruning:</strong> Exactly 70 warmup observations (14 days × 5 zones) dropped from initial history so all lag inputs are fully populated.</li>
+      <ul style="font-size: 0.84rem; color: var(--text-main); margin-left: 20px; line-height: 1.8;">
+        <li><strong>Chronological Partition:</strong> 2023–2024 forms the training baseline across 5 zones; 2025 serves as unseen forward evaluation.</li>
+        <li><strong>Zone-Isolated Shifts:</strong> Rolling calculations are grouped strictly by <code>Zone_ID</code> so consumption in Zone Z01 never spills into Zone Z02.</li>
+        <li><strong>Strict Lookahead Prevention:</strong> Day $t$ utilizes strictly $t-1$ and historical observations. Day $t$ target never leaks into predictors.</li>
       </ul>
     </div>
 
-    <div class="card">
+    <div class="card accent-top-blue">
       <div class="card-header">
         <div>
           <div class="card-title">
-            <i data-lucide="cpu" style="color: var(--primary); width: 18px; height: 18px;"></i>
-            Engineered Forecasting Features
+            <i data-lucide="cpu" style="color: var(--primary);"></i>
+            Engineered Forecasting Predictors
           </div>
-          <div class="card-subtitle">Historical indicators informing next-day water consumption</div>
+          <div class="card-subtitle">Mathematical signals driving next-day demand prediction</div>
         </div>
-        <span class="badge-tag">Feature Pipeline</span>
+        <span class="header-badge">Feature Signals</span>
       </div>
       <div class="data-table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Feature Symbol</th>
-              <th>Mathematical Formulation</th>
-              <th>Forecasting Utility</th>
+              <th>Feature Identifier</th>
+              <th>Formulation</th>
+              <th>Operational Insight</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><strong><code>Demand_Lag_1</code></strong></td>
               <td>$Demand_{t-1}$</td>
-              <td>Short-term momentum &amp; yesterday's baseline</td>
+              <td>Yesterday's baseline demand volume</td>
             </tr>
             <tr>
               <td><strong><code>Demand_Lag_7</code></strong></td>
               <td>$Demand_{t-7}$</td>
-              <td>Weekly seasonal cycle (same day last week)</td>
+              <td>Same-day-last-week cyclical pattern</td>
             </tr>
             <tr>
               <td><strong><code>Demand_Rolling_7</code></strong></td>
-              <td>$\frac{1}{7} \sum_{i=1}^{7} Demand_{t-i}$</td>
-              <td>7-day moving average demand smoothed trend</td>
+              <td>$\frac{1}{7}\sum_{i=1}^{7} D_{t-i}$</td>
+              <td>7-day moving average consumption trend</td>
             </tr>
             <tr>
               <td><strong><code>Demand_Rolling_14</code></strong></td>
-              <td>$\frac{1}{14} \sum_{i=1}^{14} Demand_{t-i}$</td>
-              <td>Bi-weekly demand baseline capturing seasonal shift</td>
+              <td>$\frac{1}{14}\sum_{i=1}^{14} D_{t-i}$</td>
+              <td>14-day smoothed baseline capturing seasonal drift</td>
             </tr>
           </tbody>
         </table>
@@ -299,46 +342,52 @@
     </div>
   </div>
 
-  <!-- Artifacts and Datasets Table -->
+  <!-- Operational Summary Table (NO FILE PATHS) -->
   <div class="card">
     <div class="card-header">
       <div>
         <div class="card-title">
-          <i data-lucide="file-check" style="color: var(--primary); width: 18px; height: 18px;"></i>
-          Generated Preprocessing Artifacts
+          <i data-lucide="check-circle" style="color: var(--primary);"></i>
+          Municipal Forecasting Pipeline Specifications
         </div>
-        <div class="card-subtitle">Processed datasets and serialized transformers ready for training</div>
+        <div class="card-subtitle">Verified feature sets, encodings, and temporal coverage across all 5 municipal zones</div>
       </div>
-      <span class="badge-tag success">Ready for Models</span>
+      <span class="header-badge">Pipeline Status</span>
     </div>
     <div class="data-table-container">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Artifact Role</th>
-            <th>File Path</th>
-            <th>Record Count / Object</th>
-            <th>Status</th>
+            <th>Specification Element</th>
+            <th>Configured Setting</th>
+            <th>Coverage Scope</th>
+            <th>Verification Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>Processed Training Set</strong></td>
-            <td><code>data/processed/demand_train.csv</code></td>
-            <td>3,585 records (2023–2024 across 5 zones)</td>
+            <td><strong>Training Window</strong></td>
+            <td><code>{{ demand_prep.train_date_range[0] }}</code> to <code>{{ demand_prep.train_date_range[1] }}</code></td>
+            <td>3,585 daily zone observations (2023–2024)</td>
             <td><span class="badge-tag success">Verified Clean</span></td>
           </tr>
           <tr>
-            <td><strong>Processed Test Set</strong></td>
-            <td><code>data/processed/demand_test.csv</code></td>
-            <td>1,825 records (2025 across 5 zones)</td>
+            <td><strong>Forward Evaluation Window</strong></td>
+            <td><code>{{ demand_prep.test_date_range[0] }}</code> to <code>{{ demand_prep.test_date_range[1] }}</code></td>
+            <td>1,825 daily zone observations (Year 2025)</td>
             <td><span class="badge-tag success">Verified Clean</span></td>
           </tr>
           <tr>
-            <td><strong>Fitted Preprocessor Pipeline</strong></td>
-            <td><code>models/demand/demand_preprocessor.joblib</code></td>
-            <td>Scaler + Categorical schema + Zone encodings</td>
-            <td><span class="badge-tag success">Serialized</span></td>
+            <td><strong>Categorical Encodings</strong></td>
+            <td>Zone Identifiers (Z01–Z05) &amp; Seasonal Regimes</td>
+            <td>One-hot encoded indicators</td>
+            <td><span class="badge-tag success">Encoded</span></td>
+          </tr>
+          <tr>
+            <td><strong>Scaling Protocol</strong></td>
+            <td>StandardScaler</td>
+            <td>Fitted solely on continuous training features</td>
+            <td><span class="badge-tag success">Leakage-Free</span></td>
           </tr>
         </tbody>
       </table>

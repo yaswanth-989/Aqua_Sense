@@ -84,6 +84,330 @@
       "missing_pct": 0.0
     }
   ],
+  "unique_counts": [
+    {
+      "feature": "Date",
+      "unique_count": 1096,
+      "unique_pct": 20.0,
+      "dtype": "str"
+    },
+    {
+      "feature": "Zone_ID",
+      "unique_count": 5,
+      "unique_pct": 0.09,
+      "dtype": "str"
+    },
+    {
+      "feature": "Population",
+      "unique_count": 3971,
+      "unique_pct": 72.46,
+      "dtype": "int64"
+    },
+    {
+      "feature": "Active_Connections",
+      "unique_count": 1853,
+      "unique_pct": 33.81,
+      "dtype": "float64"
+    },
+    {
+      "feature": "Avg_Temperature_C",
+      "unique_count": 1906,
+      "unique_pct": 34.78,
+      "dtype": "float64"
+    },
+    {
+      "feature": "Humidity_pct",
+      "unique_count": 2068,
+      "unique_pct": 37.74,
+      "dtype": "float64"
+    },
+    {
+      "feature": "Rainfall_mm",
+      "unique_count": 1516,
+      "unique_pct": 27.66,
+      "dtype": "float64"
+    },
+    {
+      "feature": "Day_of_Week",
+      "unique_count": 7,
+      "unique_pct": 0.13,
+      "dtype": "str"
+    },
+    {
+      "feature": "Is_Weekend",
+      "unique_count": 2,
+      "unique_pct": 0.04,
+      "dtype": "int64"
+    },
+    {
+      "feature": "Is_Holiday",
+      "unique_count": 2,
+      "unique_pct": 0.04,
+      "dtype": "int64"
+    },
+    {
+      "feature": "Month",
+      "unique_count": 12,
+      "unique_pct": 0.22,
+      "dtype": "int64"
+    },
+    {
+      "feature": "Season",
+      "unique_count": 4,
+      "unique_pct": 0.07,
+      "dtype": "str"
+    },
+    {
+      "feature": "Water_Demand_kL",
+      "unique_count": 5251,
+      "unique_pct": 95.82,
+      "dtype": "float64"
+    }
+  ],
+  "univariate_profiles": [
+    {
+      "feature": "Water_Demand_kL",
+      "count": 5480,
+      "mean": 779.06,
+      "std": 229.69,
+      "min": 405.21,
+      "q25": 556.83,
+      "median": 781.93,
+      "q75": 967.59,
+      "max": 1546.32,
+      "iqr": 410.76,
+      "skewness": 0.227,
+      "kurtosis": -1.144
+    },
+    {
+      "feature": "Avg_Temperature_C",
+      "count": 5415,
+      "mean": 27.07,
+      "std": 5.43,
+      "min": 13.09,
+      "q25": 22.51,
+      "median": 27.08,
+      "q75": 31.62,
+      "max": 49.78,
+      "iqr": 9.11,
+      "skewness": 0.134,
+      "kurtosis": -0.64
+    },
+    {
+      "feature": "Humidity_pct",
+      "count": 5399,
+      "mean": 66.87,
+      "std": 6.15,
+      "min": 6.22,
+      "q25": 63.2,
+      "median": 66.93,
+      "q75": 70.66,
+      "max": 87.27,
+      "iqr": 7.45,
+      "skewness": -1.685,
+      "kurtosis": 15.381
+    },
+    {
+      "feature": "Rainfall_mm",
+      "count": 5426,
+      "mean": 5.49,
+      "std": 11.77,
+      "min": 0.0,
+      "q25": 0.0,
+      "median": 0.0,
+      "q75": 8.04,
+      "max": 179.26,
+      "iqr": 8.04,
+      "skewness": 6.965,
+      "kurtosis": 82.12
+    },
+    {
+      "feature": "Active_Connections",
+      "count": 5448,
+      "mean": 13203.07,
+      "std": 2828.42,
+      "min": 9139.0,
+      "q25": 10870.0,
+      "median": 13362.0,
+      "q75": 15380.0,
+      "max": 17397.0,
+      "iqr": 4510.0,
+      "skewness": -0.013,
+      "kurtosis": -1.404
+    },
+    {
+      "feature": "Population",
+      "count": 5480,
+      "mean": 51844.07,
+      "std": 12218.8,
+      "min": 34194.0,
+      "q25": 41246.75,
+      "median": 52643.5,
+      "q75": 61155.25,
+      "max": 70422.0,
+      "iqr": 19908.5,
+      "skewness": 0.014,
+      "kurtosis": -1.431
+    }
+  ],
+  "histograms": {
+    "Water_Demand_kL": {
+      "labels": [
+        "405.2-519.3",
+        "519.3-633.4",
+        "633.4-747.5",
+        "747.5-861.7",
+        "861.7-975.8",
+        "975.8-1089.9",
+        "1089.9-1204.0",
+        "1204.0-1318.1",
+        "1318.1-1432.2",
+        "1432.2-1546.3"
+      ],
+      "counts": [
+        884,
+        1218,
+        345,
+        910,
+        799,
+        718,
+        504,
+        92,
+        5,
+        5
+      ]
+    },
+    "Avg_Temperature_C": {
+      "labels": [
+        "13.1-16.8",
+        "16.8-20.4",
+        "20.4-24.1",
+        "24.1-27.8",
+        "27.8-31.4",
+        "31.4-35.1",
+        "35.1-38.8",
+        "38.8-42.4",
+        "42.4-46.1",
+        "46.1-49.8"
+      ],
+      "counts": [
+        34,
+        628,
+        1240,
+        1013,
+        1080,
+        1105,
+        293,
+        4,
+        8,
+        10
+      ]
+    },
+    "Humidity_pct": {
+      "labels": [
+        "6.2-14.3",
+        "14.3-22.4",
+        "22.4-30.5",
+        "30.5-38.6",
+        "38.6-46.7",
+        "46.7-54.9",
+        "54.9-63.0",
+        "63.0-71.1",
+        "71.1-79.2",
+        "79.2-87.3"
+      ],
+      "counts": [
+        10,
+        2,
+        0,
+        0,
+        0,
+        71,
+        1188,
+        2890,
+        1161,
+        77
+      ]
+    },
+    "Rainfall_mm": {
+      "labels": [
+        "0.0-17.9",
+        "17.9-35.9",
+        "35.9-53.8",
+        "53.8-71.7",
+        "71.7-89.6",
+        "89.6-107.6",
+        "107.6-125.5",
+        "125.5-143.4",
+        "143.4-161.3",
+        "161.3-179.3"
+      ],
+      "counts": [
+        4893,
+        454,
+        58,
+        6,
+        0,
+        0,
+        0,
+        5,
+        2,
+        8
+      ]
+    },
+    "Active_Connections": {
+      "labels": [
+        "9139.0-9964.8",
+        "9964.8-10790.6",
+        "10790.6-11616.4",
+        "11616.4-12442.2",
+        "12442.2-13268.0",
+        "13268.0-14093.8",
+        "14093.8-14919.6",
+        "14919.6-15745.4",
+        "15745.4-16571.2",
+        "16571.2-17397.0"
+      ],
+      "counts": [
+        1092,
+        36,
+        1051,
+        0,
+        233,
+        856,
+        0,
+        1090,
+        0,
+        1090
+      ]
+    },
+    "Population": {
+      "labels": [
+        "34194.0-37816.8",
+        "37816.8-41439.6",
+        "41439.6-45062.4",
+        "45062.4-48685.2",
+        "48685.2-52308.0",
+        "52308.0-55930.8",
+        "55930.8-59553.6",
+        "59553.6-63176.4",
+        "63176.4-66799.2",
+        "66799.2-70422.0"
+      ],
+      "counts": [
+        1096,
+        489,
+        607,
+        0,
+        291,
+        805,
+        1,
+        1095,
+        0,
+        1096
+      ]
+    }
+  },
   "zone_profiles": [
     {
       "zone_id": "Z03",

@@ -1,15 +1,20 @@
 """
 AquaSense Water Potability EDA Module
-Adapts coursework EDA principles (distribution profiling, missingness, correlation matrix,
-mutual information, and IQR outlier boundaries) for the water potability dataset.
+Comprehensive exploratory analysis covering:
+1. Univariate distributions (Histograms, skewness, kurtosis, parametric summary).
+2. Missingness audits and cardinality/unique counts.
+3. Bivariate target analysis (Potable vs Non-Potable mean contrasts, t-tests).
+4. Multivariate correlation matrix and mutual information ranking.
+5. Outlier detection using Tukey's IQR boundaries.
 """
 import os
 import sys
 import json
 import numpy as np
 import pandas as pd
+from scipy import stats
 import matplotlib
-matplotlib.use("Agg")  # Non-interactive backend for headless plotting
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Dict, Any
@@ -29,7 +34,7 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 
 
 def compute_potability_eda() -> Dict[str, Any]:
-    """Execute complete EDA on the real water potability dataset and return structured analysis."""
+    """Execute comprehensive EDA on the real water potability dataset."""
     df = load_raw_potability_data()
     total_samples = len(df)
     features = [c for c in df.columns if c != "Potability"]
@@ -45,8 +50,9 @@ def compute_potability_eda() -> Dict[str, Any]:
         "imbalance_ratio": round(target_counts.get(0, 0) / max(1, target_counts.get(1, 1)), 2)
     }
 
-    # 2. Missing values analysis
+    # 2. Missing values analysis & unique counts
     missing_analysis = []
+    unique_counts = []
     for col in df.columns:
         cnt = int(df[col].isnull().sum())
         pct = round((cnt / total_samples) * 100, 2)
@@ -57,9 +63,19 @@ def compute_potability_eda() -> Dict[str, Any]:
             "complete_count": total_samples - cnt
         })
 
-    # 3. Univariate statistical profiling
+        unq = int(df[col].nunique())
+        unique_counts.append({
+            "feature": col,
+            "unique_count": unq,
+            "unique_pct": round((unq / total_samples) * 100, 2),
+            "dtype": str(df[col].dtype)
+        })
+
+    # 3. Univariate statistical profiling (with kurtosis and histogram bins)
     stat_profiles = []
     outlier_profiles = []
+    histograms = {}
+
     for col in features:
         s = df[col].dropna()
         q1 = float(s.quantile(0.25))
@@ -73,9 +89,19 @@ def compute_potability_eda() -> Dict[str, Any]:
         mean_val = float(s.mean())
         std_val = float(s.std())
         skew_val = float(s.skew())
+        kurt_val = float(stats.kurtosis(s))
+
+        # Skewness category
+        if abs(skew_val) < 0.5:
+            skew_cat = "Approximately Symmetric"
+        elif abs(skew_val) < 1.0:
+            skew_cat = "Moderately Skewed"
+        else:
+            skew_cat = "Highly Skewed"
 
         stat_profiles.append({
             "feature": col,
+            "count": int(len(s)),
             "mean": round(mean_val, 2),
             "std": round(std_val, 2),
             "min": round(float(s.min()), 2),
@@ -83,7 +109,10 @@ def compute_potability_eda() -> Dict[str, Any]:
             "median": round(float(s.median()), 2),
             "q75": round(q3, 2),
             "max": round(float(s.max()), 2),
-            "skewness": round(skew_val, 3)
+            "iqr": round(iqr, 2),
+            "skewness": round(skew_val, 3),
+            "kurtosis": round(kurt_val, 3),
+            "skew_category": skew_cat
         })
 
         outlier_profiles.append({
@@ -97,13 +126,23 @@ def compute_potability_eda() -> Dict[str, Any]:
             "outlier_pct": outlier_pct
         })
 
+        # Precompute 10 histogram bins for interactive visualizer
+        bin_counts, bin_edges = np.histogram(s, bins=10)
+        bin_labels = [
+            f"{bin_edges[i]:.1f}-{bin_edges[i+1]:.1f}"
+            for i in range(len(bin_counts))
+        ]
+        histograms[col] = {
+            "labels": bin_labels,
+            "counts": [int(c) for c in bin_counts]
+        }
+
     # 4. Correlation matrix
     corr_matrix = df.corr()
     corr_dict = {}
     for r in corr_matrix.index:
         corr_dict[r] = {c: round(float(corr_matrix.loc[r, c]), 4) for c in corr_matrix.columns}
 
-    # Correlation specifically with Potability target
     target_corrs = []
     for col in features:
         r_val = float(corr_matrix.loc[col, "Potability"])
@@ -114,7 +153,7 @@ def compute_potability_eda() -> Dict[str, Any]:
         })
     target_corrs = sorted(target_corrs, key=lambda x: x["abs_correlation"], reverse=True)
 
-    # 5. Mutual Information Scores (using complete cases)
+    # 5. Mutual Information Scores
     clean_df = df.dropna()
     mi_scores = mutual_info_classif(
         clean_df[features], clean_df["Potability"], random_state=42
@@ -127,16 +166,24 @@ def compute_potability_eda() -> Dict[str, Any]:
         })
     mi_ranking = sorted(mi_ranking, key=lambda x: x["mutual_information"], reverse=True)
 
-    # 6. Grouped statistics (Potable vs Non-Potable mean comparison)
-    grouped_stats = []
+    # 6. Bivariate Analysis (Potable vs Non-Potable mean comparison + t-test)
+    bivariate_target_stats = []
     for col in features:
-        m0 = float(df[df["Potability"] == 0][col].mean())
-        m1 = float(df[df["Potability"] == 1][col].mean())
-        grouped_stats.append({
+        p0 = df[df["Potability"] == 0][col].dropna()
+        p1 = df[df["Potability"] == 1][col].dropna()
+        m0 = float(p0.mean())
+        m1 = float(p1.mean())
+        diff = m1 - m0
+        t_stat, p_val = stats.ttest_ind(p0, p1)
+
+        bivariate_target_stats.append({
             "feature": col,
             "mean_non_potable": round(m0, 2),
             "mean_potable": round(m1, 2),
-            "diff": round(m1 - m0, 2)
+            "diff": round(diff, 2),
+            "t_statistic": round(float(t_stat), 3),
+            "p_value": round(float(p_val), 4),
+            "significant_at_05": bool(p_val < 0.05)
         })
 
     eda_summary = {
@@ -146,11 +193,13 @@ def compute_potability_eda() -> Dict[str, Any]:
         "features": features,
         "target_analysis": target_analysis,
         "missing_analysis": missing_analysis,
+        "unique_counts": unique_counts,
         "univariate_profiles": stat_profiles,
         "outlier_profiles": outlier_profiles,
+        "histograms": histograms,
         "target_correlations": target_corrs,
         "mutual_information": mi_ranking,
-        "grouped_stats": grouped_stats,
+        "bivariate_target_stats": bivariate_target_stats,
         "correlation_matrix": corr_dict
     }
 
@@ -158,14 +207,14 @@ def compute_potability_eda() -> Dict[str, Any]:
     with open(os.path.join(RESULTS_DIR, "potability_eda_summary.json"), "w") as f:
         json.dump(eda_summary, f, indent=2)
 
-    # Generate and save publication-grade figures
-    _generate_potability_figures(df, features, corr_matrix)
+    # Static figures
+    _generate_potability_figures(df, corr_matrix)
 
     return eda_summary
 
 
-def _generate_potability_figures(df: pd.DataFrame, features: list, corr_matrix: pd.DataFrame):
-    """Generate static plots for reports and verification."""
+def _generate_potability_figures(df: pd.DataFrame, corr_matrix: pd.DataFrame):
+    """Generate static plots for reports."""
     plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
 
     # 1. Target distribution
@@ -192,7 +241,7 @@ def _generate_potability_figures(df: pd.DataFrame, features: list, corr_matrix: 
 
 
 if __name__ == "__main__":
-    results = compute_potability_eda()
-    print("Potability EDA computed successfully.")
-    print("Target distribution:", results["target_analysis"])
-    print("Top correlated feature:", results["target_correlations"][0])
+    res = compute_potability_eda()
+    print("Potability EDA computed with all univariate, bivariate, and multivariate metrics.")
+    print("Features processed:", len(res["features"]))
+    print("Sample bivariate stat:", res["bivariate_target_stats"][0])

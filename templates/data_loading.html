@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Data Loading &amp; Inspection — AquaSense{% endblock %}
+{% block page_title %}Data Loading &amp; Inspection{% endblock %}
+{% block page_subtitle %}Raw dataset ingestion, schema verification, data types, and live record previews{% endblock %}
+
+{% block topbar_actions %}
+<span class="header-badge teal">
+  <i data-lucide="check-circle-2" style="width: 14px; height: 14px;"></i>
+  Unaltered Raw Ingestion
+</span>
+{% endblock %}
+
+{% block content %}
+<!-- Modern Segmented Tab Switcher -->
+<div class="tab-switcher">
+  <button id="tab-btn-load-pot" class="tab-btn active" onclick="switchLoadTab('potability')">
+    <i data-lucide="droplet" style="width: 16px; height: 16px;"></i>
+    <span>Water Potability Dataset (Task A — Real Data)</span>
+  </button>
+  <button id="tab-btn-load-dem" class="tab-btn" onclick="switchLoadTab('demand')">
+    <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
+    <span>Municipal Demand Dataset (Task B — Synthetic Time-Series)</span>
+  </button>
+</div>
+
+<!-- ==================== SECTION 1: POTABILITY LOADING ==================== -->
+<div id="section-load-potability">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Total Observations</span>
+        <span class="stat-value">{{ inspection.potability.total_rows }}</span>
+        <span class="stat-subtext">Drinking Water Samples</span>
+      </div>
+      <div class="stat-icon-wrapper blue"><i data-lucide="database"></i></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Total Features</span>
+        <span class="stat-value">{{ inspection.potability.total_columns }}</span>
+        <span class="stat-subtext">9 Inputs + 1 Binary Target</span>
+      </div>
+      <div class="stat-icon-wrapper teal"><i data-lucide="columns"></i></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Memory Footprint</span>
+        <span class="stat-value">{{ inspection.potability.memory_kb }} KB</span>
+        <span class="stat-subtext">In-Memory DataFrame</span>
+      </div>
+      <div class="stat-icon-wrapper amber"><i data-lucide="hard-drive"></i></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Duplicate Rows</span>
+        <span class="stat-value">{{ inspection.potability.duplicates }}</span>
+        <span class="stat-subtext">Zero Redundant Rows</span>
+      </div>
+      <div class="stat-icon-wrapper green"><i data-lucide="check-check"></i></div>
+    </div>
+  </div>
+
+  <!-- Column Schema Table -->
+  <div class="card accent-top-blue">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="table" style="color: var(--primary);"></i>
+          Water Potability Schema &amp; Data Types
+        </div>
+        <div class="card-subtitle">Field types, non-null counts, missing rates, and cardinality</div>
+      </div>
+      <span class="header-badge">Schema Audit</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Column Name</th>
+            <th>Data Type</th>
+            <th>Non-Null Count</th>
+            <th>Missing Count</th>
+            <th>Missing Rate (%)</th>
+            <th>Unique Values</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for col in inspection.potability.columns_info %}
+          <tr>
+            <td><strong>{{ col.name }}</strong></td>
+            <td><code>{{ col.dtype }}</code></td>
+            <td>{{ "{:,}".format(col.non_null_count) }}</td>
+            <td>{{ col.missing_count }}</td>
+            <td>
+              {% if col.missing_pct > 0 %}
+              <span class="badge-tag warning">{{ col.missing_pct }}%</span>
+              {% else %}
+              <span class="badge-tag success">0%</span>
+              {% endif %}
+            </td>
+            <td>{{ "{:,}".format(col.unique_count) }}</td>
+            <td>
+              {% if col.name == 'Potability' %}
+              <span class="badge-tag blue">Target Label</span>
+              {% elif col.missing_count > 0 %}
+              <span class="badge-tag warning">Requires Imputation</span>
+              {% else %}
+              <span class="badge-tag success">Complete</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Live Data Preview Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="eye" style="color: var(--teal);"></i>
+          Live Data Preview — First 10 Ingested Records
+        </div>
+        <div class="card-subtitle">Unaltered sample rows loaded from storage</div>
+      </div>
+      <span class="header-badge teal">Live Data Feed</span>
+    </div>
+    <div class="data-table-container" style="overflow-x: auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            {% for c in inspection.potability.column_names %}
+            <th>{{ c }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in inspection.potability.preview_rows %}
+          <tr>
+            <td style="color: var(--text-muted); font-weight: 600;">{{ loop.index }}</td>
+            {% for c in inspection.potability.column_names %}
+            <td>
+              {% if row[c] is none %}
+              <span style="color: var(--amber); font-style: italic;">null</span>
+              {% elif c == 'Potability' %}
+                {% if row[c] == 1 %}
+                <span class="badge-tag success">1 (Potable)</span>
+                {% else %}
+                <span class="badge-tag danger">0 (Non-Potable)</span>
+                {% endif %}
+              {% else %}
+              {{ row[c] }}
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 2: DEMAND LOADING ==================== -->
+<div id="section-load-demand" style="display: none;">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Total Observations</span>
+        <span class="stat-value">{{ inspection.demand.total_rows }}</span>
+        <span class="stat-subtext">Daily Consumption Logs</span>
+      </div>
+      <div class="stat-icon-wrapper teal"><i data-lucide="calendar"></i></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Total Columns</span>
+        <span class="stat-value">{{ inspection.demand.total_columns }}</span>
+        <span class="stat-subtext">Temporal, Demographic &amp; Weather</span>
+      </div>
+      <div class="stat-icon-wrapper blue"><i data-lucide="columns"></i></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Memory Footprint</span>
+        <span class="stat-value">{{ inspection.demand.memory_kb }} KB</span>
+        <span class="stat-subtext">In-Memory DataFrame</span>
+      </div>
+      <div class="stat-icon-wrapper amber"><i data-lucide="hard-drive"></i></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Duplicate Records</span>
+        <span class="stat-value">{{ inspection.demand.duplicates }}</span>
+        <span class="stat-subtext">Zero Duplicate Rows</span>
+      </div>
+      <div class="stat-icon-wrapper green"><i data-lucide="check-check"></i></div>
+    </div>
+  </div>
+
+  <!-- Demand Column Schema Table -->
+  <div class="card accent-top-teal">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="table" style="color: var(--teal);"></i>
+          Municipal Water Demand Schema &amp; Attributes
+        </div>
+        <div class="card-subtitle">Field specifications, types, non-null counts, and unique values</div>
+      </div>
+      <span class="header-badge teal">Schema Audit</span>
+    </div>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Column Name</th>
+            <th>Data Type</th>
+            <th>Non-Null Count</th>
+            <th>Missing Count</th>
+            <th>Missing Rate (%)</th>
+            <th>Unique Values</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for col in inspection.demand.columns_info %}
+          <tr>
+            <td><strong>{{ col.name }}</strong></td>
+            <td><code>{{ col.dtype }}</code></td>
+            <td>{{ "{:,}".format(col.non_null_count) }}</td>
+            <td>{{ col.missing_count }}</td>
+            <td>
+              {% if col.missing_pct > 0 %}
+              <span class="badge-tag warning">{{ col.missing_pct }}%</span>
+              {% else %}
+              <span class="badge-tag success">0%</span>
+              {% endif %}
+            </td>
+            <td>{{ "{:,}".format(col.unique_count) }}</td>
+            <td>
+              {% if col.name == 'Water_Demand_kL' %}
+              <span class="badge-tag blue">Regression Target</span>
+              {% elif col.name == 'Date' %}
+              <span class="badge-tag">Time Index</span>
+              {% elif col.name == 'Zone_ID' %}
+              <span class="badge-tag teal">Spatial Entity</span>
+              {% else %}
+              <span class="badge-tag">Explanatory Feature</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Demand Live Data Preview -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          <i data-lucide="eye" style="color: var(--primary);"></i>
+          Live Data Preview — First 10 Municipal Records
+        </div>
+        <div class="card-subtitle">Sample observations loaded from raw telemetry</div>
+      </div>
+      <span class="header-badge">Live Data Feed</span>
+    </div>
+    <div class="data-table-container" style="overflow-x: auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            {% for c in inspection.demand.column_names %}
+            <th>{{ c }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in inspection.demand.preview_rows %}
+          <tr>
+            <td style="color: var(--text-muted); font-weight: 600;">{{ loop.index }}</td>
+            {% for c in inspection.demand.column_names %}
+            <td>
+              {% if row[c] is none %}
+              <span style="color: var(--amber); font-style: italic;">null</span>
+              {% elif c == 'Water_Demand_kL' %}
+              <strong style="color: var(--teal);">{{ row[c] }} kL</strong>
+              {% elif c == 'Zone_ID' %}
+              <span class="badge-tag teal">{{ row[c] }}</span>
+              {% else %}
+              {{ row[c] }}
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchLoadTab(tab) {
+  const potSec = document.getElementById('section-load-potability');
+  const demSec = document.getElementById('section-load-demand');
+  const potBtn = document.getElementById('tab-btn-load-pot');
+  const demBtn = document.getElementById('tab-btn-load-dem');
+
+  if (tab === 'potability') {
+    potSec.style.display = 'block';
+    demSec.style.display = 'none';
+    potBtn.classList.add('active');
+    demBtn.classList.remove('active');
+  } else {
+    potSec.style.display = 'none';
+    demSec.style.display = 'block';
+    demBtn.classList.add('active');
+    potBtn.classList.remove('active');
+  }
+}
+</script>
+{% endblock %}
