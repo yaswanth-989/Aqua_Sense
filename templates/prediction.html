@@ -1,23 +1,162 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% block title %}Prediction Portal{% endblock %}
+{% block breadcrumb %}Prediction Portal{% endblock %}
 
-{% block title %}Prediction — AquaSense{% endblock %}
-{% block page_title %}Inference &amp; Prediction Engine{% endblock %}
-{% block page_subtitle %}Interactive prediction forms powered by verified pipeline schemas{% endblock %}
+{% block topbar_actions %}
+<span class="header-badge">
+  <i class="fas fa-clock" style="font-size:10px;"></i>
+  Coming Next
+</span>
+{% endblock %}
 
 {% block content %}
-<div class="coming-soon-banner">
-  <div class="coming-soon-icon">
-    <i data-lucide="sparkles"></i>
+
+<div class="page-header">
+  <h2>Prediction Portal</h2>
+  <p>Live inference — enter water quality measurements or zone conditions to get real-time predictions from trained models.</p>
+</div>
+
+<div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:520px;margin-bottom:22px;">
+  <div class="action-card active-action" id="btn-pot" onclick="switchTab('pot')">
+    <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
+    <span class="action-title">Potability Check</span>
+    <span class="action-desc">Enter 9 parameters → Is this water safe to drink?</span>
   </div>
-  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 7</div>
-  <h2 class="coming-soon-title">Interactive Prediction Portal Coming Soon</h2>
-  <p class="coming-soon-desc">
-    Interactive forms for real-time potability classification and demand forecasting will be activated once models and preprocessing pipelines are persisted to <code>models/</code>.
-  </p>
-  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
-    <span>• Live Water Potability Assessment</span>
-    <span>• Next-Day Municipal Demand Forecaster</span>
-    <span>• Input Validation &amp; Error Handling</span>
+  <div class="action-card" id="btn-dem" onclick="switchTab('dem')">
+    <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
+    <span class="action-title">Demand Forecast</span>
+    <span class="action-desc">Enter zone conditions → Predict next-day demand (kL)</span>
   </div>
 </div>
+
+<!-- POTABILITY -->
+<div id="view-pot">
+  <div class="card accent-top-blue">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-flask card-icon"></i>
+        <h3>Water Potability — Parameter Input</h3>
+      </div>
+      <span class="header-badge">9 Parameters Required</span>
+    </div>
+    <div class="card-body">
+      <div class="coming-soon-banner" style="border:none;padding:28px 0 0;">
+        <div class="coming-soon-icon"><i class="fas fa-flask"></i></div>
+        <div class="coming-soon-title">Live Prediction Form — In Development</div>
+        <div class="coming-soon-desc">
+          This form will accept pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon,
+          Trihalomethanes, and Turbidity values. The best-performing trained model will return
+          a potability verdict with confidence score.
+        </div>
+      </div>
+      <div class="table-wrapper" style="margin-top:16px;">
+        <table>
+          <thead><tr><th>Input Parameter</th><th>WHO Safe Range</th><th>Units</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;">pH</td><td>6.5 – 8.5</td><td>—</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Hardness</td><td>&lt; 300</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Solids (TDS)</td><td>&lt; 500</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Chloramines</td><td>&lt; 4</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Sulfate</td><td>&lt; 250</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Conductivity</td><td>&lt; 400</td><td>µS/cm</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Organic Carbon</td><td>&lt; 2</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Trihalomethanes</td><td>&lt; 80</td><td>µg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Turbidity</td><td>&lt; 5</td><td>NTU</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEMAND -->
+<div id="view-dem" style="display:none;">
+  <div class="card accent-top-teal">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-chart-bar card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Water Demand Forecast — Zone Conditions Input</h3>
+      </div>
+      <span class="header-badge teal">Next-Day kL Prediction</span>
+    </div>
+    <div class="card-body">
+      <div class="coming-soon-banner" style="border:none;padding:28px 0 0;">
+        <div class="coming-soon-icon" style="background:var(--teal-50);color:var(--teal);"><i class="fas fa-chart-bar"></i></div>
+        <div class="coming-soon-title">Live Demand Forecast Form — In Development</div>
+        <div class="coming-soon-desc">
+          Select a zone (Z01–Z05), enter tomorrow's expected temperature, humidity, rainfall, and whether it is
+          a weekend or holiday. The trained regression model will output next-day water demand in kiloliters.
+        </div>
+      </div>
+      <div class="table-wrapper" style="margin-top:16px;">
+        <table>
+          <thead><tr><th>Input</th><th>Type</th><th>Example</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;">Zone ID</td><td>Categorical</td><td>Z01 – Z05</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Temperature</td><td>Numeric</td><td>28.5 °C</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Humidity</td><td>Numeric</td><td>72 %</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Rainfall</td><td>Numeric</td><td>0.0 mm</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Is Weekend</td><td>Boolean</td><td>0 / 1</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Is Holiday</td><td>Boolean</td><td>0 / 1</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+            <tr><td style="font-weight:600;">Previous Day Demand</td><td>Numeric</td><td>780.0 kL</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-title">
+      <i class="fas fa-code card-icon"></i>
+      <h3>REST API — Available Now</h3>
+    </div>
+    <span class="header-badge green">Live Endpoints</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Endpoint</th><th>Method</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>/api/v1/health</code></td>
+          <td><span class="badge-tag blue">GET</span></td>
+          <td>System health check — datasets loaded, model status</td>
+        </tr>
+        <tr>
+          <td><code>/api/v1/linear/demand</code></td>
+          <td><span class="badge-tag blue">GET</span></td>
+          <td>Full demand model results JSON including metrics and convergence</td>
+        </tr>
+        <tr>
+          <td><code>/api/v1/linear/potability</code></td>
+          <td><span class="badge-tag blue">GET</span></td>
+          <td>Full potability classification results JSON including confusion matrix</td>
+        </tr>
+        <tr>
+          <td><code>/api/v1/predict/potability</code></td>
+          <td><span class="badge-tag warning">POST</span></td>
+          <td>Coming — submit 9 parameters, receive potability verdict + probability</td>
+        </tr>
+        <tr>
+          <td><code>/api/v1/predict/demand</code></td>
+          <td><span class="badge-tag warning">POST</span></td>
+          <td>Coming — submit zone conditions, receive next-day demand kL forecast</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchTab(ds) {
+  ['pot','dem'].forEach(function(id) {
+    document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
+    document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
+  });
+}
+</script>
 {% endblock %}

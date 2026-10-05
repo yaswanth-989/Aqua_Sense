@@ -1,23 +1,168 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% block title %}Model Evaluation{% endblock %}
+{% block breadcrumb %}Model Evaluation{% endblock %}
 
-{% block title %}Model Evaluation — AquaSense{% endblock %}
-{% block page_title %}Model Evaluation &amp; Benchmarking{% endblock %}
-{% block page_subtitle %}Comparative validation, ROC/PR curves, confusion matrices, and residual diagnostics{% endblock %}
+{% block topbar_actions %}
+<span class="header-badge">
+  <i class="fas fa-clock" style="font-size:10px;"></i>
+  Coming Next
+</span>
+{% endblock %}
 
 {% block content %}
-<div class="coming-soon-banner">
-  <div class="coming-soon-icon">
-    <i data-lucide="award"></i>
+
+<div class="page-header">
+  <h2>Model Evaluation &amp; Benchmarking</h2>
+  <p>Cross-model comparison — RMSE, ROC-AUC, F1, confusion matrices, and precision-recall trade-offs across all trained models.</p>
+</div>
+
+<div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:520px;margin-bottom:22px;">
+  <div class="action-card active-action" id="btn-pot" onclick="switchDS('pot')">
+    <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
+    <span class="action-title">Potability Models</span>
+    <span class="action-desc">Classification benchmark — F1, ROC-AUC, Recall</span>
   </div>
-  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 6</div>
-  <h2 class="coming-soon-title">Model Evaluation Suite Coming Soon</h2>
-  <p class="coming-soon-desc">
-    Rigorous cross-validation, precision-recall analysis, ROC-AUC comparisons, and regression residual diagnostics will be displayed after model training.
-  </p>
-  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
-    <span>• Classification: Precision, Recall, F1, ROC-AUC</span>
-    <span>• Regression: RMSE, MAE, R²</span>
-    <span>• Probability Calibration Diagnostics</span>
+  <div class="action-card" id="btn-dem" onclick="switchDS('dem')">
+    <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
+    <span class="action-title">Demand Models</span>
+    <span class="action-desc">Regression benchmark — RMSE, MAE, R²</span>
   </div>
 </div>
+
+<!-- POTABILITY EVALUATION (preview — linear models already done) -->
+<div id="view-pot">
+  <div class="card accent-top-blue">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-trophy card-icon"></i>
+        <h3>Potability Classification — Current Benchmarks (Linear Models)</h3>
+      </div>
+      <span class="header-badge">656 Test Samples</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Model</th><th>Accuracy</th><th>Recall</th><th>Precision</th><th>F1</th><th>ROC-AUC</th><th>Stage</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Logistic Regression (Baseline)</td>
+            <td>0.59</td><td>0.53</td><td>0.52</td><td>0.53</td><td>0.56</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Logistic Regression (L1)</td>
+            <td>0.60</td><td>0.54</td><td>0.53</td><td>0.54</td><td>0.55</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Logistic Regression (L2)</td>
+            <td>0.60</td><td>0.54</td><td>0.53</td><td>0.53</td><td>0.55</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Logistic Regression (Balanced)</td>
+            <td>0.59</td><td>0.59</td><td>0.51</td><td>0.55</td><td>0.56</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Decision Tree</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag">Soon</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Random Forest</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag">Soon</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Gradient Boosting</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag">Soon</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <i class="fas fa-lightbulb" style="color:var(--accent);margin-top:2px;flex-shrink:0;"></i>
+    <span>Linear models plateau at ROC-AUC ≈ 0.56 because water safety boundaries are non-linear (multi-parameter thresholds). Tree and ensemble models are expected to improve this significantly.</span>
+  </div>
+</div>
+
+<!-- DEMAND EVALUATION -->
+<div id="view-dem" style="display:none;">
+  <div class="card accent-top-teal">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-trophy card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Demand Forecasting — Current Benchmarks (Linear Models)</h3>
+      </div>
+      <span class="header-badge teal">2025 Holdout · 1,825 Rows</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Model</th><th>RMSE (kL)</th><th>MAE (kL)</th><th>R²</th><th>Stage</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Multiple Linear Regression (OLS)</td>
+            <td><strong>40.37</strong></td><td>26.65</td><td><code>0.9695</code></td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Gradient Descent (From-Scratch)</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Ridge Regression (L2)</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Lasso Regression (L1)</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Elastic Net</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag success">Done</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Decision Tree Regressor</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag">Soon</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Random Forest Regressor</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag">Soon</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Gradient Boosting Regressor</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="badge-tag">Soon</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="insight-bar" style="background:var(--teal-50);border-color:var(--teal-100);">
+    <i class="fas fa-lightbulb" style="color:var(--teal);margin-top:2px;flex-shrink:0;"></i>
+    <span>OLS already achieves R² = 0.9695 on the unseen 2025 holdout, a strong baseline. Tree models will add non-linear corrections for outlier days (e.g., holidays, rainfall spikes).</span>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchDS(ds) {
+  ['pot','dem'].forEach(function(id) {
+    document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
+    document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
+  });
+}
+</script>
 {% endblock %}

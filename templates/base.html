@@ -1,121 +1,170 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}AquaSense — AI Water Intelligence{% endblock %}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>{% block title %}AquaSense{% endblock %} — AI Water Intelligence</title>
+  <meta name="description" content="AquaSense — AI-Based Water Quality Assessment and Demand Forecasting.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="/static/css/style.css">
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js for Interactive Telemetry Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
-  <!-- Persistent Sidebar -->
-  <aside class="app-sidebar">
-    <div class="brand-section">
-      <div class="brand-icon">
-        <i data-lucide="droplets"></i>
-      </div>
-      <div>
-        <div class="brand-title">AquaSense</div>
-        <div class="brand-subtitle">AI Water Intelligence</div>
-      </div>
+
+<aside class="sidebar">
+
+  <div class="sidebar-logo">
+    <div class="logo-mark"><i class="fas fa-droplet"></i></div>
+    <div>
+      <div class="logo-text">AquaSense</div>
+      <div class="logo-sub">AI Water Intelligence</div>
     </div>
-
-    <nav class="nav-menu">
-      <div class="nav-label">Core Pipeline</div>
-      <a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
-        <i data-lucide="layout-dashboard"></i>
-        <span>Dashboard</span>
-      </a>
-      <a href="/data_loading" class="nav-link {% if active_page == 'data_loading' %}active{% endif %}">
-        <i data-lucide="database"></i>
-        <span>Data Loading</span>
-      </a>
-      <a href="/eda" class="nav-link {% if active_page == 'eda' %}active{% endif %}">
-        <i data-lucide="bar-chart-2"></i>
-        <span>EDA</span>
-      </a>
-      <a href="/preprocessing" class="nav-link {% if active_page == 'preprocessing' %}active{% endif %}">
-        <i data-lucide="sliders"></i>
-        <span>Data Preprocessing</span>
-      </a>
-      <a href="/linear_models" class="nav-link {% if active_page == 'linear_models' %}active{% endif %}">
-        <i data-lucide="trending-up"></i>
-        <span>Regression &amp; Classification</span>
-      </a>
-      <a href="/tree_models" class="nav-link {% if active_page == 'tree_models' %}active{% endif %}">
-        <i data-lucide="git-branch"></i>
-        <span>Tree &amp; Ensemble Models</span>
-      </a>
-      <a href="/clustering" class="nav-link {% if active_page == 'clustering' %}active{% endif %}">
-        <i data-lucide="pie-chart"></i>
-        <span>Pattern Discovery</span>
-      </a>
-      <a href="/evaluation" class="nav-link {% if active_page == 'evaluation' %}active{% endif %}">
-        <i data-lucide="award"></i>
-        <span>Model Evaluation</span>
-      </a>
-      <a href="/prediction" class="nav-link {% if active_page == 'prediction' %}active{% endif %}">
-        <i data-lucide="sparkles"></i>
-        <span>Prediction Portal</span>
-      </a>
-
-      <div class="nav-divider"></div>
-
-      <div class="nav-label">Operations</div>
-      <a href="/deployment" class="nav-link {% if active_page == 'deployment' %}active{% endif %}">
-        <i data-lucide="server"></i>
-        <span>Deployment</span>
-      </a>
-      <a href="/monitoring" class="nav-link {% if active_page == 'monitoring' %}active{% endif %}">
-        <i data-lucide="activity"></i>
-        <span>Monitoring</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="status-indicator">
-        <span class="status-dot"></span>
-        <span>FastAPI Online</span>
-      </div>
-      <span style="font-size: 0.7rem; color: #64748b;">v0.2.0</span>
-    </div>
-  </aside>
-
-  <!-- Main Content View -->
-  <div class="app-container">
-    <header class="top-bar">
-      <div class="top-bar-title">
-        <h1>{% block page_title %}System Dashboard{% endblock %}</h1>
-        <p>{% block page_subtitle %}Water quality assessment &amp; municipal demand forecasting{% endblock %}</p>
-      </div>
-      <div class="top-bar-actions">
-        {% block topbar_actions %}
-        <span class="header-badge">
-          <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
-          System Operational
-        </span>
-        {% endblock %}
-      </div>
-    </header>
-
-    <main class="main-content">
-      {% block content %}{% endblock %}
-    </main>
   </div>
 
-  <script src="/static/js/script.js"></script>
-  <script>
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
-  </script>
-  {% block extra_scripts %}{% endblock %}
+  <div class="nav-label">Core Pipeline</div>
+  <nav>
+    <ul>
+      <li>
+        <a href="/" class="{% if active_page == 'dashboard' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+            <span>Dashboard</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/data_loading" class="{% if active_page == 'data_loading' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-database"></i></span>
+            <span>Data Loading</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/eda" class="{% if active_page == 'eda' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+            <span>EDA</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/preprocessing" class="{% if active_page == 'preprocessing' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-sliders"></i></span>
+            <span>Data Preprocessing</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/linear_models" class="{% if active_page == 'linear_models' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+            <span>Regression &amp; Classification</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/tree_models" class="{% if active_page == 'tree_models' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-sitemap"></i></span>
+            <span>Tree &amp; Ensemble Models</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/clustering" class="{% if active_page == 'clustering' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-circle-nodes"></i></span>
+            <span>Pattern Discovery</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/evaluation" class="{% if active_page == 'evaluation' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+            <span>Model Evaluation</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/prediction" class="{% if active_page == 'prediction' %}active{% endif %}">
+          <div class="nav-item-content">
+            <span class="nav-icon"><i class="fas fa-bullseye"></i></span>
+            <span>Prediction Portal</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="nav-label" style="margin-top:8px;">Module Status</div>
+  <div style="padding:2px 10px 12px;">
+    <div class="status-row">
+      <span class="status-dot"></span>
+      <span class="status-row-label">Data Loading</span>
+      <span class="badge-done">&#10003;</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot"></span>
+      <span class="status-row-label">EDA</span>
+      <span class="badge-done">&#10003;</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot"></span>
+      <span class="status-row-label">Data Preprocessing</span>
+      <span class="badge-done">&#10003;</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot"></span>
+      <span class="status-row-label">Regression &amp; Classification</span>
+      <span class="badge-done">&#10003;</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot pending"></span>
+      <span class="status-row-label">Tree &amp; Ensemble</span>
+      <span class="badge-soon">Soon</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot pending"></span>
+      <span class="status-row-label">Pattern Discovery</span>
+      <span class="badge-soon">Soon</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot pending"></span>
+      <span class="status-row-label">Model Evaluation</span>
+      <span class="badge-soon">Soon</span>
+    </div>
+    <div class="status-row">
+      <span class="status-dot pending"></span>
+      <span class="status-row-label">Prediction Portal</span>
+      <span class="badge-soon">Soon</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-avatar"><i class="fas fa-user-gear"></i></div>
+    <div class="user-info">
+      <span class="user-name">AquaSense ML</span>
+      <span class="user-status">Pipeline Active</span>
+    </div>
+  </div>
+
+</aside>
+
+<header class="topbar">
+  <span class="topbar-site">AquaSense</span>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-page">{% block breadcrumb %}Dashboard{% endblock %}</span>
+  <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+</header>
+
+<main class="layout">
+  {% block content %}{% endblock %}
+</main>
+
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

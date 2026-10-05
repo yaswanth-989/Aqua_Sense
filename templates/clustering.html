@@ -1,23 +1,116 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% block title %}Pattern Discovery{% endblock %}
+{% block breadcrumb %}Pattern Discovery{% endblock %}
 
-{% block title %}Pattern Discovery — AquaSense{% endblock %}
-{% block page_title %}Pattern Discovery (Unsupervised Learning){% endblock %}
-{% block page_subtitle %}K-Means, DBSCAN density clustering, and PCA dimensionality reduction{% endblock %}
+{% block topbar_actions %}
+<span class="header-badge">
+  <i class="fas fa-clock" style="font-size:10px;"></i>
+  Coming Next
+</span>
+{% endblock %}
 
 {% block content %}
-<div class="coming-soon-banner">
-  <div class="coming-soon-icon">
-    <i data-lucide="pie-chart"></i>
+
+<div class="page-header">
+  <h2>Pattern Discovery</h2>
+  <p>Unsupervised learning — K-Means clustering, DBSCAN, and PCA dimensionality reduction on water quality and demand profiles.</p>
+</div>
+
+<div class="action-grid" style="grid-template-columns:repeat(3,1fr);max-width:600px;margin-bottom:22px;">
+  <div class="action-card active-action" id="btn-kmeans" onclick="switchView('kmeans')">
+    <span class="action-icon"><i class="fas fa-circle-nodes" style="color:var(--accent);"></i></span>
+    <span class="action-title">K-Means</span>
+    <span class="action-desc">Cluster water samples by quality profile</span>
   </div>
-  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 5</div>
-  <h2 class="coming-soon-title">Pattern Discovery Module Coming Soon</h2>
-  <p class="coming-soon-desc">
-    Unsupervised cluster analysis of water quality regimes (K-Means / DBSCAN) and principal component dimensionality reduction will be implemented in Milestone 5.
-  </p>
-  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
-    <span>• Elbow Method &amp; Silhouette Analysis</span>
-    <span>• DBSCAN Anomaly Detection</span>
-    <span>• 2D/3D PCA Projections</span>
+  <div class="action-card" id="btn-dbscan" onclick="switchView('dbscan')">
+    <span class="action-icon"><i class="fas fa-braille" style="color:var(--teal);"></i></span>
+    <span class="action-title">DBSCAN</span>
+    <span class="action-desc">Density-based anomaly detection</span>
+  </div>
+  <div class="action-card" id="btn-pca" onclick="switchView('pca')">
+    <span class="action-icon"><i class="fas fa-compress-arrows-alt" style="color:var(--amber);"></i></span>
+    <span class="action-title">PCA</span>
+    <span class="action-desc">Dimensionality reduction &amp; variance explained</span>
   </div>
 </div>
+
+<div id="view-kmeans">
+  <div class="coming-soon-banner">
+    <div class="coming-soon-icon"><i class="fas fa-circle-nodes"></i></div>
+    <div class="coming-soon-title">K-Means Clustering — In Development</div>
+    <div class="coming-soon-desc">
+      Water quality samples will be grouped into natural clusters based on their 9 physicochemical parameters.
+      Elbow curve (k = 2 to 10), silhouette scores, and cluster centroid profiles will be displayed here.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+      <div class="result-stat" style="min-width:140px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Elbow Method</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">k = 2 to 10</span>
+      </div>
+      <div class="result-stat" style="min-width:140px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Silhouette Score</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">Per cluster</span>
+      </div>
+      <div class="result-stat" style="min-width:140px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Cluster Profiles</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">Centroid heatmap</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="view-dbscan" style="display:none;">
+  <div class="coming-soon-banner">
+    <div class="coming-soon-icon" style="background:var(--teal-50);color:var(--teal);"><i class="fas fa-braille"></i></div>
+    <div class="coming-soon-title">DBSCAN Anomaly Detection — In Development</div>
+    <div class="coming-soon-desc">
+      Density-based spatial clustering will identify extreme/anomalous water quality readings as noise points.
+      Epsilon and min_samples selection via reachability plots will be shown here.
+    </div>
+  </div>
+</div>
+
+<div id="view-pca" style="display:none;">
+  <div class="coming-soon-banner">
+    <div class="coming-soon-icon" style="background:var(--amber-bg);color:var(--amber);"><i class="fas fa-compress-arrows-alt"></i></div>
+    <div class="coming-soon-title">PCA Dimensionality Reduction — In Development</div>
+    <div class="coming-soon-desc">
+      Principal Component Analysis will show how much variance each component explains and which original
+      features load most strongly onto the first two principal components.
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-title">
+      <i class="fas fa-list-check card-icon"></i>
+      <h3>Planned Analyses</h3>
+    </div>
+    <span class="header-badge">Milestone 7</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Algorithm</th><th>Applied To</th><th>Key Output</th><th>Evaluation</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;">K-Means</td><td>Water Quality (9 params)</td><td>Cluster centroid profiles</td><td>Silhouette Score, Inertia</td></tr>
+        <tr><td style="font-weight:600;">DBSCAN</td><td>Water Quality</td><td>Core / noise points</td><td>Noise Ratio</td></tr>
+        <tr><td style="font-weight:600;">PCA</td><td>Water Quality</td><td>Explained variance curve</td><td>95% variance threshold</td></tr>
+        <tr><td style="font-weight:600;">K-Means (Zones)</td><td>Demand Zones (5 zones)</td><td>Zone consumption clusters</td><td>Within-cluster RMSE</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchView(v) {
+  ['kmeans','dbscan','pca'].forEach(function(id) {
+    document.getElementById('view-' + id).style.display = (id === v) ? '' : 'none';
+    document.getElementById('btn-' + id).classList.toggle('active-action', id === v);
+  });
+}
+</script>
 {% endblock %}

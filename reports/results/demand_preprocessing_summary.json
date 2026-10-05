@@ -31,8 +31,8 @@
     "warmup_rows_dropped_total": 70
   },
   "artifacts_saved": [
-    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\demand_train.csv",
-    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\demand_test.csv",
-    "d:\\2-1 Odd sem\\Aqua_Sense\\models\\demand\\demand_preprocessor.joblib"
+    "D:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\demand_train.csv",
+    "D:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\demand_test.csv",
+    "D:\\2-1 Odd sem\\Aqua_Sense\\models\\demand\\demand_preprocessor.joblib"
   ]
 }

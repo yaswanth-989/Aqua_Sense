@@ -38,8 +38,8 @@
     "1": 256
   },
   "artifacts_saved": [
-    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\potability_train.csv",
-    "d:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\potability_test.csv",
-    "d:\\2-1 Odd sem\\Aqua_Sense\\models\\potability\\potability_preprocessor.joblib"
+    "D:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\potability_train.csv",
+    "D:\\2-1 Odd sem\\Aqua_Sense\\data\\processed\\potability_test.csv",
+    "D:\\2-1 Odd sem\\Aqua_Sense\\models\\potability\\potability_preprocessor.joblib"
   ]
 }

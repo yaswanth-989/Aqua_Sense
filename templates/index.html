@@ -1,204 +1,283 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
 
-{% block title %}Dashboard — AquaSense AI{% endblock %}
-{% block page_title %}AquaSense Dashboard{% endblock %}
-{% block page_subtitle %}AI-Based Water Quality Assessment and Demand Forecasting System{% endblock %}
+{% block topbar_actions %}
+<span class="header-badge green">
+  <i class="fas fa-circle-check" style="font-size:10px;"></i>
+  2 Datasets Active
+</span>
+{% endblock %}
 
 {% block content %}
-<!-- Welcome Hero Banner -->
-<div class="welcome-hero">
-  <h1>AquaSense <span>AI Water Intelligence</span> Platform</h1>
+
+<div class="page-header">
+  <h2>AquaSense — AI Water Intelligence Platform</h2>
   <p>
-    Enterprise Machine Learning workspace for municipal water authorities: assessing drinking water potability across 9 chemical criteria and forecasting next-day zone consumption across 5 distribution networks.
+    Municipal ML workspace: drinking water potability assessment across 9 chemical parameters
+    &amp; next-day zone demand forecasting across 5 distribution networks.
   </p>
-  <div class="hero-actions">
-    <a href="/eda" class="btn btn-primary">
-      <i data-lucide="bar-chart-2"></i> Explore Data &amp; Insights
-    </a>
-    <a href="/preprocessing" class="btn btn-secondary">
-      <i data-lucide="sliders"></i> Data Preparation
-    </a>
-    <a href="/api/v1/health" target="_blank" class="btn btn-outline">
-      <i data-lucide="activity"></i> System Diagnostics
-    </a>
+</div>
+
+<!-- Dataset Switcher -->
+<div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:560px;margin-bottom:22px;">
+  <div class="action-card active-action" id="btn-potability" onclick="switchDataset('potability')">
+    <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
+    <span class="action-title">Water Potability</span>
+    <span class="action-desc">3,276 samples · 9 parameters · Binary Classification</span>
+  </div>
+  <div class="action-card" id="btn-demand" onclick="switchDataset('demand')">
+    <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
+    <span class="action-title">Water Demand</span>
+    <span class="action-desc">5,480 records · 5 zones · Time-Series Regression</span>
   </div>
 </div>
 
-<!-- Quick Stats Grid -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-info">
-      <span class="stat-label">Water Quality Samples</span>
+<!-- ─── POTABILITY VIEW ─── -->
+<div id="view-potability">
+
+  <!-- Stat tiles -->
+  <div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));">
+    <div class="stat-card">
+      <span class="stat-label">Total Samples</span>
       <span class="stat-value">3,276</span>
-      <span class="stat-subtext">Real Physicochemical Data</span>
+      <span class="stat-subtext">Real lab measurements</span>
     </div>
-    <div class="stat-icon-wrapper blue">
-      <i data-lucide="droplet"></i>
+    <div class="stat-card">
+      <span class="stat-label">Features</span>
+      <span class="stat-value">9</span>
+      <span class="stat-subtext">Physicochemical parameters</span>
     </div>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-info">
-      <span class="stat-label">Daily Demand Logs</span>
-      <span class="stat-value">5,480</span>
-      <span class="stat-subtext">3-Year Temporal Record</span>
+    <div class="stat-card">
+      <span class="stat-label">Potable</span>
+      <span class="stat-value" style="color:var(--green);">1,278</span>
+      <span class="stat-subtext">39.0% of dataset</span>
     </div>
-    <div class="stat-icon-wrapper teal">
-      <i data-lucide="calendar"></i>
+    <div class="stat-card">
+      <span class="stat-label">Non-Potable</span>
+      <span class="stat-value" style="color:var(--red);">1,998</span>
+      <span class="stat-subtext">61.0% of dataset</span>
     </div>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-info">
-      <span class="stat-label">Distribution Zones</span>
-      <span class="stat-value">5 Zones</span>
-      <span class="stat-subtext">Zones Z01 through Z05</span>
-    </div>
-    <div class="stat-icon-wrapper amber">
-      <i data-lucide="map-pin"></i>
+    <div class="stat-card">
+      <span class="stat-label">Missing Values</span>
+      <span class="stat-value" style="color:var(--amber);">~15%</span>
+      <span class="stat-subtext">Median imputed (train-only)</span>
     </div>
   </div>
 
-  <div class="stat-card">
-    <div class="stat-info">
-      <span class="stat-label">Target Pipelines</span>
-      <span class="stat-value">2 Tasks</span>
-      <span class="stat-subtext">Potability &amp; Demand</span>
-    </div>
-    <div class="stat-icon-wrapper green">
-      <i data-lucide="workflow"></i>
-    </div>
-  </div>
-</div>
-
-<!-- Two Core Prediction Tasks -->
-<div class="grid-2" style="margin-bottom: 24px;">
-  <!-- Task A -->
+  <!-- Detail card -->
   <div class="card accent-top-blue">
     <div class="card-header">
-      <div>
-        <div class="card-title">
-          <i data-lucide="shield-check" style="color: var(--primary);"></i>
-          Task A: Water Potability Assessment
-        </div>
-        <div class="card-subtitle">Drinking water suitability classification based on physical and chemical properties</div>
+      <div class="card-header-title">
+        <i class="fas fa-shield-halved card-icon"></i>
+        <h3>Task A — Water Potability Assessment (Binary Classification)</h3>
       </div>
-      <span class="header-badge">Binary Classification</span>
+      <span class="header-badge">Binary · Stratified 80/20 Split</span>
     </div>
-    <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
-      Analyzes 9 water quality parameters (pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon, Trihalomethanes, and Turbidity) against safety thresholds to determine whether water is safe for human consumption.
-    </p>
-    <div class="data-table-container">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Criteria</th>
-            <th>Specification</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Target Label</strong></td>
-            <td><code>Potable</code> (1 = Safe) vs <code>Non-Potable</code> (0 = Unsafe)</td>
-          </tr>
-          <tr>
-            <td><strong>Class Distribution</strong></td>
-            <td>1,998 Non-Potable (61.0%) / 1,278 Potable (39.0%)</td>
-          </tr>
-          <tr>
-            <td><strong>Input Parameters</strong></td>
-            <td>9 Measured Physicochemical Properties</td>
-          </tr>
-          <tr>
-            <td><strong>Data Integrity</strong></td>
-            <td><span class="badge-tag success">Verified Real Observations</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:14px;">
+        Determines whether a water sample meets drinking safety standards by analysing 9 measured physicochemical properties against WHO thresholds.
+        Target variable: <code>Potability</code> — 1 = Safe, 0 = Unsafe.
+      </p>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Parameter</th><th>WHO Safe Range</th><th>Type</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;">pH</td><td>6.5 – 8.5</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Hardness</td><td>&lt; 300 mg/L</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Solids (TDS)</td><td>&lt; 500 mg/L</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Chloramines</td><td>&lt; 4 mg/L</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Sulfate</td><td>&lt; 250 mg/L</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Conductivity</td><td>&lt; 400 µS/cm</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Organic Carbon</td><td>&lt; 2 mg/L</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Trihalomethanes</td><td>&lt; 80 µg/L</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+            <tr><td style="font-weight:600;">Turbidity</td><td>&lt; 5 NTU</td><td><span class="badge-tag blue">Continuous</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="insight-bar" style="margin-top:14px;">
+        <i class="fas fa-circle-info" style="color:var(--accent);margin-top:2px;flex-shrink:0;"></i>
+        <span>Class imbalance (61/39): balanced-weight models and ROC-AUC are used alongside accuracy to avoid misleading evaluation.</span>
+      </div>
     </div>
   </div>
 
-  <!-- Task B -->
+</div>
+
+<!-- ─── DEMAND VIEW ─── -->
+<div id="view-demand" style="display:none;">
+
+  <!-- Stat tiles -->
+  <div class="stats-row" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));">
+    <div class="stat-card">
+      <span class="stat-label">Total Records</span>
+      <span class="stat-value">5,480</span>
+      <span class="stat-subtext">Daily zone observations</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Zones</span>
+      <span class="stat-value">5</span>
+      <span class="stat-subtext">Z01 through Z05</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Time Span</span>
+      <span class="stat-value" style="font-size:18px;">3 Years</span>
+      <span class="stat-subtext">2023 – 2025</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Lag Features</span>
+      <span class="stat-value">4</span>
+      <span class="stat-subtext">t-1, t-7, Roll-7, Roll-14</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">2025 Holdout</span>
+      <span class="stat-value" style="color:var(--teal);">1,825</span>
+      <span class="stat-subtext">Fully unseen test rows</span>
+    </div>
+  </div>
+
+  <!-- Detail card -->
   <div class="card accent-top-teal">
     <div class="card-header">
-      <div>
-        <div class="card-title">
-          <i data-lucide="trending-up" style="color: var(--teal);"></i>
-          Task B: Municipal Water Demand Forecasting
-        </div>
-        <div class="card-subtitle">Next-day water demand prediction for distribution planning</div>
+      <div class="card-header-title">
+        <i class="fas fa-droplet card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Task B — Municipal Water Demand Forecasting (Regression)</h3>
       </div>
-      <span class="header-badge teal">Time-Series Regression</span>
+      <span class="header-badge teal">Time-Series · Chronological 80/20 Split</span>
     </div>
-    <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
-      Predicts daily water demand in kiloliters (<code>Water_Demand_kL</code>) across 5 municipal distribution zones using historical consumption, active connections, temperature, rainfall, and calendar patterns.
-    </p>
-    <div class="data-table-container">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Criteria</th>
-            <th>Specification</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Target Variable</strong></td>
-            <td><code>Water_Demand_kL</code> (Daily Volume in Kiloliters)</td>
-          </tr>
-          <tr>
-            <td><strong>Temporal Scope</strong></td>
-            <td>2023-01-01 to 2025-12-31 (1,096 days per zone)</td>
-          </tr>
-          <tr>
-            <td><strong>Spatial Coverage</strong></td>
-            <td>5 Monitored Distribution Zones (Z01–Z05)</td>
-          </tr>
-          <tr>
-            <td><strong>Data Disclosure</strong></td>
-            <td><span class="badge-tag blue">Synthetic Benchmark Data</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:14px;">
+        Predicts next-day water consumption in kiloliters (<code>Water_Demand_kL</code>) across 5 distribution zones.
+        Lag and rolling-window features are engineered with zero future lookahead to prevent leakage.
+        The entire year 2025 is held out as an unseen evaluation horizon.
+      </p>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Feature Group</th><th>Variables</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;">Temporal Lags</td><td><code>Demand_Lag_1</code>, <code>Demand_Lag_7</code></td><td><span class="badge-tag teal">Engineered</span></td></tr>
+            <tr><td style="font-weight:600;">Rolling Windows</td><td><code>Demand_Rolling_7</code>, <code>Demand_Rolling_14</code></td><td><span class="badge-tag teal">Engineered</span></td></tr>
+            <tr><td style="font-weight:600;">Weather</td><td>Temperature, Humidity, Rainfall</td><td><span class="badge-tag blue">Raw Input</span></td></tr>
+            <tr><td style="font-weight:600;">Zone</td><td>Zone_ID (Z01–Z05, one-hot)</td><td><span class="badge-tag blue">Raw Input</span></td></tr>
+            <tr><td style="font-weight:600;">Calendar</td><td>Month, Is_Weekend, Is_Holiday, Season</td><td><span class="badge-tag blue">Raw Input</span></td></tr>
+            <tr><td style="font-weight:600;">Infrastructure</td><td>Population, Active_Connections</td><td><span class="badge-tag blue">Raw Input</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="insight-bar" style="background:var(--teal-50);border-color:var(--teal-100);margin-top:14px;">
+        <i class="fas fa-circle-info" style="color:var(--teal);margin-top:2px;flex-shrink:0;"></i>
+        <span>Chronological split — train on 2023-01-15 → 2024-12-31, test on 2025-01-01 → 2025-12-31. No future data ever touches training.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ML Workflow Pipeline -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-title">
+      <i class="fas fa-diagram-project card-icon"></i>
+      <h3>AquaSense ML Workflow — End-to-End Pipeline</h3>
+    </div>
+    <span class="header-badge">9 Stages</span>
+  </div>
+  <div class="card-body">
+    <div class="pipeline-grid">
+
+      <a href="/data_loading" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-database"></i></div>
+          <span class="pipeline-step-badge">Stage 1</span>
+        </div>
+        <div class="pipeline-title">Data Loading</div>
+        <div class="pipeline-desc">Raw dataset ingestion with SHA-256 integrity verification. Both datasets preserved unmodified.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
+      </a>
+
+      <a href="/eda" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-chart-pie"></i></div>
+          <span class="pipeline-step-badge">Stage 2</span>
+        </div>
+        <div class="pipeline-title">EDA</div>
+        <div class="pipeline-desc">Distributions, correlations, missingness audits, target balance, seasonality, outlier analysis.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
+      </a>
+
+      <a href="/preprocessing" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-sliders"></i></div>
+          <span class="pipeline-step-badge">Stage 3</span>
+        </div>
+        <div class="pipeline-title">Data Preprocessing</div>
+        <div class="pipeline-desc">Leakage-safe median imputation, standard scaling, chronological split, lag feature engineering.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
+      </a>
+
+      <a href="/linear_models" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-chart-line"></i></div>
+          <span class="pipeline-step-badge">Stage 4</span>
+        </div>
+        <div class="pipeline-title">Regression &amp; Classification</div>
+        <div class="pipeline-desc">OLS, Gradient Descent, Ridge/Lasso/Elastic Net, Logistic Regression — evaluated on unseen holdouts.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
+      </a>
+
+      <a href="/tree_models" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-sitemap"></i></div>
+          <span class="pipeline-step-badge">Stage 5</span>
+        </div>
+        <div class="pipeline-title">Tree &amp; Ensemble Models</div>
+        <div class="pipeline-desc">Decision Trees, Random Forest, Gradient Boosting — feature importance and depth tuning.</div>
+        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+      </a>
+
+      <a href="/clustering" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-circle-nodes"></i></div>
+          <span class="pipeline-step-badge">Stage 6</span>
+        </div>
+        <div class="pipeline-title">Pattern Discovery</div>
+        <div class="pipeline-desc">K-Means clustering, DBSCAN, and PCA dimensionality reduction on water quality profiles.</div>
+        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+      </a>
+
+      <a href="/evaluation" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-trophy"></i></div>
+          <span class="pipeline-step-badge">Stage 7</span>
+        </div>
+        <div class="pipeline-title">Model Evaluation</div>
+        <div class="pipeline-desc">Cross-model benchmarking with RMSE, ROC-AUC, F1, and precision-recall trade-off analysis.</div>
+        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+      </a>
+
+      <a href="/prediction" class="pipeline-card">
+        <div class="pipeline-card-top">
+          <div class="pipeline-icon"><i class="fas fa-bullseye"></i></div>
+          <span class="pipeline-step-badge">Stage 8</span>
+        </div>
+        <div class="pipeline-title">Prediction Portal</div>
+        <div class="pipeline-desc">Live inference: enter water quality readings or zone conditions to get real-time predictions.</div>
+        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+      </a>
+
     </div>
   </div>
 </div>
 
-<!-- Architecture Lifecycle -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-title">
-      <i data-lucide="git-merge" style="color: var(--accent);"></i>
-      AquaSense Machine Learning Workflow
-    </div>
-    <span class="header-badge">End-to-End Pipeline</span>
-  </div>
-  <div class="action-grid" style="margin-bottom: 0;">
-    <div class="action-card">
-      <div class="action-icon">📥</div>
-      <div class="action-title">1. Data Ingestion</div>
-      <div class="action-desc">Raw telemetry safely stored without alteration or mutation.</div>
-    </div>
-    <div class="action-card">
-      <div class="action-icon">📊</div>
-      <div class="action-title">2. Data &amp; Insights</div>
-      <div class="action-desc">Parametric distributions, missingness audits, and correlation matrices.</div>
-    </div>
-    <div class="action-card">
-      <div class="action-icon">⚙️</div>
-      <div class="action-title">3. Data Preparation</div>
-      <div class="action-desc">Leakage-safe imputation, robust scaling, and historical lag engineering.</div>
-    </div>
-    <div class="action-card">
-      <div class="action-icon">🧠</div>
-      <div class="action-title">4. Model Training</div>
-      <div class="action-desc">Linear baselines, tree ensembles, and unsupervised cluster discovery.</div>
-    </div>
-    <div class="action-card">
-      <div class="action-icon">🚀</div>
-      <div class="action-title">5. Serving &amp; Drift</div>
-      <div class="action-desc">FastAPI inference endpoints with real-time input drift monitoring.</div>
-    </div>
-  </div>
-</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchDataset(ds) {
+  ['potability','demand'].forEach(function(id) {
+    document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
+    document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
+  });
+}
+</script>
 {% endblock %}

@@ -1,23 +1,119 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% block title %}Tree & Ensemble Models{% endblock %}
+{% block breadcrumb %}Tree &amp; Ensemble Models{% endblock %}
 
-{% block title %}Tree &amp; Ensemble Models — AquaSense{% endblock %}
-{% block page_title %}Tree &amp; Ensemble Models{% endblock %}
-{% block page_subtitle %}Decision Trees, Random Forests, AdaBoost &amp; Gradient Boosting{% endblock %}
+{% block topbar_actions %}
+<span class="header-badge">
+  <i class="fas fa-clock" style="font-size:10px;"></i>
+  Coming Next
+</span>
+{% endblock %}
 
 {% block content %}
-<div class="coming-soon-banner">
-  <div class="coming-soon-icon">
-    <i data-lucide="git-branch"></i>
+
+<div class="page-header">
+  <h2>Tree &amp; Ensemble Models</h2>
+  <p>Decision Trees · Random Forest · Gradient Boosting — applied to both water potability and demand forecasting.</p>
+</div>
+
+<!-- Dataset Switcher -->
+<div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:520px;margin-bottom:22px;">
+  <div class="action-card active-action" id="btn-pot" onclick="switchDS('pot')">
+    <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
+    <span class="action-title">Water Potability</span>
+    <span class="action-desc">Binary classification — potable vs non-potable</span>
   </div>
-  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 4 (Part B)</div>
-  <h2 class="coming-soon-title">Tree &amp; Ensemble Models Coming Soon</h2>
-  <p class="coming-soon-desc">
-    Non-linear and ensemble algorithms including Decision Trees, Random Forests, and Gradient Boosting for both Potability classification and Demand regression will be trained in Milestone 4.
-  </p>
-  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
-    <span>• Entropy &amp; Gini Splitting Formulations</span>
-    <span>• Feature Importance Metrics</span>
-    <span>• Hyperparameter Optimization</span>
+  <div class="action-card" id="btn-dem" onclick="switchDS('dem')">
+    <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
+    <span class="action-title">Water Demand</span>
+    <span class="action-desc">Daily demand regression — 5 zones</span>
   </div>
 </div>
+
+<!-- POTABILITY VIEW -->
+<div id="view-pot">
+  <div class="coming-soon-banner">
+    <div class="coming-soon-icon"><i class="fas fa-sitemap"></i></div>
+    <div class="coming-soon-title">Tree Models for Potability — In Development</div>
+    <div class="coming-soon-desc">
+      Decision Tree, Random Forest, and Gradient Boosting classifiers will be trained on the water quality dataset.
+      Feature importance rankings, depth-vs-accuracy curves, and confusion matrices will appear here.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Planned: Decision Tree</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">Max Depth Tuning</span>
+      </div>
+      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Planned: Random Forest</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">n_estimators Sweep</span>
+      </div>
+      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Planned: Gradient Boost</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">Learning Rate Tuning</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEMAND VIEW -->
+<div id="view-dem" style="display:none;">
+  <div class="coming-soon-banner">
+    <div class="coming-soon-icon" style="background:var(--teal-50);color:var(--teal);"><i class="fas fa-sitemap"></i></div>
+    <div class="coming-soon-title">Tree Models for Demand Forecasting — In Development</div>
+    <div class="coming-soon-desc">
+      Decision Tree, Random Forest, and Gradient Boosting regressors will be evaluated on the 2025 holdout horizon.
+      Feature importance and RMSE benchmarks against linear baselines will be shown here.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Planned: Decision Tree</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">Regressor — RMSE</span>
+      </div>
+      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Planned: Random Forest</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">n=100 estimators</span>
+      </div>
+      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
+        <span class="rl">Planned: Gradient Boost</span>
+        <span class="rv" style="color:var(--text-muted);font-size:12px;">Chronological Split</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- What will be shown -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-title">
+      <i class="fas fa-list-check card-icon"></i>
+      <h3>Planned Output — Both Datasets</h3>
+    </div>
+    <span class="header-badge">Milestone 6</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>Output</th><th>Potability</th><th>Demand</th><th>Metric</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;">Decision Tree</td><td><span class="badge-tag blue">Classifier</span></td><td><span class="badge-tag teal">Regressor</span></td><td>F1 / RMSE</td></tr>
+        <tr><td style="font-weight:600;">Random Forest</td><td><span class="badge-tag blue">100 Trees</span></td><td><span class="badge-tag teal">100 Trees</span></td><td>ROC-AUC / R²</td></tr>
+        <tr><td style="font-weight:600;">Gradient Boosting</td><td><span class="badge-tag blue">sklearn GBM</span></td><td><span class="badge-tag teal">sklearn GBM</span></td><td>Precision / MAE</td></tr>
+        <tr><td style="font-weight:600;">Feature Importance</td><td><span class="badge-tag success">Bar Chart</span></td><td><span class="badge-tag success">Bar Chart</span></td><td>Gini / Permutation</td></tr>
+        <tr><td style="font-weight:600;">vs. Linear Baseline</td><td><span class="badge-tag success">Comparison</span></td><td><span class="badge-tag success">Comparison</span></td><td>All Metrics</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchDS(ds) {
+  ['pot','dem'].forEach(function(id) {
+    document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
+    document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
+  });
+}
+</script>
 {% endblock %}

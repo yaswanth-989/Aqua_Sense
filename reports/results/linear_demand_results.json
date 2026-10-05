@@ -1,0 +1,302 @@
+{
+  "task": "Water Demand Forecasting (Time-Series Regression)",
+  "train_samples": 3585,
+  "test_samples": 1825,
+  "features_used": [
+    "Population",
+    "Active_Connections",
+    "Avg_Temperature_C",
+    "Humidity_pct",
+    "Rainfall_mm",
+    "Is_Weekend",
+    "Is_Holiday",
+    "Month",
+    "Demand_Lag_1",
+    "Demand_Lag_7",
+    "Demand_Rolling_7",
+    "Demand_Rolling_14",
+    "Zone_ID_Z02",
+    "Zone_ID_Z03",
+    "Zone_ID_Z04",
+    "Zone_ID_Z05",
+    "Season_Post-Monsoon",
+    "Season_Summer",
+    "Season_Winter"
+  ],
+  "metrics_comparison": [
+    {
+      "model": "Multiple Linear Regression (OLS)",
+      "rmse": 40.37,
+      "mae": 26.65,
+      "r2": 0.9695
+    },
+    {
+      "model": "Gradient Descent (Vectorized From-Scratch)",
+      "rmse": 40.91,
+      "mae": 27.14,
+      "r2": 0.9687
+    },
+    {
+      "model": "Ridge Regression (L2, alpha=1.0)",
+      "rmse": 40.39,
+      "mae": 26.67,
+      "r2": 0.9695
+    },
+    {
+      "model": "Lasso Regression (L1, alpha=0.1)",
+      "rmse": 40.39,
+      "mae": 26.76,
+      "r2": 0.9695
+    },
+    {
+      "model": "Elastic Net (L1+L2, alpha=0.1, ratio=0.5)",
+      "rmse": 41.24,
+      "mae": 27.33,
+      "r2": 0.9682
+    }
+  ],
+  "feature_coefficients": [
+    {
+      "feature": "Demand_Rolling_14",
+      "coefficient": 100.14,
+      "abs_weight": 100.14
+    },
+    {
+      "feature": "Population",
+      "coefficient": 46.24,
+      "abs_weight": 46.24
+    },
+    {
+      "feature": "Zone_ID_Z03",
+      "coefficient": 36.12,
+      "abs_weight": 36.12
+    },
+    {
+      "feature": "Zone_ID_Z04",
+      "coefficient": -28.59,
+      "abs_weight": 28.59
+    },
+    {
+      "feature": "Zone_ID_Z02",
+      "coefficient": -22.39,
+      "abs_weight": 22.39
+    },
+    {
+      "feature": "Avg_Temperature_C",
+      "coefficient": 16.39,
+      "abs_weight": 16.39
+    },
+    {
+      "feature": "Zone_ID_Z05",
+      "coefficient": 16.24,
+      "abs_weight": 16.24
+    },
+    {
+      "feature": "Is_Weekend",
+      "coefficient": 11.85,
+      "abs_weight": 11.85
+    },
+    {
+      "feature": "Rainfall_mm",
+      "coefficient": -11.82,
+      "abs_weight": 11.82
+    },
+    {
+      "feature": "Season_Summer",
+      "coefficient": 9.32,
+      "abs_weight": 9.32
+    },
+    {
+      "feature": "Demand_Rolling_7",
+      "coefficient": 8.67,
+      "abs_weight": 8.67
+    },
+    {
+      "feature": "Season_Winter",
+      "coefficient": 6.26,
+      "abs_weight": 6.26
+    },
+    {
+      "feature": "Active_Connections",
+      "coefficient": 5.07,
+      "abs_weight": 5.07
+    },
+    {
+      "feature": "Demand_Lag_1",
+      "coefficient": 4.75,
+      "abs_weight": 4.75
+    },
+    {
+      "feature": "Is_Holiday",
+      "coefficient": 3.96,
+      "abs_weight": 3.96
+    },
+    {
+      "feature": "Month",
+      "coefficient": -1.68,
+      "abs_weight": 1.68
+    },
+    {
+      "feature": "Demand_Lag_7",
+      "coefficient": -1.41,
+      "abs_weight": 1.41
+    },
+    {
+      "feature": "Season_Post-Monsoon",
+      "coefficient": 0.75,
+      "abs_weight": 0.75
+    },
+    {
+      "feature": "Humidity_pct",
+      "coefficient": -0.23,
+      "abs_weight": 0.23
+    }
+  ],
+  "actual_vs_predicted_sample": {
+    "dates": [
+      "2025-01-01",
+      "2025-01-02",
+      "2025-01-03",
+      "2025-01-04",
+      "2025-01-05",
+      "2025-01-06",
+      "2025-01-07",
+      "2025-01-08",
+      "2025-01-09",
+      "2025-01-10",
+      "2025-01-11",
+      "2025-01-12",
+      "2025-01-13",
+      "2025-01-14",
+      "2025-01-15",
+      "2025-01-16",
+      "2025-01-17",
+      "2025-01-18",
+      "2025-01-19",
+      "2025-01-20",
+      "2025-01-21",
+      "2025-01-22",
+      "2025-01-23",
+      "2025-01-24",
+      "2025-01-25",
+      "2025-01-26",
+      "2025-01-27",
+      "2025-01-28",
+      "2025-01-29",
+      "2025-01-30"
+    ],
+    "actual": [
+      781.8,
+      766.5,
+      716.8,
+      813.8,
+      1037.7,
+      719.4,
+      779.4,
+      747.8,
+      794.4,
+      802.9,
+      862.6,
+      754.5,
+      754.7,
+      800.1,
+      718.8,
+      739.8,
+      754.3,
+      794.2,
+      781.6,
+      780.2,
+      765.2,
+      803.5,
+      752.0,
+      745.6,
+      863.6,
+      869.9,
+      802.5,
+      815.6,
+      971.1,
+      756.1
+    ],
+    "predicted": [
+      783.0,
+      748.2,
+      733.2,
+      783.7,
+      786.2,
+      778.2,
+      770.4,
+      779.8,
+      755.4,
+      766.6,
+      801.2,
+      809.5,
+      783.2,
+      802.5,
+      770.7,
+      770.7,
+      776.4,
+      800.5,
+      802.9,
+      760.2,
+      763.2,
+      776.2,
+      765.1,
+      769.9,
+      794.0,
+      832.6,
+      773.9,
+      774.1,
+      778.0,
+      798.1
+    ],
+    "sample_zone": "Zone Z01 (First 30 Days of 2025)"
+  },
+  "gradient_descent_convergence": {
+    "epochs": [
+      0,
+      15,
+      30,
+      45,
+      60,
+      75,
+      90,
+      105,
+      120,
+      135,
+      150,
+      165,
+      180,
+      195,
+      210,
+      225,
+      240,
+      255,
+      270,
+      285
+    ],
+    "cost_mse": [
+      52267.38,
+      1642.08,
+      1618.25,
+      1609.7,
+      1603.73,
+      1599.05,
+      1595.22,
+      1592.01,
+      1589.25,
+      1586.83,
+      1584.67,
+      1582.73,
+      1580.96,
+      1579.34,
+      1577.86,
+      1576.48,
+      1575.21,
+      1574.03,
+      1572.93,
+      1571.91
+    ],
+    "initial_cost": 52267.38,
+    "final_cost": 1571.02
+  }
+}

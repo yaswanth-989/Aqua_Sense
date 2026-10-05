@@ -1,0 +1,750 @@
+{
+  "potability": {
+    "models": [
+      {
+        "model": "Decision Tree (Gini)",
+        "accuracy": 0.6387,
+        "precision": 0.6022,
+        "recall": 0.2188,
+        "f1": 0.3209,
+        "roc_auc": 0.5901,
+        "confusion_matrix": [
+          [
+            363,
+            37
+          ],
+          [
+            200,
+            56
+          ]
+        ],
+        "tn": 363,
+        "fp": 37,
+        "fn": 200,
+        "tp": 56
+      },
+      {
+        "model": "Decision Tree (Entropy)",
+        "accuracy": 0.6326,
+        "precision": 0.5806,
+        "recall": 0.2109,
+        "f1": 0.3095,
+        "roc_auc": 0.6009,
+        "confusion_matrix": [
+          [
+            361,
+            39
+          ],
+          [
+            202,
+            54
+          ]
+        ],
+        "tn": 361,
+        "fp": 39,
+        "fn": 202,
+        "tp": 54
+      },
+      {
+        "model": "Random Forest (OOB 0.16)",
+        "accuracy": 0.6707,
+        "precision": 0.7564,
+        "recall": 0.2305,
+        "f1": 0.3533,
+        "roc_auc": 0.6697,
+        "confusion_matrix": [
+          [
+            381,
+            19
+          ],
+          [
+            197,
+            59
+          ]
+        ],
+        "tn": 381,
+        "fp": 19,
+        "fn": 197,
+        "tp": 59,
+        "oob_score": 0.6603,
+        "oob_error": 0.3397
+      },
+      {
+        "model": "Gradient Boosting",
+        "accuracy": 0.6601,
+        "precision": 0.6387,
+        "recall": 0.2969,
+        "f1": 0.4053,
+        "roc_auc": 0.6583,
+        "confusion_matrix": [
+          [
+            357,
+            43
+          ],
+          [
+            180,
+            76
+          ]
+        ],
+        "tn": 357,
+        "fp": 43,
+        "fn": 180,
+        "tp": 76
+      },
+      {
+        "model": "XGBoost Classifier",
+        "accuracy": 0.6616,
+        "precision": 0.6393,
+        "recall": 0.3047,
+        "f1": 0.4127,
+        "roc_auc": 0.6623,
+        "confusion_matrix": [
+          [
+            356,
+            44
+          ],
+          [
+            178,
+            78
+          ]
+        ],
+        "tn": 356,
+        "fp": 44,
+        "fn": 178,
+        "tp": 78
+      }
+    ],
+    "first_principles_split_demo": [
+      {
+        "feature": "ph",
+        "threshold": -0.031,
+        "parent_entropy": 0.9648,
+        "information_gain": 0.00029,
+        "parent_gini": 0.4758,
+        "weighted_child_gini": 0.4756,
+        "gini_decrease": 0.00019
+      },
+      {
+        "feature": "Chloramines",
+        "threshold": 0.001,
+        "parent_entropy": 0.9648,
+        "information_gain": 0.00011,
+        "parent_gini": 0.4758,
+        "weighted_child_gini": 0.4758,
+        "gini_decrease": 7e-05
+      },
+      {
+        "feature": "Solids",
+        "threshold": -0.117,
+        "parent_entropy": 0.9648,
+        "information_gain": 0.00011,
+        "parent_gini": 0.4758,
+        "weighted_child_gini": 0.4758,
+        "gini_decrease": 7e-05
+      },
+      {
+        "feature": "Hardness",
+        "threshold": 0.012,
+        "parent_entropy": 0.9648,
+        "information_gain": 9e-05,
+        "parent_gini": 0.4758,
+        "weighted_child_gini": 0.4758,
+        "gini_decrease": 6e-05
+      },
+      {
+        "feature": "Sulfate",
+        "threshold": -0.019,
+        "parent_entropy": 0.9648,
+        "information_gain": 2e-05,
+        "parent_gini": 0.4758,
+        "weighted_child_gini": 0.4758,
+        "gini_decrease": 1e-05
+      }
+    ],
+    "feature_importances": {
+      "Decision Tree (Gini)": {
+        "ph": 0.282,
+        "Hardness": 0.1255,
+        "Solids": 0.114,
+        "Chloramines": 0.1903,
+        "Sulfate": 0.2033,
+        "Conductivity": 0.0,
+        "Organic_carbon": 0.0124,
+        "Trihalomethanes": 0.0439,
+        "Turbidity": 0.0286
+      },
+      "Decision Tree (Entropy)": {
+        "ph": 0.2242,
+        "Hardness": 0.1189,
+        "Solids": 0.0985,
+        "Chloramines": 0.1146,
+        "Sulfate": 0.2466,
+        "Conductivity": 0.0638,
+        "Organic_carbon": 0.0143,
+        "Trihalomethanes": 0.0908,
+        "Turbidity": 0.0283
+      },
+      "Random Forest (OOB 0.16)": {
+        "ph": 0.1597,
+        "Hardness": 0.1299,
+        "Solids": 0.1106,
+        "Chloramines": 0.1145,
+        "Sulfate": 0.188,
+        "Conductivity": 0.0815,
+        "Organic_carbon": 0.0704,
+        "Trihalomethanes": 0.0742,
+        "Turbidity": 0.071
+      },
+      "Gradient Boosting": {
+        "ph": 0.1952,
+        "Hardness": 0.1193,
+        "Solids": 0.1087,
+        "Chloramines": 0.1398,
+        "Sulfate": 0.1621,
+        "Conductivity": 0.0796,
+        "Organic_carbon": 0.0538,
+        "Trihalomethanes": 0.0699,
+        "Turbidity": 0.0715
+      },
+      "XGBoost Classifier": {
+        "ph": 0.15,
+        "Hardness": 0.1148,
+        "Solids": 0.1161,
+        "Chloramines": 0.1268,
+        "Sulfate": 0.1494,
+        "Conductivity": 0.0873,
+        "Organic_carbon": 0.0749,
+        "Trihalomethanes": 0.0863,
+        "Turbidity": 0.0946
+      }
+    },
+    "permutation_importance_rf": {
+      "ph": {
+        "mean": 0.0366,
+        "std": 0.0083
+      },
+      "Hardness": {
+        "mean": 0.0157,
+        "std": 0.0056
+      },
+      "Solids": {
+        "mean": 0.0155,
+        "std": 0.0059
+      },
+      "Chloramines": {
+        "mean": 0.0194,
+        "std": 0.0065
+      },
+      "Sulfate": {
+        "mean": 0.0674,
+        "std": 0.0102
+      },
+      "Conductivity": {
+        "mean": -0.0011,
+        "std": 0.0039
+      },
+      "Organic_carbon": {
+        "mean": 0.0027,
+        "std": 0.0046
+      },
+      "Trihalomethanes": {
+        "mean": 0.0009,
+        "std": 0.0028
+      },
+      "Turbidity": {
+        "mean": 0.0012,
+        "std": 0.0039
+      }
+    },
+    "features": [
+      "ph",
+      "Hardness",
+      "Solids",
+      "Chloramines",
+      "Sulfate",
+      "Conductivity",
+      "Organic_carbon",
+      "Trihalomethanes",
+      "Turbidity"
+    ],
+    "oob_analysis": {
+      "oob_score": 0.6603,
+      "oob_error": 0.3397,
+      "note": "Calculated across 150 out-of-bag bootstrap subsamples without touching test data."
+    }
+  },
+  "demand": {
+    "models": [
+      {
+        "model": "Decision Tree Regressor",
+        "rmse": 49.01,
+        "mae": 33.98,
+        "r2": 0.9551,
+        "test_samples": 1825
+      },
+      {
+        "model": "Random Forest Regressor",
+        "rmse": 41.28,
+        "mae": 28.03,
+        "r2": 0.9681,
+        "test_samples": 1825,
+        "oob_r2": 0.9704
+      },
+      {
+        "model": "Gradient Boosting Regressor",
+        "rmse": 43.4,
+        "mae": 29.62,
+        "r2": 0.9648,
+        "test_samples": 1825
+      },
+      {
+        "model": "XGBoost Regressor",
+        "rmse": 41.96,
+        "mae": 28.41,
+        "r2": 0.9671,
+        "test_samples": 1825
+      }
+    ],
+    "feature_importances": {
+      "Decision Tree Regressor": {
+        "Population": 0.0128,
+        "Active_Connections": 0.0005,
+        "Avg_Temperature_C": 0.0019,
+        "Humidity_pct": 0.0006,
+        "Rainfall_mm": 0.0063,
+        "Is_Weekend": 0.0027,
+        "Is_Holiday": 0.0,
+        "Month": 0.0011,
+        "Demand_Lag_1": 0.0002,
+        "Demand_Lag_7": 0.0008,
+        "Demand_Rolling_7": 0.0043,
+        "Demand_Rolling_14": 0.9522,
+        "Zone_ID_Z02": 0.0,
+        "Zone_ID_Z03": 0.0,
+        "Zone_ID_Z04": 0.0134,
+        "Zone_ID_Z05": 0.003,
+        "Season_Post-Monsoon": 0.0002,
+        "Season_Summer": 0.0,
+        "Season_Winter": 0.0
+      },
+      "Random Forest Regressor": {
+        "Population": 0.1759,
+        "Active_Connections": 0.0716,
+        "Avg_Temperature_C": 0.005,
+        "Humidity_pct": 0.0018,
+        "Rainfall_mm": 0.0049,
+        "Is_Weekend": 0.0015,
+        "Is_Holiday": 0.0001,
+        "Month": 0.0039,
+        "Demand_Lag_1": 0.0964,
+        "Demand_Lag_7": 0.1601,
+        "Demand_Rolling_7": 0.152,
+        "Demand_Rolling_14": 0.2233,
+        "Zone_ID_Z02": 0.0109,
+        "Zone_ID_Z03": 0.0544,
+        "Zone_ID_Z04": 0.0296,
+        "Zone_ID_Z05": 0.0064,
+        "Season_Post-Monsoon": 0.0006,
+        "Season_Summer": 0.001,
+        "Season_Winter": 0.0004
+      },
+      "Gradient Boosting Regressor": {
+        "Population": 0.0703,
+        "Active_Connections": 0.004,
+        "Avg_Temperature_C": 0.0043,
+        "Humidity_pct": 0.0014,
+        "Rainfall_mm": 0.0079,
+        "Is_Weekend": 0.0029,
+        "Is_Holiday": 0.0003,
+        "Month": 0.0019,
+        "Demand_Lag_1": 0.0085,
+        "Demand_Lag_7": 0.0033,
+        "Demand_Rolling_7": 0.3871,
+        "Demand_Rolling_14": 0.4948,
+        "Zone_ID_Z02": 0.0,
+        "Zone_ID_Z03": 0.0066,
+        "Zone_ID_Z04": 0.002,
+        "Zone_ID_Z05": 0.0042,
+        "Season_Post-Monsoon": 0.0001,
+        "Season_Summer": 0.0004,
+        "Season_Winter": 0.0001
+      },
+      "XGBoost Regressor": {
+        "Population": 0.029,
+        "Active_Connections": 0.0022,
+        "Avg_Temperature_C": 0.0014,
+        "Humidity_pct": 0.0008,
+        "Rainfall_mm": 0.0026,
+        "Is_Weekend": 0.0021,
+        "Is_Holiday": 0.001,
+        "Month": 0.0019,
+        "Demand_Lag_1": 0.0053,
+        "Demand_Lag_7": 0.0022,
+        "Demand_Rolling_7": 0.3303,
+        "Demand_Rolling_14": 0.2401,
+        "Zone_ID_Z02": 0.1201,
+        "Zone_ID_Z03": 0.0307,
+        "Zone_ID_Z04": 0.1174,
+        "Zone_ID_Z05": 0.1087,
+        "Season_Post-Monsoon": 0.0012,
+        "Season_Summer": 0.0018,
+        "Season_Winter": 0.001
+      }
+    },
+    "permutation_importance_gbm": {
+      "Population": {
+        "mean": 0.0936,
+        "std": 0.0031
+      },
+      "Active_Connections": {
+        "mean": 0.0213,
+        "std": 0.0014
+      },
+      "Avg_Temperature_C": {
+        "mean": 0.0153,
+        "std": 0.0008
+      },
+      "Humidity_pct": {
+        "mean": 0.0001,
+        "std": 0.0003
+      },
+      "Rainfall_mm": {
+        "mean": 0.0109,
+        "std": 0.0008
+      },
+      "Is_Weekend": {
+        "mean": 0.0045,
+        "std": 0.0003
+      },
+      "Is_Holiday": {
+        "mean": 0.0003,
+        "std": 0.0001
+      },
+      "Month": {
+        "mean": 0.0026,
+        "std": 0.0004
+      },
+      "Demand_Lag_1": {
+        "mean": 0.0078,
+        "std": 0.0006
+      },
+      "Demand_Lag_7": {
+        "mean": 0.009,
+        "std": 0.0005
+      },
+      "Demand_Rolling_7": {
+        "mean": 0.1185,
+        "std": 0.0034
+      },
+      "Demand_Rolling_14": {
+        "mean": 0.3843,
+        "std": 0.0087
+      },
+      "Zone_ID_Z02": {
+        "mean": -0.0,
+        "std": 0.0
+      },
+      "Zone_ID_Z03": {
+        "mean": 0.0006,
+        "std": 0.0001
+      },
+      "Zone_ID_Z04": {
+        "mean": -0.0001,
+        "std": 0.0001
+      },
+      "Zone_ID_Z05": {
+        "mean": 0.0003,
+        "std": 0.0002
+      },
+      "Season_Post-Monsoon": {
+        "mean": 0.0004,
+        "std": 0.0
+      },
+      "Season_Summer": {
+        "mean": 0.0003,
+        "std": 0.0002
+      },
+      "Season_Winter": {
+        "mean": 0.0002,
+        "std": 0.0001
+      }
+    },
+    "features": [
+      "Population",
+      "Active_Connections",
+      "Avg_Temperature_C",
+      "Humidity_pct",
+      "Rainfall_mm",
+      "Is_Weekend",
+      "Is_Holiday",
+      "Month",
+      "Demand_Lag_1",
+      "Demand_Lag_7",
+      "Demand_Rolling_7",
+      "Demand_Rolling_14",
+      "Zone_ID_Z02",
+      "Zone_ID_Z03",
+      "Zone_ID_Z04",
+      "Zone_ID_Z05",
+      "Season_Post-Monsoon",
+      "Season_Summer",
+      "Season_Winter"
+    ],
+    "dates_sample": [
+      "2025-01-01",
+      "2025-02-16",
+      "2025-04-04",
+      "2025-05-21",
+      "2025-07-07",
+      "2025-08-22",
+      "2025-10-08",
+      "2025-11-24",
+      "2025-01-10",
+      "2025-02-25",
+      "2025-04-13",
+      "2025-05-30",
+      "2025-07-16",
+      "2025-09-01",
+      "2025-10-17",
+      "2025-12-03",
+      "2025-01-19",
+      "2025-03-07",
+      "2025-04-22",
+      "2025-06-08",
+      "2025-07-25",
+      "2025-09-10",
+      "2025-10-26",
+      "2025-12-12",
+      "2025-01-28",
+      "2025-03-16",
+      "2025-05-02",
+      "2025-06-17",
+      "2025-08-03",
+      "2025-09-19",
+      "2025-11-05",
+      "2025-12-21",
+      "2025-02-06",
+      "2025-03-25",
+      "2025-05-11",
+      "2025-06-26",
+      "2025-08-12",
+      "2025-09-28",
+      "2025-11-14",
+      "2025-12-31"
+    ],
+    "actuals_sample": [
+      781.82,
+      810.1,
+      865.33,
+      890.25,
+      781.06,
+      801.89,
+      721.07,
+      733.75,
+      539.14,
+      603.69,
+      605.51,
+      601.87,
+      558.88,
+      523.72,
+      527.29,
+      565.57,
+      1113.98,
+      1166.36,
+      1195.11,
+      1172.42,
+      1054.4,
+      1077.23,
+      1119.15,
+      1052.74,
+      427.01,
+      545.79,
+      548.26,
+      528.2,
+      498.59,
+      480.34,
+      464.08,
+      494.3,
+      911.6,
+      937.25,
+      1070.87,
+      1015.87,
+      950.14,
+      864.42,
+      915.45,
+      834.3
+    ],
+    "predictions_sample": {
+      "Decision Tree Regressor": [
+        800.03,
+        808.59,
+        823.36,
+        823.36,
+        794.57,
+        779.29,
+        738.79,
+        738.79,
+        517.77,
+        639.95,
+        615.83,
+        600.21,
+        565.01,
+        639.95,
+        639.95,
+        546.04,
+        1097.53,
+        1107.01,
+        1164.0,
+        1167.53,
+        1164.0,
+        1082.16,
+        1066.2,
+        1031.79,
+        480.9,
+        518.89,
+        529.29,
+        514.85,
+        532.51,
+        466.84,
+        466.84,
+        483.54,
+        918.26,
+        976.79,
+        1014.46,
+        976.79,
+        918.55,
+        889.9,
+        879.27,
+        845.96
+      ],
+      "Random Forest Regressor": [
+        764.26,
+        793.01,
+        818.61,
+        832.47,
+        799.1,
+        781.1,
+        755.06,
+        742.86,
+        553.66,
+        590.1,
+        627.56,
+        612.07,
+        576.36,
+        569.71,
+        569.16,
+        548.27,
+        1069.26,
+        1124.38,
+        1166.34,
+        1148.0,
+        1147.83,
+        1091.01,
+        1063.28,
+        1042.04,
+        486.68,
+        511.88,
+        537.84,
+        522.93,
+        521.09,
+        484.19,
+        475.26,
+        506.8,
+        906.66,
+        968.47,
+        1025.85,
+        981.2,
+        943.97,
+        896.71,
+        902.13,
+        860.12
+      ],
+      "Gradient Boosting Regressor": [
+        774.45,
+        803.96,
+        830.77,
+        834.74,
+        786.99,
+        782.55,
+        758.93,
+        739.93,
+        527.52,
+        615.11,
+        651.45,
+        628.89,
+        576.17,
+        611.6,
+        591.07,
+        564.14,
+        1088.87,
+        1098.63,
+        1187.38,
+        1152.53,
+        1156.75,
+        1099.68,
+        1099.9,
+        1057.3,
+        478.39,
+        521.36,
+        529.83,
+        533.4,
+        532.97,
+        485.52,
+        465.12,
+        505.63,
+        905.2,
+        984.66,
+        1040.43,
+        998.27,
+        976.07,
+        896.71,
+        934.91,
+        839.07
+      ],
+      "XGBoost Regressor": [
+        774.56,
+        806.82,
+        824.52,
+        837.82,
+        795.88,
+        780.58,
+        765.35,
+        736.86,
+        529.52,
+        593.16,
+        665.34,
+        673.61,
+        602.26,
+        572.69,
+        581.98,
+        556.41,
+        1097.28,
+        1112.37,
+        1169.41,
+        1130.76,
+        1158.29,
+        1090.11,
+        1075.44,
+        1046.2,
+        484.25,
+        521.68,
+        528.44,
+        536.62,
+        532.65,
+        478.74,
+        467.64,
+        500.25,
+        912.9,
+        976.29,
+        1036.07,
+        1012.27,
+        940.39,
+        899.5,
+        913.5,
+        843.3
+      ]
+    },
+    "holdout_year": 2025,
+    "test_rows": 1825
+  }
+}

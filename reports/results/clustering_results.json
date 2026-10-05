@@ -1,0 +1,1302 @@
+{
+  "potability": {
+    "kmeans": {
+      "k_range": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "inertias": [
+        21614.4275474137,
+        20233.650837698187,
+        19266.54425698362,
+        18458.204951842756,
+        17779.61155312602,
+        17174.889541550237,
+        16679.863972176496
+      ],
+      "silhouettes": [
+        0.083,
+        0.0771,
+        0.0731,
+        0.0745,
+        0.0758,
+        0.0747,
+        0.0772
+      ],
+      "chosen_k": 3,
+      "cluster_profiles": [
+        {
+          "cluster_id": 0,
+          "sample_count": 920,
+          "potability_rate": 0.3641,
+          "means": {
+            "ph": 0.45,
+            "Hardness": 0.48,
+            "Solids": -0.59,
+            "Chloramines": -0.0,
+            "Sulfate": 0.22,
+            "Conductivity": -0.14,
+            "Organic_carbon": 0.27,
+            "Trihalomethanes": -0.07,
+            "Turbidity": -0.52
+          }
+        },
+        {
+          "cluster_id": 1,
+          "sample_count": 911,
+          "potability_rate": 0.393,
+          "means": {
+            "ph": -0.33,
+            "Hardness": -0.5,
+            "Solids": -0.3,
+            "Chloramines": 0.25,
+            "Sulfate": 0.22,
+            "Conductivity": 0.1,
+            "Organic_carbon": -0.47,
+            "Trihalomethanes": 0.25,
+            "Turbidity": 0.54
+          }
+        },
+        {
+          "cluster_id": 2,
+          "sample_count": 789,
+          "potability_rate": 0.417,
+          "means": {
+            "ph": -0.14,
+            "Hardness": 0.01,
+            "Solids": 1.04,
+            "Chloramines": -0.29,
+            "Sulfate": -0.51,
+            "Conductivity": 0.04,
+            "Organic_carbon": 0.22,
+            "Trihalomethanes": -0.21,
+            "Turbidity": -0.02
+          }
+        }
+      ]
+    },
+    "dbscan": {
+      "configurations": [
+        {
+          "eps": 1.5,
+          "min_samples": 10,
+          "clusters_found": 1,
+          "noise_points": 1511,
+          "noise_pct": 57.67,
+          "silhouette": null
+        },
+        {
+          "eps": 2.0,
+          "min_samples": 10,
+          "clusters_found": 1,
+          "noise_points": 382,
+          "noise_pct": 14.58,
+          "silhouette": null
+        },
+        {
+          "eps": 2.5,
+          "min_samples": 10,
+          "clusters_found": 1,
+          "noise_points": 66,
+          "noise_pct": 2.52,
+          "silhouette": null
+        },
+        {
+          "eps": 3.0,
+          "min_samples": 10,
+          "clusters_found": 1,
+          "noise_points": 11,
+          "noise_pct": 0.42,
+          "silhouette": null
+        }
+      ],
+      "chosen_eps": 2.5,
+      "min_samples": 10
+    },
+    "hierarchical": {
+      "clusters": 3,
+      "linkage": "ward",
+      "silhouette": 0.036
+    },
+    "pca": {
+      "n_components": 9,
+      "explained_variance_ratio": [
+        0.1369,
+        0.125,
+        0.1177,
+        0.1128,
+        0.1098,
+        0.1087,
+        0.1051,
+        0.0989,
+        0.0852
+      ],
+      "cumulative_variance_ratio": [
+        0.1369,
+        0.2619,
+        0.3796,
+        0.4923,
+        0.6021,
+        0.7108,
+        0.8159,
+        0.9148,
+        1.0
+      ],
+      "loadings": {
+        "PC1": {
+          "ph": -0.2759,
+          "Hardness": 0.0352,
+          "Solids": 0.6693,
+          "Chloramines": -0.3184,
+          "Sulfate": -0.6012,
+          "Conductivity": 0.0519,
+          "Organic_carbon": -0.0398,
+          "Trihalomethanes": -0.0268,
+          "Turbidity": 0.0825
+        },
+        "PC2": {
+          "ph": 0.5962,
+          "Hardness": 0.4874,
+          "Solids": -0.046,
+          "Chloramines": -0.3813,
+          "Sulfate": -0.1475,
+          "Conductivity": 0.1655,
+          "Organic_carbon": 0.3166,
+          "Trihalomethanes": 0.0231,
+          "Turbidity": -0.3311
+        },
+        "PC3": {
+          "ph": -0.0379,
+          "Hardness": 0.5848,
+          "Solids": -0.1737,
+          "Chloramines": 0.2215,
+          "Sulfate": -0.2784,
+          "Conductivity": -0.5227,
+          "Organic_carbon": -0.4731,
+          "Trihalomethanes": 0.0464,
+          "Turbidity": -0.0247
+        }
+      },
+      "pc1_pc2_explained": 26.19,
+      "pc1_to_pc5_explained": 60.21,
+      "scatter_data": [
+        {
+          "pc1": -0.18,
+          "pc2": 0.693,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.773,
+          "pc2": -0.708,
+          "potable": 0,
+          "ph": -0.64,
+          "sulfate": -0.13
+        },
+        {
+          "pc1": -0.124,
+          "pc2": 1.045,
+          "potable": 1,
+          "ph": 0.71,
+          "sulfate": 0.42
+        },
+        {
+          "pc1": 1.803,
+          "pc2": 0.879,
+          "potable": 0,
+          "ph": -0.84,
+          "sulfate": -1.57
+        },
+        {
+          "pc1": -1.171,
+          "pc2": -1.189,
+          "potable": 1,
+          "ph": -0.97,
+          "sulfate": 1.49
+        },
+        {
+          "pc1": 0.35,
+          "pc2": -0.015,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": 0.45
+        },
+        {
+          "pc1": -0.138,
+          "pc2": 0.8,
+          "potable": 0,
+          "ph": 1.65,
+          "sulfate": -0.91
+        },
+        {
+          "pc1": 0.074,
+          "pc2": 1.686,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.68
+        },
+        {
+          "pc1": -0.017,
+          "pc2": -1.201,
+          "potable": 1,
+          "ph": -0.92,
+          "sulfate": 2.25
+        },
+        {
+          "pc1": 0.03,
+          "pc2": 0.313,
+          "potable": 0,
+          "ph": 0.67,
+          "sulfate": 0.63
+        },
+        {
+          "pc1": 0.546,
+          "pc2": 0.382,
+          "potable": 1,
+          "ph": -0.04,
+          "sulfate": -0.18
+        },
+        {
+          "pc1": -1.019,
+          "pc2": 0.263,
+          "potable": 0,
+          "ph": 1.26,
+          "sulfate": 0.94
+        },
+        {
+          "pc1": -0.303,
+          "pc2": -0.347,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": 2.31
+        },
+        {
+          "pc1": -1.497,
+          "pc2": 0.53,
+          "potable": 0,
+          "ph": 0.81,
+          "sulfate": 0.35
+        },
+        {
+          "pc1": 2.739,
+          "pc2": 0.245,
+          "potable": 0,
+          "ph": 0.12,
+          "sulfate": -1.98
+        },
+        {
+          "pc1": 1.762,
+          "pc2": -0.565,
+          "potable": 1,
+          "ph": -1.39,
+          "sulfate": -0.92
+        },
+        {
+          "pc1": -0.049,
+          "pc2": 0.108,
+          "potable": 0,
+          "ph": 0.55,
+          "sulfate": -2.08
+        },
+        {
+          "pc1": -0.159,
+          "pc2": -0.501,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.41
+        },
+        {
+          "pc1": 0.678,
+          "pc2": -1.516,
+          "potable": 0,
+          "ph": -2.28,
+          "sulfate": -0.28
+        },
+        {
+          "pc1": -0.644,
+          "pc2": 0.245,
+          "potable": 0,
+          "ph": -0.43,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -1.284,
+          "pc2": -0.301,
+          "potable": 1,
+          "ph": -0.45,
+          "sulfate": 0.87
+        },
+        {
+          "pc1": -0.561,
+          "pc2": 0.24,
+          "potable": 0,
+          "ph": 0.62,
+          "sulfate": -0.58
+        },
+        {
+          "pc1": -0.217,
+          "pc2": -2.4,
+          "potable": 0,
+          "ph": -1.31,
+          "sulfate": 2.03
+        },
+        {
+          "pc1": 0.554,
+          "pc2": 0.132,
+          "potable": 0,
+          "ph": -0.73,
+          "sulfate": -1.39
+        },
+        {
+          "pc1": 0.509,
+          "pc2": -2.125,
+          "potable": 0,
+          "ph": -2.47,
+          "sulfate": 1.39
+        },
+        {
+          "pc1": 0.095,
+          "pc2": 1.869,
+          "potable": 1,
+          "ph": 1.48,
+          "sulfate": -1.59
+        },
+        {
+          "pc1": -0.437,
+          "pc2": 0.929,
+          "potable": 0,
+          "ph": -0.18,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.488,
+          "pc2": -1.486,
+          "potable": 1,
+          "ph": -0.68,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.063,
+          "pc2": 1.148,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": 0.38
+        },
+        {
+          "pc1": -1.054,
+          "pc2": -0.447,
+          "potable": 0,
+          "ph": -1.49,
+          "sulfate": 0.53
+        },
+        {
+          "pc1": 0.482,
+          "pc2": -0.351,
+          "potable": 1,
+          "ph": -0.75,
+          "sulfate": 0.13
+        },
+        {
+          "pc1": 1.139,
+          "pc2": 0.218,
+          "potable": 0,
+          "ph": -1.17,
+          "sulfate": -2.16
+        },
+        {
+          "pc1": -0.264,
+          "pc2": 0.221,
+          "potable": 1,
+          "ph": -0.2,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -1.621,
+          "pc2": -0.344,
+          "potable": 0,
+          "ph": 0.38,
+          "sulfate": 0.68
+        },
+        {
+          "pc1": 0.059,
+          "pc2": 0.05,
+          "potable": 0,
+          "ph": 0.33,
+          "sulfate": 0.56
+        },
+        {
+          "pc1": 0.583,
+          "pc2": 0.401,
+          "potable": 0,
+          "ph": 0.64,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -1.048,
+          "pc2": 0.481,
+          "potable": 1,
+          "ph": 2.32,
+          "sulfate": -0.01
+        },
+        {
+          "pc1": -1.066,
+          "pc2": -0.987,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": 2.8
+        },
+        {
+          "pc1": 0.655,
+          "pc2": 0.794,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": -1.17
+        },
+        {
+          "pc1": -0.867,
+          "pc2": 1.269,
+          "potable": 0,
+          "ph": 0.89,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.593,
+          "pc2": 0.857,
+          "potable": 0,
+          "ph": -0.45,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.153,
+          "pc2": -1.594,
+          "potable": 1,
+          "ph": 0.15,
+          "sulfate": -0.28
+        },
+        {
+          "pc1": 0.247,
+          "pc2": -1.205,
+          "potable": 1,
+          "ph": -0.55,
+          "sulfate": -0.3
+        },
+        {
+          "pc1": -0.988,
+          "pc2": 0.553,
+          "potable": 0,
+          "ph": 0.84,
+          "sulfate": 0.85
+        },
+        {
+          "pc1": -0.931,
+          "pc2": 1.659,
+          "potable": 0,
+          "ph": 1.2,
+          "sulfate": -0.29
+        },
+        {
+          "pc1": -1.344,
+          "pc2": 0.588,
+          "potable": 0,
+          "ph": 2.12,
+          "sulfate": 0.11
+        },
+        {
+          "pc1": -0.013,
+          "pc2": 1.58,
+          "potable": 0,
+          "ph": 0.75,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.169,
+          "pc2": -2.598,
+          "potable": 0,
+          "ph": -1.62,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.449,
+          "pc2": -0.759,
+          "potable": 1,
+          "ph": -0.92,
+          "sulfate": 0.98
+        },
+        {
+          "pc1": -0.219,
+          "pc2": -1.414,
+          "potable": 0,
+          "ph": -0.64,
+          "sulfate": 0.51
+        },
+        {
+          "pc1": 0.006,
+          "pc2": -1.309,
+          "potable": 1,
+          "ph": -1.26,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 1.408,
+          "pc2": 0.653,
+          "potable": 0,
+          "ph": -0.09,
+          "sulfate": 0.12
+        },
+        {
+          "pc1": -0.825,
+          "pc2": 1.329,
+          "potable": 0,
+          "ph": 3.05,
+          "sulfate": -0.04
+        },
+        {
+          "pc1": 0.77,
+          "pc2": -0.971,
+          "potable": 0,
+          "ph": -0.91,
+          "sulfate": -0.75
+        },
+        {
+          "pc1": 0.279,
+          "pc2": -0.271,
+          "potable": 1,
+          "ph": -0.86,
+          "sulfate": -1.95
+        },
+        {
+          "pc1": 0.638,
+          "pc2": 0.772,
+          "potable": 0,
+          "ph": 0.31,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.118,
+          "pc2": 1.514,
+          "potable": 0,
+          "ph": -0.99,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.571,
+          "pc2": -1.536,
+          "potable": 1,
+          "ph": -1.39,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.296,
+          "pc2": 0.085,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": 0.18
+        },
+        {
+          "pc1": -0.036,
+          "pc2": 0.103,
+          "potable": 1,
+          "ph": -0.22,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.992,
+          "pc2": -0.923,
+          "potable": 1,
+          "ph": -0.93,
+          "sulfate": 0.38
+        },
+        {
+          "pc1": 1.041,
+          "pc2": -1.919,
+          "potable": 0,
+          "ph": -0.95,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.144,
+          "pc2": 0.156,
+          "potable": 1,
+          "ph": 0.2,
+          "sulfate": -1.09
+        },
+        {
+          "pc1": -0.566,
+          "pc2": 1.325,
+          "potable": 0,
+          "ph": 1.51,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.181,
+          "pc2": -0.222,
+          "potable": 0,
+          "ph": 0.1,
+          "sulfate": 0.27
+        },
+        {
+          "pc1": -0.174,
+          "pc2": -0.618,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.387,
+          "pc2": -0.866,
+          "potable": 1,
+          "ph": 0.57,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.835,
+          "pc2": -2.247,
+          "potable": 0,
+          "ph": -2.48,
+          "sulfate": -0.57
+        },
+        {
+          "pc1": 0.707,
+          "pc2": -0.283,
+          "potable": 0,
+          "ph": -1.46,
+          "sulfate": -0.44
+        },
+        {
+          "pc1": 1.054,
+          "pc2": -0.136,
+          "potable": 1,
+          "ph": 0.62,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.516,
+          "pc2": -0.114,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": -0.48
+        },
+        {
+          "pc1": 0.164,
+          "pc2": -0.636,
+          "potable": 1,
+          "ph": -0.08,
+          "sulfate": -0.72
+        },
+        {
+          "pc1": 0.046,
+          "pc2": -0.201,
+          "potable": 1,
+          "ph": -0.25,
+          "sulfate": -0.53
+        },
+        {
+          "pc1": -0.476,
+          "pc2": 0.237,
+          "potable": 1,
+          "ph": 0.92,
+          "sulfate": -0.93
+        },
+        {
+          "pc1": -0.533,
+          "pc2": -0.705,
+          "potable": 1,
+          "ph": 0.12,
+          "sulfate": -0.15
+        },
+        {
+          "pc1": -1.431,
+          "pc2": -5.481,
+          "potable": 1,
+          "ph": -4.14,
+          "sulfate": 3.05
+        },
+        {
+          "pc1": -0.437,
+          "pc2": -1.553,
+          "potable": 0,
+          "ph": -2.12,
+          "sulfate": 1.58
+        },
+        {
+          "pc1": -0.87,
+          "pc2": 0.443,
+          "potable": 0,
+          "ph": 0.13,
+          "sulfate": -0.18
+        },
+        {
+          "pc1": -0.719,
+          "pc2": 0.556,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.756,
+          "pc2": 0.607,
+          "potable": 0,
+          "ph": 0.23,
+          "sulfate": -0.38
+        },
+        {
+          "pc1": -0.208,
+          "pc2": -0.346,
+          "potable": 1,
+          "ph": -0.67,
+          "sulfate": -0.7
+        },
+        {
+          "pc1": -1.306,
+          "pc2": -0.75,
+          "potable": 0,
+          "ph": -0.02,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 2.073,
+          "pc2": -0.042,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -1.09
+        },
+        {
+          "pc1": -0.661,
+          "pc2": -1.099,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": 0.48
+        },
+        {
+          "pc1": -0.335,
+          "pc2": -1.057,
+          "potable": 0,
+          "ph": -0.62,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.664,
+          "pc2": -1.184,
+          "potable": 0,
+          "ph": -1.14,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.33,
+          "pc2": 0.537,
+          "potable": 0,
+          "ph": 0.97,
+          "sulfate": 0.29
+        },
+        {
+          "pc1": -0.749,
+          "pc2": 0.387,
+          "potable": 1,
+          "ph": 0.21,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.89,
+          "pc2": 0.006,
+          "potable": 0,
+          "ph": 0.55,
+          "sulfate": 0.2
+        },
+        {
+          "pc1": -0.15,
+          "pc2": 0.263,
+          "potable": 0,
+          "ph": -0.83,
+          "sulfate": 0.15
+        },
+        {
+          "pc1": -0.499,
+          "pc2": -1.432,
+          "potable": 0,
+          "ph": -0.68,
+          "sulfate": 1.08
+        },
+        {
+          "pc1": 1.024,
+          "pc2": 0.427,
+          "potable": 1,
+          "ph": -0.37,
+          "sulfate": -0.59
+        },
+        {
+          "pc1": 1.667,
+          "pc2": -0.026,
+          "potable": 0,
+          "ph": -0.4,
+          "sulfate": -1.0
+        },
+        {
+          "pc1": -0.119,
+          "pc2": 1.138,
+          "potable": 0,
+          "ph": -0.31,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 1.562,
+          "pc2": -0.603,
+          "potable": 0,
+          "ph": -1.24,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.003,
+          "pc2": 0.399,
+          "potable": 1,
+          "ph": 0.04,
+          "sulfate": -0.89
+        },
+        {
+          "pc1": 1.355,
+          "pc2": -0.303,
+          "potable": 0,
+          "ph": -0.09,
+          "sulfate": -0.01
+        },
+        {
+          "pc1": -0.432,
+          "pc2": -0.233,
+          "potable": 0,
+          "ph": 0.14,
+          "sulfate": -0.04
+        },
+        {
+          "pc1": 0.014,
+          "pc2": 0.416,
+          "potable": 0,
+          "ph": -0.08,
+          "sulfate": 0.75
+        },
+        {
+          "pc1": -0.418,
+          "pc2": -0.162,
+          "potable": 0,
+          "ph": 0.44,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 1.639,
+          "pc2": 0.678,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.26
+        },
+        {
+          "pc1": 0.267,
+          "pc2": -0.922,
+          "potable": 0,
+          "ph": -2.07,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 1.004,
+          "pc2": -1.221,
+          "potable": 0,
+          "ph": -1.18,
+          "sulfate": -0.18
+        },
+        {
+          "pc1": 0.271,
+          "pc2": 0.241,
+          "potable": 1,
+          "ph": 0.39,
+          "sulfate": 0.84
+        },
+        {
+          "pc1": 1.101,
+          "pc2": -0.065,
+          "potable": 0,
+          "ph": -0.44,
+          "sulfate": -0.82
+        },
+        {
+          "pc1": 2.416,
+          "pc2": -2.627,
+          "potable": 0,
+          "ph": -2.26,
+          "sulfate": -0.27
+        },
+        {
+          "pc1": -0.555,
+          "pc2": -0.75,
+          "potable": 0,
+          "ph": 0.64,
+          "sulfate": 0.53
+        },
+        {
+          "pc1": 1.79,
+          "pc2": -0.39,
+          "potable": 1,
+          "ph": 0.37,
+          "sulfate": -0.9
+        },
+        {
+          "pc1": -0.731,
+          "pc2": -0.287,
+          "potable": 1,
+          "ph": 1.43,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -1.193,
+          "pc2": -0.247,
+          "potable": 1,
+          "ph": -1.44,
+          "sulfate": 1.26
+        },
+        {
+          "pc1": 1.291,
+          "pc2": 0.233,
+          "potable": 1,
+          "ph": 0.36,
+          "sulfate": -1.38
+        },
+        {
+          "pc1": -0.796,
+          "pc2": -1.4,
+          "potable": 0,
+          "ph": -0.15,
+          "sulfate": 1.16
+        },
+        {
+          "pc1": 0.194,
+          "pc2": 0.229,
+          "potable": 0,
+          "ph": 0.53,
+          "sulfate": 0.21
+        },
+        {
+          "pc1": -1.324,
+          "pc2": 0.106,
+          "potable": 1,
+          "ph": -0.67,
+          "sulfate": 0.91
+        },
+        {
+          "pc1": -0.675,
+          "pc2": -0.328,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": 1.2
+        },
+        {
+          "pc1": -0.102,
+          "pc2": 0.417,
+          "potable": 1,
+          "ph": 1.0,
+          "sulfate": 0.46
+        },
+        {
+          "pc1": -1.207,
+          "pc2": -2.41,
+          "potable": 0,
+          "ph": -1.08,
+          "sulfate": 0.9
+        },
+        {
+          "pc1": -0.068,
+          "pc2": -0.273,
+          "potable": 0,
+          "ph": -0.73,
+          "sulfate": -0.35
+        },
+        {
+          "pc1": -0.001,
+          "pc2": -0.685,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.133,
+          "pc2": 0.942,
+          "potable": 0,
+          "ph": 0.45,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.147,
+          "pc2": -0.402,
+          "potable": 0,
+          "ph": -0.34,
+          "sulfate": -0.29
+        },
+        {
+          "pc1": -0.994,
+          "pc2": 3.35,
+          "potable": 0,
+          "ph": 1.54,
+          "sulfate": 0.25
+        },
+        {
+          "pc1": -0.978,
+          "pc2": -1.159,
+          "potable": 0,
+          "ph": -0.5,
+          "sulfate": -0.49
+        },
+        {
+          "pc1": -0.767,
+          "pc2": -0.184,
+          "potable": 1,
+          "ph": 0.57,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.98,
+          "pc2": -0.671,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": 0.5
+        },
+        {
+          "pc1": -0.264,
+          "pc2": 1.429,
+          "potable": 0,
+          "ph": 1.62,
+          "sulfate": -1.1
+        },
+        {
+          "pc1": 0.585,
+          "pc2": -2.046,
+          "potable": 0,
+          "ph": -2.29,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 0.098,
+          "pc2": 2.061,
+          "potable": 0,
+          "ph": 1.97,
+          "sulfate": 0.02
+        },
+        {
+          "pc1": -1.25,
+          "pc2": -0.434,
+          "potable": 0,
+          "ph": -0.06,
+          "sulfate": 1.34
+        },
+        {
+          "pc1": -0.676,
+          "pc2": -0.707,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": 0.57
+        },
+        {
+          "pc1": 0.962,
+          "pc2": -0.333,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.222,
+          "pc2": -0.55,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": 0.1
+        },
+        {
+          "pc1": -0.882,
+          "pc2": -0.009,
+          "potable": 0,
+          "ph": 0.11,
+          "sulfate": 0.31
+        },
+        {
+          "pc1": 0.402,
+          "pc2": -0.223,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -1.9
+        },
+        {
+          "pc1": -0.043,
+          "pc2": -0.379,
+          "potable": 1,
+          "ph": 0.55,
+          "sulfate": 0.73
+        },
+        {
+          "pc1": -0.206,
+          "pc2": -4.304,
+          "potable": 0,
+          "ph": -2.81,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.146,
+          "pc2": 1.39,
+          "potable": 1,
+          "ph": -0.03,
+          "sulfate": 1.2
+        },
+        {
+          "pc1": 1.054,
+          "pc2": -1.785,
+          "potable": 0,
+          "ph": -1.64,
+          "sulfate": 0.79
+        },
+        {
+          "pc1": -1.253,
+          "pc2": -0.533,
+          "potable": 0,
+          "ph": -0.02,
+          "sulfate": 0.93
+        },
+        {
+          "pc1": 2.366,
+          "pc2": -0.936,
+          "potable": 1,
+          "ph": -1.64,
+          "sulfate": -0.53
+        },
+        {
+          "pc1": -0.789,
+          "pc2": 0.993,
+          "potable": 0,
+          "ph": 0.55,
+          "sulfate": 0.17
+        },
+        {
+          "pc1": -0.216,
+          "pc2": 0.83,
+          "potable": 0,
+          "ph": 0.48,
+          "sulfate": 0.45
+        },
+        {
+          "pc1": 0.27,
+          "pc2": 0.736,
+          "potable": 1,
+          "ph": 0.82,
+          "sulfate": -1.6
+        },
+        {
+          "pc1": -1.389,
+          "pc2": 0.768,
+          "potable": 0,
+          "ph": -0.15,
+          "sulfate": 1.89
+        },
+        {
+          "pc1": -0.066,
+          "pc2": -1.101,
+          "potable": 1,
+          "ph": -0.66,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 1.007,
+          "pc2": -0.493,
+          "potable": 1,
+          "ph": -0.62,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.494,
+          "pc2": -0.68,
+          "potable": 0,
+          "ph": -0.03,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": 1.055,
+          "pc2": 2.196,
+          "potable": 1,
+          "ph": 1.28,
+          "sulfate": -0.02
+        },
+        {
+          "pc1": -0.583,
+          "pc2": 1.056,
+          "potable": 0,
+          "ph": 0.55,
+          "sulfate": -0.52
+        },
+        {
+          "pc1": -0.836,
+          "pc2": 0.488,
+          "potable": 1,
+          "ph": 0.45,
+          "sulfate": 0.83
+        }
+      ]
+    },
+    "supervised_integration_test": {
+      "baseline": {
+        "accuracy": 0.657,
+        "f1": 0.2812,
+        "roc_auc": 0.6755
+      },
+      "with_cluster_feature": {
+        "accuracy": 0.6509,
+        "f1": 0.2589,
+        "roc_auc": 0.6611
+      },
+      "delta_accuracy": -0.0061,
+      "delta_f1": -0.0223,
+      "delta_auc": -0.0144,
+      "recommendation": "Cluster feature does NOT significantly improve supervised performance (delta F1: -0.0223). Unsupervised clusters describe physicochemical geometry rather than potability boundaries, confirming that clustering should be kept for exploratory profiling rather than forced into supervised inference."
+    }
+  },
+  "demand": {
+    "zone_profiles": [
+      {
+        "zone": "Z01",
+        "mean_demand_kL": 782.22,
+        "std_demand_kL": 52.36,
+        "max_demand_kL": 1256.65,
+        "population": 52427.27,
+        "active_connections": 13309.1
+      },
+      {
+        "zone": "Z02",
+        "mean_demand_kL": 577.18,
+        "std_demand_kL": 39.45,
+        "max_demand_kL": 846.34,
+        "population": 41358.01,
+        "active_connections": 10904.08
+      },
+      {
+        "zone": "Z03",
+        "mean_demand_kL": 1096.99,
+        "std_demand_kL": 77.01,
+        "max_demand_kL": 1546.32,
+        "population": 68585.61,
+        "active_connections": 17018.35
+      },
+      {
+        "zone": "Z04",
+        "mean_demand_kL": 494.46,
+        "std_demand_kL": 35.04,
+        "max_demand_kL": 728.45,
+        "population": 35298.63,
+        "active_connections": 9283.88
+      },
+      {
+        "zone": "Z05",
+        "mean_demand_kL": 930.14,
+        "std_demand_kL": 65.4,
+        "max_demand_kL": 1384.57,
+        "population": 60522.6,
+        "active_connections": 15217.85
+      }
+    ],
+    "zones_count": 5
+  }
+}

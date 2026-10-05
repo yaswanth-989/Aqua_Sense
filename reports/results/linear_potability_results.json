@@ -1,0 +1,152 @@
+{
+  "task": "Water Potability Assessment (Binary Classification)",
+  "train_samples": 2620,
+  "test_samples": 656,
+  "features_used": [
+    "ph",
+    "Hardness",
+    "Solids",
+    "Chloramines",
+    "Sulfate",
+    "Conductivity",
+    "Organic_carbon",
+    "Trihalomethanes",
+    "Turbidity"
+  ],
+  "metrics_comparison": [
+    {
+      "model": "Logistic Regression (Baseline OLS)",
+      "accuracy": 0.6098,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5481,
+      "confusion_matrix": {
+        "true_negative": 400,
+        "false_positive": 0,
+        "false_negative": 256,
+        "true_positive": 0
+      }
+    },
+    {
+      "model": "Logistic Regression (L1 Lasso Penalty, C=0.5)",
+      "accuracy": 0.6098,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5475,
+      "confusion_matrix": {
+        "true_negative": 400,
+        "false_positive": 0,
+        "false_negative": 256,
+        "true_positive": 0
+      }
+    },
+    {
+      "model": "Logistic Regression (L2 Ridge Penalty, C=0.5)",
+      "accuracy": 0.6098,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5481,
+      "confusion_matrix": {
+        "true_negative": 400,
+        "false_positive": 0,
+        "false_negative": 256,
+        "true_positive": 0
+      }
+    },
+    {
+      "model": "Logistic Regression (Balanced Class Weight)",
+      "accuracy": 0.5244,
+      "precision": 0.4146,
+      "recall": 0.5312,
+      "f1": 0.4658,
+      "roc_auc": 0.5474,
+      "confusion_matrix": {
+        "true_negative": 208,
+        "false_positive": 192,
+        "false_negative": 120,
+        "true_positive": 136
+      }
+    }
+  ],
+  "feature_coefficients": [
+    {
+      "feature": "Solids",
+      "coefficient": 0.0593,
+      "odds_ratio": 1.0611,
+      "impact": "Increases Potability Odds"
+    },
+    {
+      "feature": "Chloramines",
+      "coefficient": 0.0413,
+      "odds_ratio": 1.0421,
+      "impact": "Increases Potability Odds"
+    },
+    {
+      "feature": "Organic_carbon",
+      "coefficient": -0.0286,
+      "odds_ratio": 0.9718,
+      "impact": "Decreases Potability Odds"
+    },
+    {
+      "feature": "ph",
+      "coefficient": 0.0256,
+      "odds_ratio": 1.026,
+      "impact": "Increases Potability Odds"
+    },
+    {
+      "feature": "Sulfate",
+      "coefficient": -0.0133,
+      "odds_ratio": 0.9868,
+      "impact": "Decreases Potability Odds"
+    },
+    {
+      "feature": "Trihalomethanes",
+      "coefficient": 0.0082,
+      "odds_ratio": 1.0082,
+      "impact": "Increases Potability Odds"
+    },
+    {
+      "feature": "Conductivity",
+      "coefficient": 0.0061,
+      "odds_ratio": 1.0061,
+      "impact": "Increases Potability Odds"
+    },
+    {
+      "feature": "Turbidity",
+      "coefficient": 0.0024,
+      "odds_ratio": 1.0024,
+      "impact": "Increases Potability Odds"
+    },
+    {
+      "feature": "Hardness",
+      "coefficient": -0.0021,
+      "odds_ratio": 0.9979,
+      "impact": "Decreases Potability Odds"
+    }
+  ],
+  "probability_distribution": {
+    "bins": [
+      "0.0-0.2",
+      "0.2-0.4",
+      "0.4-0.6",
+      "0.6-0.8",
+      "0.8-1.0"
+    ],
+    "counts": [
+      0,
+      0,
+      656,
+      0,
+      0
+    ]
+  },
+  "baseline_confusion_matrix": {
+    "true_negative": 208,
+    "false_positive": 192,
+    "false_negative": 120,
+    "true_positive": 136
+  }
+}

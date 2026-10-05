@@ -1,23 +1,361 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% block title %}Regression & Classification — AquaSense{% endblock %}
+{% block page_title %}Regression &amp; Classification{% endblock %}
+{% block page_subtitle %}Demand forecasting via linear models · Potability classification via logistic regression{% endblock %}
 
-{% block title %}Regression &amp; Classification — AquaSense{% endblock %}
-{% block page_title %}Linear &amp; Regularized Models{% endblock %}
-{% block page_subtitle %}Linear Regression, Gradient Descent, Ridge, Lasso, ElasticNet &amp; Logistic Regression{% endblock %}
+{% block topbar_actions %}
+<span class="header-badge">
+  <i class="fas fa-shield-halved" style="font-size:11px;"></i>
+  Unseen 2025 Holdout
+</span>
+{% endblock %}
 
 {% block content %}
-<div class="coming-soon-banner">
-  <div class="coming-soon-icon">
-    <i data-lucide="trending-up"></i>
+
+<div class="page-header">
+  <h2>Linear &amp; Regularized Model Suite</h2>
+  <p>Multiple Linear Regression · Vectorized Gradient Descent · Ridge / Lasso / Elastic Net · Logistic Regression for potability</p>
+</div>
+
+<div class="action-grid">
+  <div class="action-card active-action" id="action-card-multiple" onclick="switchView('multiple')">
+    <span class="action-icon">📐</span>
+    <span class="action-title">Multiple LR (OLS)</span>
+    <span class="action-desc">Closed-form baseline on 19 predictors · R² = {{ demand_linear.metrics_comparison[0].r2 }}</span>
   </div>
-  <div class="badge-tag" style="margin-bottom: 12px;">Milestone 4 (Part A)</div>
-  <h2 class="coming-soon-title">Linear &amp; Regularized Models Coming Soon</h2>
-  <p class="coming-soon-desc">
-    Linear models for water demand forecasting and baseline logistic regression for potability will be trained, tuned, and compared following data preparation.
-  </p>
-  <div style="display: inline-flex; gap: 12px; font-size: 0.82rem; color: var(--text-muted);">
-    <span>• Vectorized Gradient Descent</span>
-    <span>• Ridge / Lasso / ElasticNet Penalty Paths</span>
-    <span>• Calibrated Logistic Regression</span>
+  <div class="action-card" id="action-card-gd" onclick="switchView('gd')">
+    <span class="action-icon">📉</span>
+    <span class="action-title">Gradient Descent</span>
+    <span class="action-desc">From-scratch vectorized GD · 300 epochs · η = 0.05</span>
+  </div>
+  <div class="action-card" id="action-card-reg" onclick="switchView('reg')">
+    <span class="action-icon">⚖️</span>
+    <span class="action-title">Ridge &amp; Lasso</span>
+    <span class="action-desc">L1 / L2 / Elastic Net regularization comparison</span>
+  </div>
+  <div class="action-card" id="action-card-pot" onclick="switchView('pot')">
+    <span class="action-icon">🛡️</span>
+    <span class="action-title">Potability Classification</span>
+    <span class="action-desc">Logistic Regression · Confusion Matrix · ROC-AUC</span>
   </div>
 </div>
+
+<!-- VIEW 1: MULTIPLE LR -->
+<div id="view-multiple">
+  <div class="card" id="ols-info-card" style="border-top:3px solid var(--accent);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-chart-line card-icon"></i>
+        <h3>Multiple Linear Regression — Ordinary Least Squares (OLS)</h3>
+      </div>
+      <span class="header-badge">R² = {{ demand_linear.metrics_comparison[0].r2 }}</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+        <div class="result-stat"><span class="rl">RMSE</span><span class="rv">{{ demand_linear.metrics_comparison[0].rmse }} kL</span></div>
+        <div class="result-stat"><span class="rl">MAE</span><span class="rv">{{ demand_linear.metrics_comparison[0].mae }} kL</span></div>
+        <div class="result-stat"><span class="rl">R²</span><span class="rv" style="color:var(--accent);">{{ demand_linear.metrics_comparison[0].r2 }}</span></div>
+        <div class="result-stat"><span class="rl">Train Samples</span><span class="rv">{{ "{:,}".format(demand_linear.train_samples) }}</span></div>
+        <div class="result-stat"><span class="rl">Test Samples</span><span class="rv">{{ "{:,}".format(demand_linear.test_samples) }}</span></div>
+        <div class="result-stat"><span class="rl">Horizon</span><span class="rv">Year 2025</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="ols-chart-card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-eye card-icon"></i>
+        <h3>Actual vs Predicted — Zone Z01 (Jan 2025)</h3>
+      </div>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div style="height:240px;">
+        <canvas id="olsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" id="ols-bottom">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-arrows-up-down card-icon"></i>
+          <h3>Top Feature Weights</h3>
+        </div>
+        <span class="header-badge">Sorted by |w|</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Feature</th><th>Coefficient</th><th>Influence</th></tr></thead>
+          <tbody>
+            {% for c in demand_linear.feature_coefficients[:8] %}
+            <tr>
+              <td style="font-weight:600;">{{ c.feature }}</td>
+              <td style="font-family:monospace;color:{% if c.coefficient > 0 %}var(--green){% else %}var(--red){% endif %};">{{ c.coefficient }}</td>
+              <td style="width:120px;">
+                <div class="progress-container">
+                  <div class="progress-bar-fill" style="width:{{ [(c.abs_weight / demand_linear.feature_coefficients[0].abs_weight * 100)|round|int, 100]|min }}%;"></div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-table card-icon"></i>
+          <h3>Actual vs Predicted — 10 Rows</h3>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Date</th><th>Actual</th><th>Predicted</th><th>Error</th></tr></thead>
+          <tbody>
+            {% for i in range([demand_linear.actual_vs_predicted_sample.dates|length, 10]|min) %}
+            {% set act = demand_linear.actual_vs_predicted_sample.actual[i] %}
+            {% set pred = demand_linear.actual_vs_predicted_sample.predicted[i] %}
+            {% set err = (act - pred)|abs|round(1) %}
+            <tr>
+              <td class="row-num">{{ i + 1 }}</td>
+              <td>{{ demand_linear.actual_vs_predicted_sample.dates[i] }}</td>
+              <td>{{ act }}</td>
+              <td class="fill-val">{{ pred }}</td>
+              <td style="color:{% if err < 20 %}var(--green){% elif err < 60 %}var(--amber){% else %}var(--red){% endif %};font-weight:600;">{{ err }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW 2: GRADIENT DESCENT -->
+<div id="view-gd" style="display:none;">
+  <div class="card" id="gd-info-card" style="border-top:3px solid var(--teal);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-chart-area card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Vectorized Gradient Descent — From Scratch</h3>
+      </div>
+      <span class="header-badge teal">η = 0.05 · 300 Epochs</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+        <div class="result-stat"><span class="rl">Initial Cost</span><span class="rv" style="color:var(--red);">{{ demand_linear.gradient_descent_convergence.initial_cost }}</span></div>
+        <div class="result-stat"><span class="rl">Final Cost</span><span class="rv" style="color:var(--teal);">{{ demand_linear.gradient_descent_convergence.final_cost }}</span></div>
+        <div class="result-stat"><span class="rl">RMSE</span><span class="rv">{{ demand_linear.metrics_comparison[1].rmse }} kL</span></div>
+        <div class="result-stat"><span class="rl">MAE</span><span class="rv">{{ demand_linear.metrics_comparison[1].mae }} kL</span></div>
+        <div class="result-stat"><span class="rl">R²</span><span class="rv" style="color:var(--accent);">{{ demand_linear.metrics_comparison[1].r2 }}</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="gd-chart-card">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-arrow-trend-down card-icon" style="background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border);"></i>
+        <h3>MSE Convergence Curve</h3>
+      </div>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div style="height:260px;">
+        <canvas id="gdChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW 3: REGULARIZATION -->
+<div id="view-reg" style="display:none;">
+  <div class="card" id="reg-table-card" style="border-top:3px solid var(--accent);">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-scale-balanced card-icon"></i>
+        <h3>Regularized Models — Water Demand Forecasting</h3>
+      </div>
+      <span class="header-badge">5 Architectures · 2025 Holdout</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Model</th><th>Penalty</th><th>RMSE (kL)</th><th>MAE (kL)</th><th>R²</th><th>Key Trait</th></tr>
+        </thead>
+        <tbody>
+          {% for m in demand_linear.metrics_comparison %}
+          <tr>
+            <td style="font-weight:600;font-size:0.8rem;">{{ m.model }}</td>
+            <td>
+              {% if 'Ridge' in m.model %}<span class="badge-tag blue">L2 Ridge</span>
+              {% elif 'Lasso' in m.model %}<span class="badge-tag warning">L1 Lasso</span>
+              {% elif 'Elastic' in m.model %}<span class="badge-tag" style="background:var(--teal-50);color:var(--teal);">Elastic Net</span>
+              {% elif 'Gradient' in m.model %}<span class="badge-tag">Iterative GD</span>
+              {% else %}<span class="badge-tag success">OLS</span>{% endif %}
+            </td>
+            <td><strong>{{ m.rmse }}</strong></td>
+            <td>{{ m.mae }}</td>
+            <td><code>{{ m.r2 }}</code></td>
+            <td style="font-size:0.78rem;color:var(--text-muted);">
+              {% if 'Ridge' in m.model %}Shrinks all coefficients smoothly
+              {% elif 'Lasso' in m.model %}Zeroes redundant features
+              {% elif 'Elastic' in m.model %}L1 + L2 combined penalty
+              {% elif 'Gradient' in m.model %}Iterative optimizer from scratch
+              {% else %}Analytical closed-form solution{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW 4: POTABILITY -->
+<div id="view-pot" style="display:none;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div class="card" id="pot-cm-card" style="border-top:3px solid var(--teal);margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-table-cells card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+          <h3>Decision Matrix (Balanced Weights)</h3>
+        </div>
+        <span class="header-badge teal">F1 = {{ potability_linear.metrics_comparison[3].f1 }}</span>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="result-stat" style="flex-direction:column;align-items:center;border-left:3px solid var(--green);">
+            <span class="rv" style="font-size:1.6rem;">{{ potability_linear.baseline_confusion_matrix.true_negative }}</span>
+            <span class="rl" style="text-transform:uppercase;font-size:0.7rem;">True Negatives</span>
+            <span style="font-size:0.7rem;color:var(--green);">Correct Non-Potable</span>
+          </div>
+          <div class="result-stat" style="flex-direction:column;align-items:center;border-left:3px solid var(--amber);">
+            <span class="rv" style="font-size:1.6rem;">{{ potability_linear.baseline_confusion_matrix.false_positive }}</span>
+            <span class="rl" style="text-transform:uppercase;font-size:0.7rem;">False Positives</span>
+            <span style="font-size:0.7rem;color:var(--amber);">Unsafe → Safe ⚠</span>
+          </div>
+          <div class="result-stat" style="flex-direction:column;align-items:center;border-left:3px solid var(--red);">
+            <span class="rv" style="font-size:1.6rem;">{{ potability_linear.baseline_confusion_matrix.false_negative }}</span>
+            <span class="rl" style="text-transform:uppercase;font-size:0.7rem;">False Negatives</span>
+            <span style="font-size:0.7rem;color:var(--red);">Safe → Unsafe ✗</span>
+          </div>
+          <div class="result-stat" style="flex-direction:column;align-items:center;border-left:3px solid var(--accent);">
+            <span class="rv" style="font-size:1.6rem;">{{ potability_linear.baseline_confusion_matrix.true_positive }}</span>
+            <span class="rl" style="text-transform:uppercase;font-size:0.7rem;">True Positives</span>
+            <span style="font-size:0.7rem;color:var(--accent);">Correct Potable</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="pot-compare-card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-list-check card-icon"></i>
+          <h3>Logistic Regression Variants</h3>
+        </div>
+        <span class="header-badge">656 Test Samples</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Model</th><th>Acc</th><th>Recall</th><th>F1</th><th>ROC-AUC</th></tr></thead>
+          <tbody>
+            {% for m in potability_linear.metrics_comparison %}
+            <tr>
+              <td style="font-weight:600;font-size:0.78rem;">{{ m.model }}</td>
+              <td>{{ m.accuracy }}</td>
+              <td><code>{{ m.recall }}</code></td>
+              <td><strong>{{ m.f1 }}</strong></td>
+              <td><code>{{ m.roc_auc }}</code></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="pot-coef-card">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-arrows-up-down card-icon"></i>
+        <h3>Feature Coefficients &amp; Odds Ratios (Balanced Model)</h3>
+      </div>
+      <span class="header-badge">Sorted by |coef|</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Feature</th><th>Coefficient</th><th>Odds Ratio</th><th>Impact</th><th>Influence</th></tr></thead>
+        <tbody>
+          {% for c in potability_linear.feature_coefficients %}
+          <tr>
+            <td style="font-weight:600;">{{ c.feature }}</td>
+            <td style="font-family:monospace;color:{% if c.coefficient > 0 %}var(--green){% else %}var(--red){% endif %};">{{ c.coefficient }}</td>
+            <td><code>{{ c.odds_ratio }}</code></td>
+            <td style="font-size:0.78rem;color:var(--text-muted);">{{ c.impact }}</td>
+            <td style="width:120px;">
+              <div class="progress-container">
+                <div class="progress-bar-fill {% if c.coefficient <= 0 %}amber{% endif %}" style="width:{{ [(c.coefficient|abs / potability_linear.feature_coefficients[0].coefficient|abs * 100)|round|int, 100]|min }}%;"></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="background:var(--primary-50);border:1px solid var(--primary-200);border-radius:var(--radius);padding:14px 18px;display:flex;gap:10px;" id="pot-insight">
+    <i class="fas fa-lightbulb" style="color:var(--accent);margin-top:3px;flex-shrink:0;"></i>
+    <div>
+      <strong style="color:var(--accent);">Why ROC-AUC ≈ 0.55?</strong>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;line-height:1.6;">Water safety requires multi-attribute thresholds (pH 6.5–8.5, turbidity &lt; 5 NTU) — boundaries are non-monotonic and linear models cannot capture them. This directly motivates the <strong>Tree &amp; Ensemble Models</strong> stage.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchView(v) {
+  ['multiple','gd','reg','pot'].forEach(function(id) {
+    document.getElementById('view-' + id).style.display = (id === v) ? '' : 'none';
+    document.getElementById('action-card-' + id).classList.toggle('active-action', id === v);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  Chart.defaults.font.family = 'Inter, sans-serif';
+  Chart.defaults.font.size = 12;
+
+  var ctxOLS = document.getElementById('olsChart');
+  if (ctxOLS) {
+    new Chart(ctxOLS, {
+      type: 'line',
+      data: {
+        labels: {{ demand_linear.actual_vs_predicted_sample.dates|tojson }},
+        datasets: [
+          { label: 'Actual (kL)', data: {{ demand_linear.actual_vs_predicted_sample.actual|tojson }}, borderColor: '#0f172a', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 2.5 },
+          { label: 'Predicted (kL)', data: {{ demand_linear.actual_vs_predicted_sample.predicted|tojson }}, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.08)', borderWidth: 2, borderDash: [5,4], pointRadius: 2, fill: true }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { title: { display: true, text: 'Demand (kL)' } }, x: { ticks: { maxTicksLimit: 10 } } } }
+    });
+  }
+
+  var ctxGD = document.getElementById('gdChart');
+  if (ctxGD) {
+    new Chart(ctxGD, {
+      type: 'line',
+      data: {
+        labels: {{ demand_linear.gradient_descent_convergence.epochs|tojson }}.map(function(e){ return 'Ep ' + e; }),
+        datasets: [{ label: 'MSE Cost', data: {{ demand_linear.gradient_descent_convergence.cost_mse|tojson }}, borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.1)', fill: true, tension: 0.3, pointRadius: 2 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { title: { display: true, text: 'Cost (MSE)' } }, x: { ticks: { maxTicksLimit: 8 } } } }
+    });
+  }
+});
+</script>
 {% endblock %}

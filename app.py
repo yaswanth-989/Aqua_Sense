@@ -108,10 +108,20 @@ async def preprocessing_view(request: Request):
 @app.get("/linear_models", response_class=HTMLResponse)
 async def linear_models_view(request: Request):
     """Linear & Regularized Regression/Classification View."""
+    from src.models.linear_demand import train_evaluate_demand_linear_models
+    from src.models.linear_potability import train_evaluate_potability_linear_models
+
+    demand_linear = load_or_compute_json("linear_demand_results.json", train_evaluate_demand_linear_models)
+    potability_linear = load_or_compute_json("linear_potability_results.json", train_evaluate_potability_linear_models)
+
     return templates.TemplateResponse(
         request=request,
         name="linear_models.html",
-        context={"active_page": "linear_models"}
+        context={
+            "active_page": "linear_models",
+            "demand_linear": demand_linear,
+            "potability_linear": potability_linear
+        }
     )
 
 
@@ -232,6 +242,20 @@ async def preprocessing_summary_api():
         "potability": pot_summary,
         "demand": dem_summary
     })
+
+
+@app.get("/api/v1/models/linear/demand")
+async def linear_demand_api():
+    """Water Demand Forecasting Linear Models Evaluation API."""
+    from src.models.linear_demand import train_evaluate_demand_linear_models
+    return sanitize_numpy(load_or_compute_json("linear_demand_results.json", train_evaluate_demand_linear_models))
+
+
+@app.get("/api/v1/models/linear/potability")
+async def linear_potability_api():
+    """Water Potability Assessment Linear Models Evaluation API."""
+    from src.models.linear_potability import train_evaluate_potability_linear_models
+    return sanitize_numpy(load_or_compute_json("linear_potability_results.json", train_evaluate_potability_linear_models))
 
 
 if __name__ == "__main__":
