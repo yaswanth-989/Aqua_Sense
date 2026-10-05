@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}Model Evaluation — AquaSense{% endblock %}
 {% block page_title %}Model Evaluation &amp; Benchmarking{% endblock %}
@@ -51,7 +52,8 @@
           <tr>
             <th>#</th>
             <th>Model</th>
-            <th>CV AUC (mean ± std)</th>
+            <th>CV F1 (mean ± std)</th>
+            <th>CV AUC</th>
             <th>Test Accuracy</th>
             <th>Test Precision</th>
             <th>Test Recall</th>
@@ -66,7 +68,8 @@
           <tr {% if loop.first %}style="background:var(--accent-bg);"{% endif %}>
             <td style="font-weight:700;color:{% if loop.first %}var(--accent){% else %}var(--text-muted){% endif %};">{{ loop.index }}</td>
             <td style="font-weight:600;">{{ m.model }}{% if loop.first %} <span class="badge-tag success" style="margin-left:4px;">Best</span>{% endif %}</td>
-            <td style="font-family:monospace;white-space:nowrap;">{{ m.cv_auc_mean }} <span style="color:var(--text-muted);">± {{ m.cv_f1_std }}</span></td>
+            <td style="font-family:monospace;white-space:nowrap;">{{ m.cv_f1_mean }} <span style="color:var(--text-muted);">± {{ m.cv_f1_std }}</span></td>
+            <td style="font-family:monospace;">{{ m.cv_auc_mean }}</td>
             <td>{{ m.test_accuracy }}</td>
             <td style="color:var(--accent);">{{ m.test_precision }}</td>
             <td>{{ m.test_recall }}</td>
@@ -113,7 +116,7 @@
     <div class="card" style="margin-bottom:0;">
       <div class="card-header">
         <div class="card-header-title">
-          <i class="fas fa-grid card-icon"></i>
+          <i class="fas fa-table-cells card-icon"></i>
           <h3>Best Model — Confusion Matrix</h3>
         </div>
         <span class="header-badge">{{ eval_data.potability.benchmark_table[0].model }}</span>
@@ -326,7 +329,6 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 function switchDS(ds) {
   ['pot','dem'].forEach(function(id) {
@@ -339,8 +341,8 @@ const evalData = {{ eval_data | tojson }};
 
 // Threshold Chart (Random Forest)
 const threshCtx = document.getElementById('thresholdChart');
-if (threshCtx) {
-  const rfKey = Object.keys(evalData.potability.threshold_analyses)[0];
+if (threshCtx && evalData.potability.threshold_analyses) {
+  const rfKey = evalData.potability.threshold_analyses['Random Forest (Tuned)'] ? 'Random Forest (Tuned)' : Object.keys(evalData.potability.threshold_analyses)[0];
   const threshData = evalData.potability.threshold_analyses[rfKey];
   new Chart(threshCtx, {
     type: 'line',

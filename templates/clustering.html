@@ -190,7 +190,8 @@
     </div>
     <div class="insight-bar" style="margin:0 16px 16px 16px;background:var(--teal-50);border-color:var(--teal-100);">
       <i class="fas fa-info-circle" style="color:var(--teal);flex-shrink:0;"></i>
-      <span>DBSCAN at ε=2.5 identifies <strong>{{ clustering_data.potability.dbscan.configurations[2].noise_points }} noise points ({{ clustering_data.potability.dbscan.configurations[2].noise_pct }}%)</strong> as outlier water samples — extreme pH, very high sulfate, or unusual mineral loading. These border cases represent real ambiguity in the Kaggle dataset and explain why supervised models struggle near the classification boundary.</span>
+      {% set chosen_db = clustering_data.potability.dbscan.configurations | selectattr('eps', 'equalto', clustering_data.potability.dbscan.chosen_eps) | first | default(clustering_data.potability.dbscan.configurations[0]) %}
+      <span>DBSCAN at ε={{ chosen_db.eps }} identifies <strong>{{ chosen_db.noise_points }} noise points ({{ chosen_db.noise_pct }}%)</strong> as outlier water samples — extreme pH, very high sulfate, or unusual mineral loading. These border cases represent real ambiguity in the Kaggle dataset and explain why supervised models struggle near the classification boundary.</span>
     </div>
   </div>
 
@@ -291,7 +292,7 @@
   <div class="card" style="margin-bottom:14px;">
     <div class="card-header">
       <div class="card-header-title">
-        <i class="fas fa-chart-scatter card-icon" style="background:var(--amber-bg);color:var(--amber);border-color:var(--amber-100,#fde68a);"></i>
+        <i class="fas fa-circle-nodes card-icon" style="background:var(--amber-bg);color:var(--amber);border-color:var(--amber-100,#fde68a);"></i>
         <h3>PCA 2D Projection — Test Set (150 Samples)</h3>
       </div>
       <span class="header-badge" style="background:var(--amber-bg);color:var(--amber);">Coloured by Potability</span>
@@ -361,7 +362,6 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 function switchView(v) {
   ['kmeans','dbscan','pca','superv'].forEach(function(id) {
