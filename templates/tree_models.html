@@ -1,11 +1,12 @@
-﻿{% extends "base.html" %}
-{% block title %}Tree & Ensemble Models{% endblock %}
-{% block breadcrumb %}Tree &amp; Ensemble Models{% endblock %}
+{% extends "base.html" %}
+{% block title %}Tree & Ensemble Models — AquaSense{% endblock %}
+{% block page_title %}Tree &amp; Ensemble Models{% endblock %}
+{% block page_subtitle %}Decision Trees · Random Forest (OOB) · Gradient Boosting · XGBoost — potability &amp; demand{% endblock %}
 
 {% block topbar_actions %}
 <span class="header-badge">
-  <i class="fas fa-clock" style="font-size:10px;"></i>
-  Coming Next
+  <i class="fas fa-leaf" style="font-size:11px;"></i>
+  Unseen 2025 Holdout
 </span>
 {% endblock %}
 
@@ -13,7 +14,7 @@
 
 <div class="page-header">
   <h2>Tree &amp; Ensemble Models</h2>
-  <p>Decision Trees · Random Forest · Gradient Boosting — applied to both water potability and demand forecasting.</p>
+  <p>First-principles entropy &amp; Gini · Cost-Complexity Pruning · OOB Error · MDI &amp; Permutation Importance — applied to both water quality classification and demand regression.</p>
 </div>
 
 <!-- Dataset Switcher -->
@@ -21,98 +22,331 @@
   <div class="action-card active-action" id="btn-pot" onclick="switchDS('pot')">
     <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
     <span class="action-title">Water Potability</span>
-    <span class="action-desc">Binary classification — potable vs non-potable</span>
+    <span class="action-desc">Classification — {{ tree_data.potability.models|length }} models · ROC-AUC {{ tree_data.potability.models | selectattr('model', 'equalto', 'XGBoost Classifier') | map(attribute='roc_auc') | first | default('—') }}</span>
   </div>
   <div class="action-card" id="btn-dem" onclick="switchDS('dem')">
     <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
     <span class="action-title">Water Demand</span>
-    <span class="action-desc">Daily demand regression — 5 zones</span>
+    <span class="action-desc">Regression — {{ tree_data.demand.models|length }} models · Best R² {{ tree_data.demand.models | sort(attribute='r2', reverse=True) | first | attr('r2') }}</span>
   </div>
 </div>
 
-<!-- POTABILITY VIEW -->
+<!-- =========================================================
+     POTABILITY VIEW
+     ========================================================= -->
 <div id="view-pot">
-  <div class="coming-soon-banner">
-    <div class="coming-soon-icon"><i class="fas fa-sitemap"></i></div>
-    <div class="coming-soon-title">Tree Models for Potability — In Development</div>
-    <div class="coming-soon-desc">
-      Decision Tree, Random Forest, and Gradient Boosting classifiers will be trained on the water quality dataset.
-      Feature importance rankings, depth-vs-accuracy curves, and confusion matrices will appear here.
+
+  <!-- First Principles Info Box -->
+  <div class="card" style="border-top:3px solid var(--accent);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-calculator card-icon"></i>
+        <h3>First Principles — Entropy &amp; Gini (Adapted from decision__tree_1.py)</h3>
+      </div>
+      <span class="header-badge">Information Theory</span>
     </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Planned: Decision Tree</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">Max Depth Tuning</span>
+    <div class="card-body" style="padding-top:0;">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Feature</th><th>Threshold</th><th>Parent Entropy</th><th>Info Gain</th><th>Parent Gini</th><th>Gini Decrease</th></tr></thead>
+          <tbody>
+            {% for d in tree_data.potability.first_principles_split_demo %}
+            <tr>
+              <td style="font-weight:600;">{{ d.feature }}</td>
+              <td style="font-family:monospace;">{{ d.threshold }}</td>
+              <td style="font-family:monospace;">{{ d.parent_entropy }}</td>
+              <td style="font-family:monospace;color:{% if loop.first %}var(--accent){% else %}var(--text-muted){% endif %};">{{ d.information_gain }}</td>
+              <td style="font-family:monospace;">{{ d.parent_gini }}</td>
+              <td style="font-family:monospace;color:{% if loop.first %}var(--accent){% else %}var(--text-muted){% endif %};">{{ d.gini_decrease }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Planned: Random Forest</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">n_estimators Sweep</span>
-      </div>
-      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Planned: Gradient Boost</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">Learning Rate Tuning</span>
+      <div class="insight-bar" style="margin-top:10px;">
+        <i class="fas fa-lightbulb" style="color:var(--accent);margin-top:2px;flex-shrink:0;"></i>
+        <span>At the root's median split, pH delivers the highest Information Gain ({{ tree_data.potability.first_principles_split_demo[0].information_gain }}) — confirming it as the most discriminating parameter in water potability. All gains are small because water quality boundaries are highly non-linear; this is exactly why tree ensembles outperform single splits.</span>
       </div>
     </div>
   </div>
-</div>
 
-<!-- DEMAND VIEW -->
+  <!-- Model Performance Table -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-trophy card-icon"></i>
+        <h3>Potability Classification Benchmark</h3>
+      </div>
+      <span class="header-badge">{{ tree_data.potability.models[0].confusion_matrix[0][0] + tree_data.potability.models[0].confusion_matrix[0][1] + tree_data.potability.models[0].confusion_matrix[1][0] + tree_data.potability.models[0].confusion_matrix[1][1] }} Test Samples</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>ROC-AUC</th><th>OOB</th></tr></thead>
+        <tbody>
+          {% for m in tree_data.potability.models %}
+          <tr {% if m.roc_auc == tree_data.potability.models | map(attribute='roc_auc') | max %}style="background:var(--accent-bg);"{% endif %}>
+            <td style="font-weight:600;">{{ m.model }}{% if m.roc_auc == tree_data.potability.models | map(attribute='roc_auc') | max %} <span class="badge-tag success" style="margin-left:4px;">Best</span>{% endif %}</td>
+            <td>{{ m.accuracy }}</td>
+            <td style="color:var(--accent);">{{ m.precision }}</td>
+            <td>{{ m.recall }}</td>
+            <td style="font-weight:600;">{{ m.f1 }}</td>
+            <td style="font-weight:700;color:var(--accent);">{{ m.roc_auc }}</td>
+            <td>{% if m.oob_score is defined %}{{ m.oob_score }}<br><span style="font-size:11px;color:var(--text-muted);">err {{ m.oob_error }}</span>{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Feature Importance + Confusion Matrix row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;" id="pot-bottom">
+    <!-- Feature Importances -->
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-sort-amount-down card-icon"></i>
+          <h3>Feature Importance — Random Forest (MDI)</h3>
+        </div>
+        <span class="header-badge">Gini-Based</span>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        {% set rf_imp = tree_data.potability.feature_importances['Random Forest (OOB 0.16)'] %}
+        {% set max_imp = rf_imp.values() | max %}
+        {% for feat, val in rf_imp.items() | sort(attribute='1', reverse=True) %}
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">
+            <span style="font-weight:600;">{{ feat }}</span>
+            <span style="font-family:monospace;color:var(--accent);">{{ (val*100)|round(1) }}%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar-fill" style="width:{{ (val/max_imp*100)|round|int }}%;"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Confusion Matrix — Best Model (XGBoost) -->
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-grid card-icon"></i>
+          <h3>Confusion Matrix — XGBoost</h3>
+        </div>
+        <span class="header-badge">F1 = {{ tree_data.potability.models[-1].f1 }}</span>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        {% set mx = tree_data.potability.models[-1] %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:260px;margin:0 auto 14px auto;">
+          <div style="background:var(--green-bg);border:1px solid var(--green-100);border-radius:8px;padding:18px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:var(--green);">{{ mx.tn }}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">True Negative</div>
+          </div>
+          <div style="background:var(--red-bg,#fff0f0);border:1px solid var(--red-100,#ffd0d0);border-radius:8px;padding:18px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:var(--red,#e05050);">{{ mx.fp }}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">False Positive</div>
+          </div>
+          <div style="background:var(--red-bg,#fff0f0);border:1px solid var(--red-100,#ffd0d0);border-radius:8px;padding:18px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:var(--red,#e05050);">{{ mx.fn }}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">False Negative</div>
+          </div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-100);border-radius:8px;padding:18px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:var(--green);">{{ mx.tp }}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">True Positive</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div class="result-stat"><span class="rl">Accuracy</span><span class="rv">{{ mx.accuracy }}</span></div>
+          <div class="result-stat"><span class="rl">Precision</span><span class="rv" style="color:var(--accent);">{{ mx.precision }}</span></div>
+          <div class="result-stat"><span class="rl">Recall</span><span class="rv">{{ mx.recall }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OOB Analysis -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-flask card-icon"></i>
+        <h3>Random Forest — Out-of-Bag (OOB) Error Analysis</h3>
+      </div>
+      <span class="header-badge">Bootstrap Validation</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+        <div class="result-stat"><span class="rl">OOB Score (Accuracy)</span><span class="rv" style="color:var(--accent);">{{ tree_data.potability.oob_analysis.oob_score }}</span></div>
+        <div class="result-stat"><span class="rl">OOB Error Rate</span><span class="rv">{{ tree_data.potability.oob_analysis.oob_error }}</span></div>
+        <div class="result-stat"><span class="rl">n_estimators</span><span class="rv">150 trees</span></div>
+        <div class="result-stat"><span class="rl">Max Features</span><span class="rv">√(9) ≈ 3</span></div>
+      </div>
+      <div class="insight-bar" style="margin-top:12px;">
+        <i class="fas fa-info-circle" style="color:var(--accent);flex-shrink:0;"></i>
+        <span>{{ tree_data.potability.oob_analysis.note }}</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-pot -->
+
+
+<!-- =========================================================
+     DEMAND VIEW
+     ========================================================= -->
 <div id="view-dem" style="display:none;">
-  <div class="coming-soon-banner">
-    <div class="coming-soon-icon" style="background:var(--teal-50);color:var(--teal);"><i class="fas fa-sitemap"></i></div>
-    <div class="coming-soon-title">Tree Models for Demand Forecasting — In Development</div>
-    <div class="coming-soon-desc">
-      Decision Tree, Random Forest, and Gradient Boosting regressors will be evaluated on the 2025 holdout horizon.
-      Feature importance and RMSE benchmarks against linear baselines will be shown here.
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Planned: Decision Tree</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">Regressor — RMSE</span>
-      </div>
-      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Planned: Random Forest</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">n=100 estimators</span>
-      </div>
-      <div class="result-stat" style="min-width:130px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Planned: Gradient Boost</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">Chronological Split</span>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- What will be shown -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-title">
-      <i class="fas fa-list-check card-icon"></i>
-      <h3>Planned Output — Both Datasets</h3>
+  <!-- Benchmark Table -->
+  <div class="card" style="border-top:3px solid var(--teal);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-trophy card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Demand Forecasting Benchmark — 2025 Holdout</h3>
+      </div>
+      <span class="header-badge teal">{{ tree_data.demand.test_rows | default(1825) }} Test Rows</span>
     </div>
-    <span class="header-badge">Milestone 6</span>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Model</th><th>RMSE (kL)</th><th>MAE (kL)</th><th>R²</th><th>OOB R²</th></tr></thead>
+        <tbody>
+          {% for m in tree_data.demand.models %}
+          <tr {% if m.r2 == tree_data.demand.models | map(attribute='r2') | max %}style="background:var(--teal-50);"{% endif %}>
+            <td style="font-weight:600;">{{ m.model }}{% if m.r2 == tree_data.demand.models | map(attribute='r2') | max %} <span class="badge-tag teal" style="margin-left:4px;">Best</span>{% endif %}</td>
+            <td style="font-weight:600;">{{ m.rmse }}</td>
+            <td>{{ m.mae }}</td>
+            <td style="font-weight:700;color:var(--teal);">{{ m.r2 }}</td>
+            <td>{% if m.oob_r2 is defined %}{{ m.oob_r2 }}{% else %}<span style="color:var(--text-muted);">—</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="table-wrapper">
-    <table>
-      <thead><tr><th>Output</th><th>Potability</th><th>Demand</th><th>Metric</th></tr></thead>
-      <tbody>
-        <tr><td style="font-weight:600;">Decision Tree</td><td><span class="badge-tag blue">Classifier</span></td><td><span class="badge-tag teal">Regressor</span></td><td>F1 / RMSE</td></tr>
-        <tr><td style="font-weight:600;">Random Forest</td><td><span class="badge-tag blue">100 Trees</span></td><td><span class="badge-tag teal">100 Trees</span></td><td>ROC-AUC / R²</td></tr>
-        <tr><td style="font-weight:600;">Gradient Boosting</td><td><span class="badge-tag blue">sklearn GBM</span></td><td><span class="badge-tag teal">sklearn GBM</span></td><td>Precision / MAE</td></tr>
-        <tr><td style="font-weight:600;">Feature Importance</td><td><span class="badge-tag success">Bar Chart</span></td><td><span class="badge-tag success">Bar Chart</span></td><td>Gini / Permutation</td></tr>
-        <tr><td style="font-weight:600;">vs. Linear Baseline</td><td><span class="badge-tag success">Comparison</span></td><td><span class="badge-tag success">Comparison</span></td><td>All Metrics</td></tr>
-      </tbody>
-    </table>
+
+  <!-- Feature Importances — Demand GBM -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-sort-amount-down card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+          <h3>Feature Importance — Random Forest (MDI)</h3>
+        </div>
+        <span class="header-badge teal">Demand</span>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        {% set rf_dem_imp = tree_data.demand.feature_importances['Random Forest Regressor'] %}
+        {% set max_dem_imp = rf_dem_imp.values() | max %}
+        {% for feat, val in rf_dem_imp.items() | sort(attribute='1', reverse=True) %}
+        {% if loop.index <= 8 %}
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">
+            <span style="font-weight:600;">{{ feat }}</span>
+            <span style="font-family:monospace;color:var(--teal);">{{ (val*100)|round(1) }}%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar-fill" style="width:{{ (val/max_dem_imp*100)|round|int }}%;background:var(--teal);"></div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-chart-line card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+          <h3>Actual vs Predicted — 40 Sample Days</h3>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <div style="height:220px;">
+          <canvas id="demTreeChart"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+
+  <div class="insight-bar" style="background:var(--teal-50);border-color:var(--teal-100);">
+    <i class="fas fa-lightbulb" style="color:var(--teal);margin-top:2px;flex-shrink:0;"></i>
+    <span>Random Forest Regressor achieves R² = {{ tree_data.demand.models | sort(attribute='r2', reverse=True) | first | attr('r2') }} on the unseen 2025 horizon — comparable to OLS (R² = 0.9695) but non-linearly captures demand spikes from rainfall and holiday anomalies. Lag-1 and Population dominate feature importance, confirming strong temporal autocorrelation in zone-level demand patterns.</span>
+  </div>
+
+</div><!-- /view-dem -->
 
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// ---- Dataset Switcher ----
 function switchDS(ds) {
   ['pot','dem'].forEach(function(id) {
     document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
     document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
+  });
+}
+
+// ---- Demand Actual vs Predicted Chart ----
+const demData = {{ tree_data.demand | tojson }};
+const actuals = demData.actuals_sample;
+const rfPreds = demData.predictions_sample['Random Forest Regressor'];
+const xgbPreds = demData.predictions_sample['XGBoost Regressor'];
+const labels = demData.dates_sample.map(function(d, i) { return i % 5 === 0 ? d.slice(5) : ''; });
+
+const demCtx = document.getElementById('demTreeChart');
+if (demCtx) {
+  new Chart(demCtx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Actual',
+          data: actuals,
+          borderColor: 'rgba(20,184,166,0.85)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 2
+        },
+        {
+          label: 'Random Forest',
+          data: rfPreds,
+          borderColor: 'rgba(99,102,241,0.75)',
+          backgroundColor: 'transparent',
+          borderDash: [4,3],
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 0
+        },
+        {
+          label: 'XGBoost',
+          data: xgbPreds,
+          borderColor: 'rgba(245,158,11,0.7)',
+          backgroundColor: 'transparent',
+          borderDash: [2,3],
+          borderWidth: 1.5,
+          tension: 0.3,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 14, font: { size: 11 } } },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: { ticks: { font: { size: 10 }, maxRotation: 30 } },
+        y: {
+          title: { display: true, text: 'Demand (kL)', font: { size: 11 } },
+          ticks: { font: { size: 10 } }
+        }
+      }
+    }
   });
 }
 </script>

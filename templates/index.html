@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block breadcrumb %}Dashboard{% endblock %}
 
@@ -231,8 +231,8 @@
           <span class="pipeline-step-badge">Stage 5</span>
         </div>
         <div class="pipeline-title">Tree &amp; Ensemble Models</div>
-        <div class="pipeline-desc">Decision Trees, Random Forest, Gradient Boosting — feature importance and depth tuning.</div>
-        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+        <div class="pipeline-desc">Decision Trees, Random Forest (OOB), Gradient Boosting, XGBoost — feature importance &amp; split criteria.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
       </a>
 
       <a href="/clustering" class="pipeline-card">
@@ -241,8 +241,8 @@
           <span class="pipeline-step-badge">Stage 6</span>
         </div>
         <div class="pipeline-title">Pattern Discovery</div>
-        <div class="pipeline-desc">K-Means clustering, DBSCAN, and PCA dimensionality reduction on water quality profiles.</div>
-        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+        <div class="pipeline-desc">K-Means elbow &amp; silhouette, DBSCAN density analysis, PCA variance decomposition &amp; supervised cluster integration.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
       </a>
 
       <a href="/evaluation" class="pipeline-card">
@@ -251,8 +251,8 @@
           <span class="pipeline-step-badge">Stage 7</span>
         </div>
         <div class="pipeline-title">Model Evaluation</div>
-        <div class="pipeline-desc">Cross-model benchmarking with RMSE, ROC-AUC, F1, and precision-recall trade-off analysis.</div>
-        <span class="pipeline-status soon"><i class="fas fa-clock"></i> Coming Soon</span>
+        <div class="pipeline-desc">Stratified 5-Fold &amp; TimeSeriesSplit CV, hyperparameter tuning via GridSearchCV, decision threshold optimization.</div>
+        <span class="pipeline-status done"><i class="fas fa-check-circle"></i> Complete</span>
       </a>
 
       <a href="/prediction" class="pipeline-card">

@@ -128,30 +128,45 @@ async def linear_models_view(request: Request):
 @app.get("/tree_models", response_class=HTMLResponse)
 async def tree_models_view(request: Request):
     """Tree & Ensemble Models View."""
+    from src.models.tree_models import run_all_tree_models
+    tree_data = load_or_compute_json("tree_models_results.json", run_all_tree_models)
     return templates.TemplateResponse(
         request=request,
         name="tree_models.html",
-        context={"active_page": "tree_models"}
+        context={
+            "active_page": "tree_models",
+            "tree_data": tree_data
+        }
     )
 
 
 @app.get("/clustering", response_class=HTMLResponse)
 async def clustering_view(request: Request):
     """Pattern Discovery (Clustering & PCA) View."""
+    from src.models.clustering_pca import run_all_unsupervised
+    clustering_data = load_or_compute_json("clustering_results.json", run_all_unsupervised)
     return templates.TemplateResponse(
         request=request,
         name="clustering.html",
-        context={"active_page": "clustering"}
+        context={
+            "active_page": "clustering",
+            "clustering_data": clustering_data
+        }
     )
 
 
 @app.get("/evaluation", response_class=HTMLResponse)
 async def evaluation_view(request: Request):
     """Model Evaluation & Benchmark View."""
+    from src.models.evaluation_tuning import run_full_evaluation
+    eval_data = load_or_compute_json("model_evaluation_results.json", run_full_evaluation)
     return templates.TemplateResponse(
         request=request,
         name="evaluation.html",
-        context={"active_page": "evaluation"}
+        context={
+            "active_page": "evaluation",
+            "eval_data": eval_data
+        }
     )
 
 
@@ -256,6 +271,38 @@ async def linear_potability_api():
     """Water Potability Assessment Linear Models Evaluation API."""
     from src.models.linear_potability import train_evaluate_potability_linear_models
     return sanitize_numpy(load_or_compute_json("linear_potability_results.json", train_evaluate_potability_linear_models))
+
+
+@app.get("/api/v1/models/tree/potability")
+async def tree_potability_api():
+    """Tree & Ensemble Potability Classification Results API."""
+    from src.models.tree_models import run_all_tree_models
+    data = load_or_compute_json("tree_models_results.json", run_all_tree_models)
+    return sanitize_numpy(data.get("potability", data))
+
+
+@app.get("/api/v1/models/tree/demand")
+async def tree_demand_api():
+    """Tree & Ensemble Demand Regression Results API."""
+    from src.models.tree_models import run_all_tree_models
+    data = load_or_compute_json("tree_models_results.json", run_all_tree_models)
+    return sanitize_numpy(data.get("demand", data))
+
+
+@app.get("/api/v1/clustering")
+async def clustering_api():
+    """Unsupervised Clustering & PCA Results API."""
+    from src.models.clustering_pca import run_all_unsupervised
+    data = load_or_compute_json("clustering_results.json", run_all_unsupervised)
+    return sanitize_numpy(data)
+
+
+@app.get("/api/v1/evaluation")
+async def evaluation_api():
+    """Full Model Evaluation & Benchmark Comparison API."""
+    from src.models.evaluation_tuning import run_full_evaluation
+    data = load_or_compute_json("model_evaluation_results.json", run_full_evaluation)
+    return sanitize_numpy(data)
 
 
 if __name__ == "__main__":

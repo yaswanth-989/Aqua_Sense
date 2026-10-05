@@ -1,26 +1,28 @@
-﻿{% extends "base.html" %}
-{% block title %}Pattern Discovery{% endblock %}
-{% block breadcrumb %}Pattern Discovery{% endblock %}
+{% extends "base.html" %}
+{% block title %}Pattern Discovery — AquaSense{% endblock %}
+{% block page_title %}Pattern Discovery{% endblock %}
+{% block page_subtitle %}K-Means · DBSCAN · Hierarchical · PCA dimensionality reduction — water quality &amp; demand profiling{% endblock %}
 
 {% block topbar_actions %}
 <span class="header-badge">
-  <i class="fas fa-clock" style="font-size:10px;"></i>
-  Coming Next
+  <i class="fas fa-circle-nodes" style="font-size:11px;"></i>
+  Unsupervised
 </span>
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-  <h2>Pattern Discovery</h2>
-  <p>Unsupervised learning — K-Means clustering, DBSCAN, and PCA dimensionality reduction on water quality and demand profiles.</p>
+  <h2>Pattern Discovery — Unsupervised Learning</h2>
+  <p>K-Means (k=2..8) · DBSCAN density anomaly detection · Agglomerative clustering · PCA variance decomposition — adapted from eda_complete_course.py</p>
 </div>
 
-<div class="action-grid" style="grid-template-columns:repeat(3,1fr);max-width:600px;margin-bottom:22px;">
+<!-- Tab Switcher -->
+<div class="action-grid" style="grid-template-columns:repeat(4,1fr);max-width:700px;margin-bottom:22px;">
   <div class="action-card active-action" id="btn-kmeans" onclick="switchView('kmeans')">
     <span class="action-icon"><i class="fas fa-circle-nodes" style="color:var(--accent);"></i></span>
     <span class="action-title">K-Means</span>
-    <span class="action-desc">Cluster water samples by quality profile</span>
+    <span class="action-desc">Elbow · Silhouette · Centroid profiles</span>
   </div>
   <div class="action-card" id="btn-dbscan" onclick="switchView('dbscan')">
     <span class="action-icon"><i class="fas fa-braille" style="color:var(--teal);"></i></span>
@@ -30,86 +32,484 @@
   <div class="action-card" id="btn-pca" onclick="switchView('pca')">
     <span class="action-icon"><i class="fas fa-compress-arrows-alt" style="color:var(--amber);"></i></span>
     <span class="action-title">PCA</span>
-    <span class="action-desc">Dimensionality reduction &amp; variance explained</span>
+    <span class="action-desc">Variance decomposition &amp; loadings</span>
+  </div>
+  <div class="action-card" id="btn-superv" onclick="switchView('superv')">
+    <span class="action-icon"><i class="fas fa-flask" style="color:var(--green);"></i></span>
+    <span class="action-title">Integration Test</span>
+    <span class="action-desc">Does clustering improve classification?</span>
   </div>
 </div>
 
+<!-- =========================================================
+     K-MEANS VIEW
+     ========================================================= -->
 <div id="view-kmeans">
-  <div class="coming-soon-banner">
-    <div class="coming-soon-icon"><i class="fas fa-circle-nodes"></i></div>
-    <div class="coming-soon-title">K-Means Clustering — In Development</div>
-    <div class="coming-soon-desc">
-      Water quality samples will be grouped into natural clusters based on their 9 physicochemical parameters.
-      Elbow curve (k = 2 to 10), silhouette scores, and cluster centroid profiles will be displayed here.
+
+  <!-- Elbow + Silhouette Chart -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--accent);">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-chart-line card-icon"></i>
+          <h3>Elbow Curve — Inertia vs k</h3>
+        </div>
+        <span class="header-badge">k = 2..8</span>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <div style="height:200px;"><canvas id="elbowChart"></canvas></div>
+      </div>
     </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
-      <div class="result-stat" style="min-width:140px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Elbow Method</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">k = 2 to 10</span>
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--accent);">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-star-half card-icon"></i>
+          <h3>Silhouette Score vs k</h3>
+        </div>
+        <span class="header-badge">Best k={{ clustering_data.potability.kmeans.chosen_k }}</span>
       </div>
-      <div class="result-stat" style="min-width:140px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Silhouette Score</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">Per cluster</span>
-      </div>
-      <div class="result-stat" style="min-width:140px;flex-direction:column;align-items:center;gap:4px;">
-        <span class="rl">Cluster Profiles</span>
-        <span class="rv" style="color:var(--text-muted);font-size:12px;">Centroid heatmap</span>
+      <div class="card-body" style="padding-top:0;">
+        <div style="height:200px;"><canvas id="silhouetteChart"></canvas></div>
       </div>
     </div>
   </div>
-</div>
 
+  <!-- Cluster Profiles Table -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-layer-group card-icon"></i>
+        <h3>Cluster Centroid Profiles (k={{ clustering_data.potability.kmeans.chosen_k }})</h3>
+      </div>
+      <span class="header-badge">Physicochemical Means</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Cluster</th>
+            <th>Size</th>
+            <th>Potability Rate</th>
+            <th>pH</th>
+            <th>Hardness</th>
+            <th>Sulfate</th>
+            <th>Chloramines</th>
+            <th>Solids</th>
+            <th>Turbidity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in clustering_data.potability.kmeans.cluster_profiles %}
+          <tr>
+            <td style="font-weight:700;">Cluster {{ p.cluster_id }}</td>
+            <td>{{ p.sample_count }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="progress-container" style="flex:1;">
+                  <div class="progress-bar-fill" style="width:{{ (p.potability_rate*100)|round|int }}%;"></div>
+                </div>
+                <span style="font-family:monospace;color:var(--accent);font-size:12px;">{{ (p.potability_rate*100)|round(1) }}%</span>
+              </div>
+            </td>
+            <td style="font-family:monospace;">{{ p.means.ph }}</td>
+            <td style="font-family:monospace;">{{ p.means.Hardness }}</td>
+            <td style="font-family:monospace;">{{ p.means.Sulfate }}</td>
+            <td style="font-family:monospace;">{{ p.means.Chloramines }}</td>
+            <td style="font-family:monospace;">{{ p.means.Solids }}</td>
+            <td style="font-family:monospace;">{{ p.means.Turbidity }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="insight-bar" style="margin:0 16px 16px 16px;">
+      <i class="fas fa-lightbulb" style="color:var(--accent);flex-shrink:0;"></i>
+      <span>K-Means clusters separate water samples by physicochemical geometry, not directly by potability. All three clusters exhibit similar potability rates (~36–42%), confirming that safe water cannot be identified by single-parameter thresholds — requiring supervised ensemble methods.</span>
+    </div>
+  </div>
+
+  <!-- Hierarchical Clustering Info -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-sitemap card-icon"></i>
+        <h3>Hierarchical (Agglomerative) Clustering — Ward Linkage</h3>
+      </div>
+      <span class="header-badge">k={{ clustering_data.potability.hierarchical.clusters }}</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+        <div class="result-stat"><span class="rl">Linkage Method</span><span class="rv">{{ clustering_data.potability.hierarchical.linkage | capitalize }}</span></div>
+        <div class="result-stat"><span class="rl">Silhouette Score</span><span class="rv" style="color:var(--accent);">{{ clustering_data.potability.hierarchical.silhouette }}</span></div>
+        <div class="result-stat"><span class="rl">Clusters</span><span class="rv">{{ clustering_data.potability.hierarchical.clusters }}</span></div>
+        <div class="result-stat"><span class="rl">Metric</span><span class="rv">Euclidean</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-kmeans -->
+
+
+<!-- =========================================================
+     DBSCAN VIEW
+     ========================================================= -->
 <div id="view-dbscan" style="display:none;">
-  <div class="coming-soon-banner">
-    <div class="coming-soon-icon" style="background:var(--teal-50);color:var(--teal);"><i class="fas fa-braille"></i></div>
-    <div class="coming-soon-title">DBSCAN Anomaly Detection — In Development</div>
-    <div class="coming-soon-desc">
-      Density-based spatial clustering will identify extreme/anomalous water quality readings as noise points.
-      Epsilon and min_samples selection via reachability plots will be shown here.
+
+  <div class="card" style="border-top:3px solid var(--teal);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-braille card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>DBSCAN — Epsilon Sweep (min_samples = 10)</h3>
+      </div>
+      <span class="header-badge teal">Anomaly Detection</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>ε (Epsilon)</th><th>Clusters Found</th><th>Noise Points</th><th>Noise %</th><th>Silhouette</th><th>Interpretation</th></tr></thead>
+        <tbody>
+          {% for d in clustering_data.potability.dbscan.configurations %}
+          <tr {% if d.eps == clustering_data.potability.dbscan.chosen_eps %}style="background:var(--teal-50);"{% endif %}>
+            <td style="font-family:monospace;font-weight:600;">{{ d.eps }}</td>
+            <td>{{ d.clusters_found }}</td>
+            <td style="color:{% if d.noise_pct > 20 %}var(--red,#e05050){% else %}var(--text-secondary){% endif %};">{{ d.noise_points }}</td>
+            <td style="font-family:monospace;">{{ d.noise_pct }}%</td>
+            <td>{{ d.silhouette if d.silhouette else '—' }}</td>
+            <td>
+              {% if d.noise_pct > 30 %}
+                <span class="badge-tag" style="background:var(--red-bg,#fff0f0);color:var(--red,#e05050);">Over-sensitive</span>
+              {% elif d.noise_pct < 1 %}
+                <span class="badge-tag success">Under-sensitive</span>
+              {% else %}
+                <span class="badge-tag teal">Balanced {% if d.eps == clustering_data.potability.dbscan.chosen_eps %}✓ Chosen{% endif %}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="insight-bar" style="margin:0 16px 16px 16px;background:var(--teal-50);border-color:var(--teal-100);">
+      <i class="fas fa-info-circle" style="color:var(--teal);flex-shrink:0;"></i>
+      <span>DBSCAN at ε=2.5 identifies <strong>{{ clustering_data.potability.dbscan.configurations[2].noise_points }} noise points ({{ clustering_data.potability.dbscan.configurations[2].noise_pct }}%)</strong> as outlier water samples — extreme pH, very high sulfate, or unusual mineral loading. These border cases represent real ambiguity in the Kaggle dataset and explain why supervised models struggle near the classification boundary.</span>
     </div>
   </div>
-</div>
 
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-chart-bar card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Noise Point Distribution by ε</h3>
+      </div>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div style="height:180px;"><canvas id="dbscanChart"></canvas></div>
+    </div>
+  </div>
+
+</div><!-- /view-dbscan -->
+
+
+<!-- =========================================================
+     PCA VIEW
+     ========================================================= -->
 <div id="view-pca" style="display:none;">
-  <div class="coming-soon-banner">
-    <div class="coming-soon-icon" style="background:var(--amber-bg);color:var(--amber);"><i class="fas fa-compress-arrows-alt"></i></div>
-    <div class="coming-soon-title">PCA Dimensionality Reduction — In Development</div>
-    <div class="coming-soon-desc">
-      Principal Component Analysis will show how much variance each component explains and which original
-      features load most strongly onto the first two principal components.
-    </div>
-  </div>
-</div>
 
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-title">
-      <i class="fas fa-list-check card-icon"></i>
-      <h3>Planned Analyses</h3>
+  <div class="card" style="border-top:3px solid var(--amber);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-compress-arrows-alt card-icon" style="background:var(--amber-bg);color:var(--amber);border-color:var(--amber-100,#fde68a);"></i>
+        <h3>PCA — Explained Variance Decomposition (9 Components)</h3>
+      </div>
+      <span class="header-badge" style="background:var(--amber-bg);color:var(--amber);">PC1+PC2 = {{ clustering_data.potability.pca.pc1_pc2_explained }}%</span>
     </div>
-    <span class="header-badge">Milestone 7</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px;">
+      <div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Component</th><th>Variance Explained</th><th>Cumulative</th></tr></thead>
+            <tbody>
+              {% for i in range(clustering_data.potability.pca.n_components) %}
+              <tr {% if i < 2 %}style="background:var(--amber-bg);"{% endif %}>
+                <td style="font-weight:600;">PC{{ i+1 }}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="progress-container" style="flex:1;">
+                      <div class="progress-bar-fill" style="width:{{ (clustering_data.potability.pca.explained_variance_ratio[i]*100/clustering_data.potability.pca.explained_variance_ratio[0])|round|int }}%;background:var(--amber);"></div>
+                    </div>
+                    <span style="font-family:monospace;font-size:12px;">{{ (clustering_data.potability.pca.explained_variance_ratio[i]*100)|round(1) }}%</span>
+                  </div>
+                </td>
+                <td style="font-family:monospace;color:{% if clustering_data.potability.pca.cumulative_variance_ratio[i] >= 0.95 %}var(--green){% else %}var(--text-secondary){% endif %};">
+                  {{ (clustering_data.potability.pca.cumulative_variance_ratio[i]*100)|round(1) }}%
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div style="height:220px;"><canvas id="pcaVarianceChart"></canvas></div>
+      </div>
+    </div>
+    <div class="insight-bar" style="margin:0 16px 16px 16px;background:var(--amber-bg);border-color:var(--amber-100,#fde68a);">
+      <i class="fas fa-lightbulb" style="color:var(--amber);flex-shrink:0;"></i>
+      <span>The 9 water quality parameters distribute their variance nearly uniformly across all PCs (~10–14% each). <strong>PC1+PC2 explain only {{ clustering_data.potability.pca.pc1_pc2_explained }}%</strong> — showing high intrinsic dimensionality. All 5 PCs are needed for 60% cumulative variance, meaning water quality does not compress easily into 2D.</span>
+    </div>
   </div>
-  <div class="table-wrapper">
-    <table>
-      <thead><tr><th>Algorithm</th><th>Applied To</th><th>Key Output</th><th>Evaluation</th></tr></thead>
-      <tbody>
-        <tr><td style="font-weight:600;">K-Means</td><td>Water Quality (9 params)</td><td>Cluster centroid profiles</td><td>Silhouette Score, Inertia</td></tr>
-        <tr><td style="font-weight:600;">DBSCAN</td><td>Water Quality</td><td>Core / noise points</td><td>Noise Ratio</td></tr>
-        <tr><td style="font-weight:600;">PCA</td><td>Water Quality</td><td>Explained variance curve</td><td>95% variance threshold</td></tr>
-        <tr><td style="font-weight:600;">K-Means (Zones)</td><td>Demand Zones (5 zones)</td><td>Zone consumption clusters</td><td>Within-cluster RMSE</td></tr>
-      </tbody>
-    </table>
+
+  <!-- PC Loadings -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-arrows-alt card-icon" style="background:var(--amber-bg);color:var(--amber);border-color:var(--amber-100,#fde68a);"></i>
+        <h3>PC1, PC2, PC3 — Feature Loadings</h3>
+      </div>
+      <span class="header-badge" style="background:var(--amber-bg);color:var(--amber);">Adapted from eda_complete_course.py</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Feature</th><th>PC1 Loading</th><th>PC2 Loading</th><th>PC3 Loading</th></tr></thead>
+        <tbody>
+          {% set pc1 = clustering_data.potability.pca.loadings.PC1 %}
+          {% set pc2 = clustering_data.potability.pca.loadings.PC2 %}
+          {% set pc3 = clustering_data.potability.pca.loadings.PC3 %}
+          {% for feat in ['ph','Hardness','Solids','Chloramines','Sulfate','Conductivity','Organic_carbon','Trihalomethanes','Turbidity'] %}
+          <tr>
+            <td style="font-weight:600;">{{ feat }}</td>
+            <td style="font-family:monospace;color:{% if pc1[feat] > 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ pc1[feat] }}</td>
+            <td style="font-family:monospace;color:{% if pc2[feat] > 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ pc2[feat] }}</td>
+            <td style="font-family:monospace;color:{% if pc3[feat] > 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ pc3[feat] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+
+  <!-- 2D PCA Scatter -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-chart-scatter card-icon" style="background:var(--amber-bg);color:var(--amber);border-color:var(--amber-100,#fde68a);"></i>
+        <h3>PCA 2D Projection — Test Set (150 Samples)</h3>
+      </div>
+      <span class="header-badge" style="background:var(--amber-bg);color:var(--amber);">Coloured by Potability</span>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div style="height:300px;"><canvas id="pcaScatterChart"></canvas></div>
+    </div>
+    <div class="insight-bar" style="margin:0 16px 16px 16px;background:var(--amber-bg);border-color:var(--amber-100,#fde68a);">
+      <i class="fas fa-info-circle" style="color:var(--amber);flex-shrink:0;"></i>
+      <span>The 2D PCA projection shows significant class overlap between potable and non-potable samples — potability boundaries are non-linear and cannot be captured by any single 2D cut. This visualisation (adapted from eda_complete_course.py's PCA section) explains why Random Forest significantly outperforms linear classifiers.</span>
+    </div>
+  </div>
+
+</div><!-- /view-pca -->
+
+
+<!-- =========================================================
+     SUPERVISED INTEGRATION TEST
+     ========================================================= -->
+<div id="view-superv" style="display:none;">
+
+  <div class="card" style="border-top:3px solid var(--green);margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-flask card-icon" style="background:var(--green-bg);color:var(--green);border-color:var(--green-100,#bbf7d0);"></i>
+        <h3>Leakage-Safe Supervised Integration Experiment</h3>
+      </div>
+      <span class="header-badge success">Critical Validity Test</span>
+    </div>
+    <div class="card-body">
+      {% set exp = clustering_data.potability.supervised_integration_test %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <!-- Baseline -->
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Without Cluster Feature</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div class="result-stat"><span class="rl">Accuracy</span><span class="rv">{{ exp.baseline.accuracy }}</span></div>
+            <div class="result-stat"><span class="rl">F1</span><span class="rv">{{ exp.baseline.f1 }}</span></div>
+            <div class="result-stat"><span class="rl">ROC-AUC</span><span class="rv">{{ exp.baseline.roc_auc }}</span></div>
+          </div>
+        </div>
+        <!-- Augmented -->
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">With K-Means Cluster Label</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div class="result-stat"><span class="rl">Accuracy</span><span class="rv" style="color:{% if exp.delta_accuracy >= 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ exp.with_cluster_feature.accuracy }}</span></div>
+            <div class="result-stat"><span class="rl">F1</span><span class="rv" style="color:{% if exp.delta_f1 >= 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ exp.with_cluster_feature.f1 }}</span></div>
+            <div class="result-stat"><span class="rl">ROC-AUC</span><span class="rv" style="color:{% if exp.delta_auc >= 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ exp.with_cluster_feature.roc_auc }}</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Delta Row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+        <div class="result-stat"><span class="rl">ΔAccuracy</span><span class="rv" style="color:{% if exp.delta_accuracy >= 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ '%+.4f' | format(exp.delta_accuracy) }}</span></div>
+        <div class="result-stat"><span class="rl">ΔF1</span><span class="rv" style="color:{% if exp.delta_f1 >= 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ '%+.4f' | format(exp.delta_f1) }}</span></div>
+        <div class="result-stat"><span class="rl">ΔROC-AUC</span><span class="rv" style="color:{% if exp.delta_auc >= 0 %}var(--green){% else %}var(--red,#e05050){% endif %};">{{ '%+.4f' | format(exp.delta_auc) }}</span></div>
+      </div>
+      <div class="insight-bar" style="background:var(--green-bg);border-color:var(--green-100,#bbf7d0);">
+        <i class="fas fa-check-circle" style="color:var(--green);flex-shrink:0;"></i>
+        <span><strong>Leakage Prevention Verified:</strong> K-Means was fitted exclusively on training data; cluster labels were predicted (not fitted) for the test partition. Result: appending cluster labels does not meaningfully change classification performance (ΔF1 ≈ {{ exp.delta_f1 }}). Unsupervised clusters describe physicochemical geometry — not potability boundaries — confirming they should be used for exploratory profiling only.</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-superv -->
 
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 function switchView(v) {
-  ['kmeans','dbscan','pca'].forEach(function(id) {
+  ['kmeans','dbscan','pca','superv'].forEach(function(id) {
     document.getElementById('view-' + id).style.display = (id === v) ? '' : 'none';
     document.getElementById('btn-' + id).classList.toggle('active-action', id === v);
+  });
+}
+
+const clData = {{ clustering_data | tojson }};
+const km = clData.potability.kmeans;
+const pca = clData.potability.pca;
+const dbData = clData.potability.dbscan;
+
+// Elbow Chart
+const elbowCtx = document.getElementById('elbowChart');
+if (elbowCtx) {
+  new Chart(elbowCtx, {
+    type: 'line',
+    data: {
+      labels: km.k_range,
+      datasets: [{
+        label: 'Inertia (WCSS)',
+        data: km.inertias,
+        borderColor: 'rgba(99,102,241,0.85)',
+        backgroundColor: 'rgba(99,102,241,0.1)',
+        borderWidth: 2, tension: 0.3, pointRadius: 4, fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: 'k (clusters)' } }, y: { title: { display: true, text: 'Inertia' } } }
+    }
+  });
+}
+
+// Silhouette Chart
+const silCtx = document.getElementById('silhouetteChart');
+if (silCtx) {
+  new Chart(silCtx, {
+    type: 'bar',
+    data: {
+      labels: km.k_range,
+      datasets: [{
+        label: 'Silhouette Score',
+        data: km.silhouettes,
+        backgroundColor: km.k_range.map(function(k) {
+          return k === km.chosen_k ? 'rgba(99,102,241,0.85)' : 'rgba(99,102,241,0.25)';
+        }),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: 'k' } }, y: { title: { display: true, text: 'Silhouette' }, min: 0 } }
+    }
+  });
+}
+
+// DBSCAN Chart
+const dbCtx = document.getElementById('dbscanChart');
+if (dbCtx) {
+  new Chart(dbCtx, {
+    type: 'bar',
+    data: {
+      labels: dbData.configurations.map(function(d) { return 'ε=' + d.eps; }),
+      datasets: [{
+        label: 'Noise Points',
+        data: dbData.configurations.map(function(d) { return d.noise_points; }),
+        backgroundColor: 'rgba(20,184,166,0.6)',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: 'Epsilon' } }, y: { title: { display: true, text: 'Noise Points' } } }
+    }
+  });
+}
+
+// PCA Cumulative Variance Chart
+const pcaCtx = document.getElementById('pcaVarianceChart');
+if (pcaCtx) {
+  new Chart(pcaCtx, {
+    type: 'bar',
+    data: {
+      labels: pca.explained_variance_ratio.map(function(v, i) { return 'PC' + (i+1); }),
+      datasets: [
+        {
+          label: 'Individual',
+          data: pca.explained_variance_ratio.map(function(v) { return (v*100).toFixed(1); }),
+          backgroundColor: 'rgba(245,158,11,0.65)', borderRadius: 3, type: 'bar'
+        },
+        {
+          label: 'Cumulative',
+          data: pca.cumulative_variance_ratio.map(function(v) { return (v*100).toFixed(1); }),
+          borderColor: 'rgba(99,102,241,0.85)',
+          backgroundColor: 'transparent',
+          borderWidth: 2, tension: 0.2, pointRadius: 4, type: 'line'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+      scales: {
+        y: { title: { display: true, text: '% Variance' }, max: 110 }
+      }
+    }
+  });
+}
+
+// PCA Scatter
+const scatterCtx = document.getElementById('pcaScatterChart');
+if (scatterCtx) {
+  const pts = pca.scatter_data;
+  const potable = pts.filter(function(p) { return p.potable === 1; });
+  const nonPotable = pts.filter(function(p) { return p.potable === 0; });
+  new Chart(scatterCtx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Potable',
+          data: potable.map(function(p) { return { x: p.pc1, y: p.pc2 }; }),
+          backgroundColor: 'rgba(20,184,166,0.55)', pointRadius: 5
+        },
+        {
+          label: 'Non-Potable',
+          data: nonPotable.map(function(p) { return { x: p.pc1, y: p.pc2 }; }),
+          backgroundColor: 'rgba(239,68,68,0.45)', pointRadius: 5
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } }, tooltip: { callbacks: {
+        label: function(ctx) {
+          return ctx.dataset.label + ' (PC1=' + ctx.parsed.x.toFixed(2) + ', PC2=' + ctx.parsed.y.toFixed(2) + ')';
+        }
+      }}},
+      scales: {
+        x: { title: { display: true, text: 'PC1 (' + (pca.explained_variance_ratio[0]*100).toFixed(1) + '%)' } },
+        y: { title: { display: true, text: 'PC2 (' + (pca.explained_variance_ratio[1]*100).toFixed(1) + '%)' } }
+      }
+    }
   });
 }
 </script>

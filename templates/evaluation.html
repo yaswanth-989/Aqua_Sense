@@ -1,167 +1,398 @@
-﻿{% extends "base.html" %}
-{% block title %}Model Evaluation{% endblock %}
-{% block breadcrumb %}Model Evaluation{% endblock %}
+{% extends "base.html" %}
+{% block title %}Model Evaluation — AquaSense{% endblock %}
+{% block page_title %}Model Evaluation &amp; Benchmarking{% endblock %}
+{% block page_subtitle %}5-Fold CV · TimeSeriesSplit · GridSearchCV · Threshold analysis · Cross-model master comparison{% endblock %}
 
 {% block topbar_actions %}
 <span class="header-badge">
-  <i class="fas fa-clock" style="font-size:10px;"></i>
-  Coming Next
+  <i class="fas fa-trophy" style="font-size:11px;"></i>
+  {{ eval_data.potability.benchmark_table | length + eval_data.demand.benchmark_table | length }} Models Ranked
 </span>
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-  <h2>Model Evaluation &amp; Benchmarking</h2>
-  <p>Cross-model comparison — RMSE, ROC-AUC, F1, confusion matrices, and precision-recall trade-offs across all trained models.</p>
+  <h2>Full Model Evaluation &amp; Benchmarking</h2>
+  <p>Stratified 5-Fold CV · TimeSeriesSplit · Hyperparameter Tuning (GridSearchCV) · Threshold Sweep · Calibration · Master Cross-Model Comparison</p>
 </div>
 
+<!-- Dataset Switcher -->
 <div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:520px;margin-bottom:22px;">
   <div class="action-card active-action" id="btn-pot" onclick="switchDS('pot')">
     <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
-    <span class="action-title">Potability Models</span>
-    <span class="action-desc">Classification benchmark — F1, ROC-AUC, Recall</span>
+    <span class="action-title">Potability Classification</span>
+    <span class="action-desc">F1 · ROC-AUC · Precision-Recall · Threshold</span>
   </div>
   <div class="action-card" id="btn-dem" onclick="switchDS('dem')">
     <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
-    <span class="action-title">Demand Models</span>
-    <span class="action-desc">Regression benchmark — RMSE, MAE, R²</span>
+    <span class="action-title">Demand Forecasting</span>
+    <span class="action-desc">RMSE · MAE · R² · TimeSeriesSplit CV</span>
   </div>
 </div>
 
-<!-- POTABILITY EVALUATION (preview — linear models already done) -->
+<!-- =========================================================
+     POTABILITY EVALUATION
+     ========================================================= -->
 <div id="view-pot">
-  <div class="card accent-top-blue">
+
+  <!-- Master Benchmark Table -->
+  <div class="card" style="border-top:3px solid var(--accent);margin-bottom:14px;">
     <div class="card-header">
       <div class="card-header-title">
-        <i class="fas fa-trophy card-icon"></i>
-        <h3>Potability Classification — Current Benchmarks (Linear Models)</h3>
+        <i class="fas fa-table card-icon"></i>
+        <h3>Master Potability Benchmark — All Models Ranked by ROC-AUC</h3>
       </div>
-      <span class="header-badge">656 Test Samples</span>
+      <span class="header-badge">{{ eval_data.potability.test_sample_count }} Test Samples · 5-Fold Stratified CV</span>
     </div>
     <div class="table-wrapper">
       <table>
-        <thead><tr><th>Model</th><th>Accuracy</th><th>Recall</th><th>Precision</th><th>F1</th><th>ROC-AUC</th><th>Stage</th></tr></thead>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Model</th>
+            <th>CV AUC (mean ± std)</th>
+            <th>Test Accuracy</th>
+            <th>Test Precision</th>
+            <th>Test Recall</th>
+            <th>Test F1</th>
+            <th>Test ROC-AUC</th>
+            <th>PR-AUC</th>
+            <th>Brier ↓</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr>
-            <td style="font-weight:600;">Logistic Regression (Baseline)</td>
-            <td>0.59</td><td>0.53</td><td>0.52</td><td>0.53</td><td>0.56</td>
-            <td><span class="badge-tag success">Done</span></td>
+          {% for m in eval_data.potability.benchmark_table %}
+          <tr {% if loop.first %}style="background:var(--accent-bg);"{% endif %}>
+            <td style="font-weight:700;color:{% if loop.first %}var(--accent){% else %}var(--text-muted){% endif %};">{{ loop.index }}</td>
+            <td style="font-weight:600;">{{ m.model }}{% if loop.first %} <span class="badge-tag success" style="margin-left:4px;">Best</span>{% endif %}</td>
+            <td style="font-family:monospace;white-space:nowrap;">{{ m.cv_auc_mean }} <span style="color:var(--text-muted);">± {{ m.cv_f1_std }}</span></td>
+            <td>{{ m.test_accuracy }}</td>
+            <td style="color:var(--accent);">{{ m.test_precision }}</td>
+            <td>{{ m.test_recall }}</td>
+            <td style="font-weight:600;">{{ m.test_f1 }}</td>
+            <td style="font-weight:700;color:var(--accent);">{{ m.test_roc_auc }}</td>
+            <td>{{ m.test_pr_auc }}</td>
+            <td style="font-family:monospace;">{{ m.brier_score }}</td>
           </tr>
-          <tr>
-            <td style="font-weight:600;">Logistic Regression (L1)</td>
-            <td>0.60</td><td>0.54</td><td>0.53</td><td>0.54</td><td>0.55</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Logistic Regression (L2)</td>
-            <td>0.60</td><td>0.54</td><td>0.53</td><td>0.53</td><td>0.55</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Logistic Regression (Balanced)</td>
-            <td>0.59</td><td>0.59</td><td>0.51</td><td>0.55</td><td>0.56</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Decision Tree</td>
-            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag">Soon</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Random Forest</td>
-            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag">Soon</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Gradient Boosting</td>
-            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag">Soon</span></td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="insight-bar">
-    <i class="fas fa-lightbulb" style="color:var(--accent);margin-top:2px;flex-shrink:0;"></i>
-    <span>Linear models plateau at ROC-AUC ≈ 0.56 because water safety boundaries are non-linear (multi-parameter thresholds). Tree and ensemble models are expected to improve this significantly.</span>
-  </div>
-</div>
+  <!-- Tuning Best Params + Threshold Analysis row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
 
-<!-- DEMAND EVALUATION -->
+    <!-- Tuning Results -->
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-sliders card-icon"></i>
+          <h3>GridSearchCV — Best Hyperparameters</h3>
+        </div>
+        <span class="header-badge">5-Fold CV, Scoring=F1</span>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        {% for model_name, params in eval_data.potability.tuning_best_params.items() %}
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:700;font-size:13px;color:var(--text-secondary);margin-bottom:6px;">{{ model_name }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            {% for k, v in params.items() %}
+            <div style="background:var(--accent-bg);border:1px solid var(--accent-100,#c7d2fe);border-radius:6px;padding:4px 8px;font-family:monospace;font-size:12px;">
+              {{ k }}: <strong>{{ v }}</strong>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Confusion Matrices Mini -->
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-grid card-icon"></i>
+          <h3>Best Model — Confusion Matrix</h3>
+        </div>
+        <span class="header-badge">{{ eval_data.potability.benchmark_table[0].model }}</span>
+      </div>
+      <div class="card-body">
+        {% set bm = eval_data.potability.benchmark_table[0] %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:240px;margin:0 auto 14px auto;">
+          <div style="background:var(--green-bg);border:1px solid var(--green-100);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:700;color:var(--green);">{{ bm.tn }}</div>
+            <div style="font-size:10px;color:var(--text-muted);">True Negative</div>
+          </div>
+          <div style="background:var(--red-bg,#fff0f0);border:1px solid var(--red-100,#ffd0d0);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:700;color:var(--red,#e05050);">{{ bm.fp }}</div>
+            <div style="font-size:10px;color:var(--text-muted);">False Positive</div>
+          </div>
+          <div style="background:var(--red-bg,#fff0f0);border:1px solid var(--red-100,#ffd0d0);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:700;color:var(--red,#e05050);">{{ bm.fn }}</div>
+            <div style="font-size:10px;color:var(--text-muted);">False Negative</div>
+          </div>
+          <div style="background:var(--green-bg);border:1px solid var(--green-100);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:700;color:var(--green);">{{ bm.tp }}</div>
+            <div style="font-size:10px;color:var(--text-muted);">True Positive</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <div class="result-stat"><span class="rl">Precision</span><span class="rv" style="color:var(--accent);">{{ bm.test_precision }}</span></div>
+          <div class="result-stat"><span class="rl">Recall</span><span class="rv">{{ bm.test_recall }}</span></div>
+          <div class="result-stat"><span class="rl">ROC-AUC</span><span class="rv">{{ bm.test_roc_auc }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threshold Analysis Chart -->
+  {% if eval_data.potability.threshold_analyses %}
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-sliders-h card-icon"></i>
+        <h3>Threshold Sweep — F1 / Precision / Recall vs Decision Boundary</h3>
+      </div>
+      <span class="header-badge">Random Forest (Tuned)</span>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div style="height:230px;"><canvas id="thresholdChart"></canvas></div>
+      <div class="insight-bar" style="margin-top:10px;">
+        <i class="fas fa-info-circle" style="color:var(--accent);flex-shrink:0;"></i>
+        <span>At the default 0.5 threshold, precision is high but recall suffers. For drinking water safety compliance, lowering the threshold to 0.35–0.40 recovers recall (less False Negatives) at the cost of slightly higher False Positives — an acceptable trade-off when missing unsafe water is the primary risk.</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Model Selection Rationale -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-check-double card-icon"></i>
+        <h3>Final Model Selection — Potability</h3>
+      </div>
+      <span class="header-badge success">{{ eval_data.model_selection.potability.selected_model }}</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:12px;">
+        {% for k, v in eval_data.model_selection.potability.selected_metrics.items() %}
+        <div class="result-stat"><span class="rl">{{ k }}</span><span class="rv" style="color:var(--accent);">{{ v }}</span></div>
+        {% endfor %}
+      </div>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin:0;">{{ eval_data.model_selection.potability.rationale }}</p>
+    </div>
+  </div>
+
+</div><!-- /view-pot -->
+
+
+<!-- =========================================================
+     DEMAND EVALUATION
+     ========================================================= -->
 <div id="view-dem" style="display:none;">
-  <div class="card accent-top-teal">
+
+  <!-- Master Demand Benchmark -->
+  <div class="card" style="border-top:3px solid var(--teal);margin-bottom:14px;">
     <div class="card-header">
       <div class="card-header-title">
-        <i class="fas fa-trophy card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
-        <h3>Demand Forecasting — Current Benchmarks (Linear Models)</h3>
+        <i class="fas fa-table card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Master Demand Benchmark — All Models Ranked by Test RMSE</h3>
       </div>
-      <span class="header-badge teal">2025 Holdout · 1,825 Rows</span>
+      <span class="header-badge teal">{{ eval_data.demand.test_rows }} Test Rows · TimeSeriesSplit (4 Folds)</span>
     </div>
     <div class="table-wrapper">
       <table>
-        <thead><tr><th>Model</th><th>RMSE (kL)</th><th>MAE (kL)</th><th>R²</th><th>Stage</th></tr></thead>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Model</th>
+            <th>CV RMSE (mean ± std)</th>
+            <th>Test RMSE (kL)</th>
+            <th>Test MAE (kL)</th>
+            <th>Test R²</th>
+            <th>Max Error (kL)</th>
+            <th>Mean Residual</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr>
-            <td style="font-weight:600;">Multiple Linear Regression (OLS)</td>
-            <td><strong>40.37</strong></td><td>26.65</td><td><code>0.9695</code></td>
-            <td><span class="badge-tag success">Done</span></td>
+          {% for m in eval_data.demand.benchmark_table %}
+          <tr {% if loop.first %}style="background:var(--teal-50);"{% endif %}>
+            <td style="font-weight:700;color:{% if loop.first %}var(--teal){% else %}var(--text-muted){% endif %};">{{ loop.index }}</td>
+            <td style="font-weight:600;">{{ m.model }}{% if loop.first %} <span class="badge-tag teal" style="margin-left:4px;">Best</span>{% endif %}</td>
+            <td style="font-family:monospace;white-space:nowrap;">{{ m.cv_rmse_mean }} <span style="color:var(--text-muted);">± {{ m.cv_rmse_std }}</span></td>
+            <td style="font-weight:700;">{{ m.test_rmse }}</td>
+            <td>{{ m.test_mae }}</td>
+            <td style="font-weight:700;color:var(--teal);">{{ m.test_r2 }}</td>
+            <td>{{ m.max_error }}</td>
+            <td style="font-family:monospace;">{{ m.mean_residual }}</td>
           </tr>
-          <tr>
-            <td style="font-weight:600;">Gradient Descent (From-Scratch)</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Ridge Regression (L2)</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Lasso Regression (L1)</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Elastic Net</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag success">Done</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Decision Tree Regressor</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag">Soon</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Random Forest Regressor</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag">Soon</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight:600;">Gradient Boosting Regressor</td>
-            <td>—</td><td>—</td><td>—</td>
-            <td><span class="badge-tag">Soon</span></td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="insight-bar" style="background:var(--teal-50);border-color:var(--teal-100);">
-    <i class="fas fa-lightbulb" style="color:var(--teal);margin-top:2px;flex-shrink:0;"></i>
-    <span>OLS already achieves R² = 0.9695 on the unseen 2025 holdout, a strong baseline. Tree models will add non-linear corrections for outlier days (e.g., holidays, rainfall spikes).</span>
+  <!-- Tuning + Residual Analysis Row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-sliders card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+          <h3>GridSearchCV — Best Hyperparameters</h3>
+        </div>
+        <span class="header-badge teal">TimeSeriesSplit, Scoring=RMSE</span>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        {% for model_name, params in eval_data.demand.tuning_best_params.items() %}
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:700;font-size:13px;color:var(--text-secondary);margin-bottom:6px;">{{ model_name }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            {% for k, v in params.items() %}
+            <div style="background:var(--teal-50);border:1px solid var(--teal-100);border-radius:6px;padding:4px 8px;font-family:monospace;font-size:12px;">
+              {{ k }}: <strong>{{ v }}</strong>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header">
+        <div class="card-header-title">
+          <i class="fas fa-chart-bar card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+          <h3>Residuals Summary — Top Models</h3>
+        </div>
+        <span class="header-badge teal">2025 Holdout</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Model</th><th>Mean Res.</th><th>Std Res.</th><th>Q25</th><th>Median</th><th>Q75</th></tr></thead>
+          <tbody>
+            {% for name, r in eval_data.demand.residuals_summary.items() %}
+            <tr>
+              <td style="font-weight:600;font-size:12px;">{{ name | truncate(28, True, '…') }}</td>
+              <td style="font-family:monospace;color:{% if r.mean_residual | abs < 1 %}var(--green){% else %}var(--text-secondary){% endif %};">{{ r.mean_residual }}</td>
+              <td style="font-family:monospace;">{{ r.std_residual }}</td>
+              <td style="font-family:monospace;">{{ r.q25 }}</td>
+              <td style="font-family:monospace;font-weight:600;">{{ r.median }}</td>
+              <td style="font-family:monospace;">{{ r.q75 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-</div>
+
+  <!-- RMSE Comparison Chart -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-chart-bar card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>RMSE Comparison — All Models</h3>
+      </div>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div style="height:220px;"><canvas id="rmseChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Model Selection Rationale -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-header">
+      <div class="card-header-title">
+        <i class="fas fa-check-double card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
+        <h3>Final Model Selection — Demand Forecasting</h3>
+      </div>
+      <span class="header-badge teal">{{ eval_data.model_selection.demand.selected_model }}</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:12px;">
+        {% for k, v in eval_data.model_selection.demand.selected_metrics.items() %}
+        <div class="result-stat"><span class="rl">{{ k }}</span><span class="rv" style="color:var(--teal);">{{ v }}</span></div>
+        {% endfor %}
+      </div>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin:0;">{{ eval_data.model_selection.demand.rationale }}</p>
+    </div>
+  </div>
+
+</div><!-- /view-dem -->
 
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 function switchDS(ds) {
   ['pot','dem'].forEach(function(id) {
     document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
     document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
+  });
+}
+
+const evalData = {{ eval_data | tojson }};
+
+// Threshold Chart (Random Forest)
+const threshCtx = document.getElementById('thresholdChart');
+if (threshCtx) {
+  const rfKey = Object.keys(evalData.potability.threshold_analyses)[0];
+  const threshData = evalData.potability.threshold_analyses[rfKey];
+  new Chart(threshCtx, {
+    type: 'line',
+    data: {
+      labels: threshData.map(function(d) { return d.threshold; }),
+      datasets: [
+        { label: 'F1', data: threshData.map(function(d) { return d.f1; }), borderColor: 'rgba(99,102,241,0.85)', borderWidth: 2.5, tension: 0.3, pointRadius: 3 },
+        { label: 'Precision', data: threshData.map(function(d) { return d.precision; }), borderColor: 'rgba(20,184,166,0.8)', borderDash: [4,3], borderWidth: 2, tension: 0.3, pointRadius: 2 },
+        { label: 'Recall', data: threshData.map(function(d) { return d.recall; }), borderColor: 'rgba(245,158,11,0.8)', borderDash: [2,3], borderWidth: 2, tension: 0.3, pointRadius: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { title: { display: true, text: 'Decision Threshold' } },
+        y: { title: { display: true, text: 'Score' }, min: 0, max: 1 }
+      }
+    }
+  });
+}
+
+// RMSE Comparison Chart
+const rmseCtx = document.getElementById('rmseChart');
+if (rmseCtx) {
+  const demBench = evalData.demand.benchmark_table;
+  const labels = demBench.map(function(m) {
+    const n = m.model;
+    return n.length > 22 ? n.substring(0, 22) + '…' : n;
+  });
+  new Chart(rmseCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Test RMSE (kL)',
+        data: demBench.map(function(m) { return m.test_rmse; }),
+        backgroundColor: demBench.map(function(m, i) {
+          return i === 0 ? 'rgba(20,184,166,0.85)' : 'rgba(20,184,166,0.3)';
+        }),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'RMSE (kL)' }, min: 38 },
+        y: { ticks: { font: { size: 11 } } }
+      }
+    }
   });
 }
 </script>
