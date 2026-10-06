@@ -278,11 +278,25 @@ def predict_potability(payload: Dict[str, Any]) -> Dict[str, Any]:
         badge_class = "green"
         recommendation = "Water complies with standard potable quality thresholds. Suitable for direct municipal distribution and consumption."
 
+    # Final safety verdict: Safety guardrail overrides raw model prediction if extreme WHO violations occur
+    if risk_level == "HIGH RISK / CONTAMINATED" or len(violations) >= 3:
+        is_potable = False
+        verdict = "UNSAFE / NON-POTABLE (Severe WHO Exceedance)"
+    elif prediction == 1 and len(violations) <= 1:
+        is_potable = True
+        verdict = "SAFE TO DRINK (Potable)"
+    elif prediction == 1:
+        is_potable = False
+        verdict = "MARGINAL QUALITY (Filtration Required)"
+    else:
+        is_potable = False
+        verdict = "UNSAFE / NON-POTABLE"
+
     return {
         "status": "success",
         "model_used": engine.pot_model_name,
-        "is_potable": bool(prediction == 1),
-        "verdict": "SAFE TO DRINK (Potable)" if prediction == 1 else "UNSAFE / NON-POTABLE",
+        "is_potable": is_potable,
+        "verdict": verdict,
         "potability_probability": round(prob_potable * 100, 1),
         "non_potable_probability": round(prob_non_potable * 100, 1),
         "confidence_score": round(max(prob_potable, prob_non_potable) * 100, 1),

@@ -1,162 +1,1146 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Prediction Portal{% endblock %}
 {% block breadcrumb %}Prediction Portal{% endblock %}
 
+{% block extra_head %}
+<style>
+/* Embedded scoped styles for Prediction Portal to prevent cache mismatch */
+.portal-preset-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 18px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+.portal-preset-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 4px;
+}
+.portal-preset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  color: #1e293b;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.portal-preset-btn i {
+  color: #2563eb;
+  font-size: 12px;
+}
+.portal-preset-btn:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #2563eb;
+  transform: translateY(-1.5px);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.15);
+}
+.portal-preset-btn:active {
+  transform: translateY(0);
+}
+
+/* Feature Grid Layout */
+.feature-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feature-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1024px) {
+  .feature-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+  .feature-grid-3, .feature-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* Feature Input Card */
+.feature-box {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.15s ease;
+}
+.feature-box:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.07);
+}
+.feature-box:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.feature-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.feature-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.who-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2.5px 8.5px;
+  border-radius: 12px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  white-space: nowrap;
+}
+.who-chip.neutral {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+
+/* Unified Text Box & Unit Row */
+.input-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 42px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+.input-row:focus-within {
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.input-box {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 14px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+}
+.input-box::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+.unit-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  background: #f1f5f9;
+  border-left: 1.5px solid #e2e8f0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  user-select: none;
+  white-space: nowrap;
+}
+.feature-hint {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.35;
+}
+.feature-hint i {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+/* Dropdown Select */
+.select-box {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.select-box:focus {
+  border-color: #0d9488;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+}
+
+/* Custom Buttons */
+.action-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+.btn-action-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.btn-action-primary:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  transform: translateY(-1.5px);
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.38);
+}
+.btn-action-primary:active {
+  transform: translateY(0);
+}
+
+.btn-action-teal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  background: linear-gradient(135deg, #0d9488, #0f766e);
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.28);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.btn-action-teal:hover {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  transform: translateY(-1.5px);
+  box-shadow: 0 5px 14px rgba(13, 148, 136, 0.38);
+}
+.btn-action-teal:active {
+  transform: translateY(0);
+}
+
+.btn-action-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.btn-action-reset:hover {
+  background: #f8fafc;
+  border-color: #64748b;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+.btn-action-reset:active {
+  transform: translateY(0);
+}
+</style>
+{% endblock %}
+
 {% block topbar_actions %}
-<span class="header-badge">
-  <i class="fas fa-clock" style="font-size:10px;"></i>
-  Coming Next
+<span class="header-badge green" style="background:var(--green-bg);color:var(--green);border-color:var(--green-border);">
+  <i class="fas fa-circle-check" style="font-size:10px;"></i>
+  Inference Engine Online
 </span>
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-  <h2>Prediction Portal</h2>
-  <p>Live inference — enter water quality measurements or zone conditions to get real-time predictions from trained models.</p>
+  <h2>Live Prediction &amp; Forecasting Portal</h2>
+  <p>Real-time machine learning inference for drinking water potability verification and municipal distribution demand forecasting.</p>
 </div>
 
-<div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:520px;margin-bottom:22px;">
-  <div class="action-card active-action" id="btn-pot" onclick="switchTab('pot')">
+<!-- Mode Switcher Tabs -->
+<div class="action-grid" style="grid-template-columns:1fr 1fr;max-width:560px;margin-bottom:24px;">
+  <div class="action-card active-action" id="tab-btn-pot" onclick="switchPortalTab('pot')">
     <span class="action-icon"><i class="fas fa-shield-halved" style="color:var(--accent);"></i></span>
-    <span class="action-title">Potability Check</span>
-    <span class="action-desc">Enter 9 parameters → Is this water safe to drink?</span>
+    <span class="action-title">Water Potability Assessment</span>
+    <span class="action-desc">9-parameter laboratory input &amp; WHO safety audit</span>
   </div>
-  <div class="action-card" id="btn-dem" onclick="switchTab('dem')">
+  <div class="action-card" id="tab-btn-dem" onclick="switchPortalTab('dem')">
     <span class="action-icon"><i class="fas fa-droplet" style="color:var(--teal);"></i></span>
-    <span class="action-title">Demand Forecast</span>
-    <span class="action-desc">Enter zone conditions → Predict next-day demand (kL)</span>
+    <span class="action-title">Municipal Demand Forecast</span>
+    <span class="action-desc">Next-day kL consumption, 95% CI &amp; pumping dispatch</span>
   </div>
 </div>
 
-<!-- POTABILITY -->
-<div id="view-pot">
+<!-- ========================================== -->
+<!-- TAB 1: WATER POTABILITY ASSESSMENT PORTAL -->
+<!-- ========================================== -->
+<div id="portal-view-pot">
+
+  <!-- Quick Scenario Presets -->
+  <div class="portal-preset-bar">
+    <span class="portal-preset-title"><i class="fas fa-bolt"></i> Quick Scenarios:</span>
+    {% for preset in potability_presets %}
+    <button type="button" class="portal-preset-btn" onclick='loadPotPreset({{ preset.params | tojson }})'>
+      <i class="fas fa-flask"></i> {{ preset.name }}
+    </button>
+    {% endfor %}
+  </div>
+
   <div class="card accent-top-blue">
     <div class="card-header">
       <div class="card-header-title">
         <i class="fas fa-flask card-icon"></i>
-        <h3>Water Potability — Parameter Input</h3>
+        <h3>Water Quality Parameters — Direct Laboratory Inputs</h3>
       </div>
-      <span class="header-badge">9 Parameters Required</span>
+      <span class="header-badge">WHO Standard Audit</span>
     </div>
     <div class="card-body">
-      <div class="coming-soon-banner" style="border:none;padding:28px 0 0;">
-        <div class="coming-soon-icon"><i class="fas fa-flask"></i></div>
-        <div class="coming-soon-title">Live Prediction Form — In Development</div>
-        <div class="coming-soon-desc">
-          This form will accept pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon,
-          Trihalomethanes, and Turbidity values. The best-performing trained model will return
-          a potability verdict with confidence score.
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">
+        Directly type or edit the 9 water sample measurements below. Values are checked in real-time against World Health Organization (WHO) potable standards.
+      </p>
+
+      <form id="form-potability" onsubmit="event.preventDefault(); submitPotability();">
+        <div class="feature-grid-3">
+
+          <!-- pH -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-vial" style="color:#2563eb;"></i> pH Level</span>
+              <span class="who-chip">WHO: 6.5 – 8.5</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.01" min="0" max="14" class="input-box" id="pot-ph" name="ph" value="7.35" placeholder="7.35">
+              <span class="unit-label">pH</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Safe drinking: 6.50 – 8.50 (Acidic &lt; 7.0, Basic &gt; 7.0)</span>
+          </div>
+
+          <!-- Hardness -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-cubes-stacked" style="color:#2563eb;"></i> Hardness (CaCO₃)</span>
+              <span class="who-chip">WHO: &lt; 300</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="1000" class="input-box" id="pot-Hardness" name="Hardness" value="185.0" placeholder="185.0">
+              <span class="unit-label">mg/L</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Dissolved calcium and magnesium mineral content</span>
+          </div>
+
+          <!-- Solids / TDS -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-gem" style="color:#2563eb;"></i> Total Dissolved Solids</span>
+              <span class="who-chip">WHO: &lt; 1000</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="1" min="0" max="50000" class="input-box" id="pot-Solids" name="Solids" value="320.0" placeholder="320">
+              <span class="unit-label">mg/L</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Total organic &amp; inorganic dissolved minerals (TDS)</span>
+          </div>
+
+          <!-- Chloramines -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-atom" style="color:#2563eb;"></i> Chloramines</span>
+              <span class="who-chip">WHO: &lt; 4.0</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.01" min="0" max="25" class="input-box" id="pot-Chloramines" name="Chloramines" value="2.8" placeholder="2.80">
+              <span class="unit-label">mg/L</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Disinfectant chlorine-ammonia residual compound</span>
+          </div>
+
+          <!-- Sulfate -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-fire-flame-simple" style="color:#2563eb;"></i> Sulfate (SO₄²⁻)</span>
+              <span class="who-chip">WHO: &lt; 250</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="1000" class="input-box" id="pot-Sulfate" name="Sulfate" value="175.0" placeholder="175.0">
+              <span class="unit-label">mg/L</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Naturally occurring mineral sulfate salt concentration</span>
+          </div>
+
+          <!-- Conductivity -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-bolt" style="color:#2563eb;"></i> Conductivity</span>
+              <span class="who-chip">WHO: &lt; 400</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="2000" class="input-box" id="pot-Conductivity" name="Conductivity" value="340.0" placeholder="340.0">
+              <span class="unit-label">µS/cm</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Electrical conduction from dissolved ionic electrolytes</span>
+          </div>
+
+          <!-- Organic Carbon -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-leaf" style="color:#2563eb;"></i> Organic Carbon (TOC)</span>
+              <span class="who-chip">WHO: &lt; 2.0</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.01" min="0" max="50" class="input-box" id="pot-Organic_carbon" name="Organic_carbon" value="1.4" placeholder="1.40">
+              <span class="unit-label">mg/L</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Total organic matter and microbial degradation</span>
+          </div>
+
+          <!-- Trihalomethanes -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-skull-crossbones" style="color:#2563eb;"></i> Trihalomethanes</span>
+              <span class="who-chip">WHO: &lt; 80.0</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="300" class="input-box" id="pot-Trihalomethanes" name="Trihalomethanes" value="45.0" placeholder="45.0">
+              <span class="unit-label">µg/L</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Chlorination by-products and halogenated compounds</span>
+          </div>
+
+          <!-- Turbidity -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-smog" style="color:#2563eb;"></i> Turbidity</span>
+              <span class="who-chip">WHO: &lt; 5.0</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.01" min="0" max="30" class="input-box" id="pot-Turbidity" name="Turbidity" value="1.8" placeholder="1.80">
+              <span class="unit-label">NTU</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Cloudiness from suspended clay, silt, or algae particulates</span>
+          </div>
+
         </div>
-      </div>
-      <div class="table-wrapper" style="margin-top:16px;">
-        <table>
-          <thead><tr><th>Input Parameter</th><th>WHO Safe Range</th><th>Units</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td style="font-weight:600;">pH</td><td>6.5 – 8.5</td><td>—</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Hardness</td><td>&lt; 300</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Solids (TDS)</td><td>&lt; 500</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Chloramines</td><td>&lt; 4</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Sulfate</td><td>&lt; 250</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Conductivity</td><td>&lt; 400</td><td>µS/cm</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Organic Carbon</td><td>&lt; 2</td><td>mg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Trihalomethanes</td><td>&lt; 80</td><td>µg/L</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Turbidity</td><td>&lt; 5</td><td>NTU</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-          </tbody>
-        </table>
+
+        <div class="action-btn-row">
+          <button type="submit" class="btn-action-primary" id="btn-submit-pot">
+            <div class="btn-spinner" id="spin-pot"></div>
+            <i class="fas fa-wand-magic-sparkles" id="icon-pot"></i>
+            <span>Assess Water Potability</span>
+          </button>
+          <button type="button" class="btn-action-reset" onclick="resetPotForm()">
+            <i class="fas fa-rotate-left"></i> Reset to Standard Baseline
+          </button>
+        </div>
+      </form>
+
+      <!-- Potability Output Display -->
+      <div id="pot-result-box" class="prediction-box">
+
+        <!-- Verdict Banner -->
+        <div id="pot-verdict-banner" class="verdict-header safe">
+          <div class="verdict-title">
+            <div class="verdict-icon" id="pot-verdict-icon">
+              <i class="fas fa-shield-check" style="color:var(--green);"></i>
+            </div>
+            <div>
+              <div id="pot-verdict-text">SAFE TO DRINK (Potable)</div>
+              <div style="font-size:12.5px;font-weight:500;opacity:0.85;margin-top:2px;" id="pot-model-label">
+                Model: Tuned XGBoost Classifier
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div class="confidence-chip">
+              <i class="fas fa-chart-pie" style="color:var(--accent);"></i>
+              <span id="pot-conf-text">92.4% Confidence</span>
+            </div>
+            <span class="badge-tag" id="pot-risk-badge">LOW RISK</span>
+          </div>
+        </div>
+
+        <!-- Metric highlights -->
+        <div class="metric-highlight-grid">
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Potability Probability</span>
+            <span class="metric-highlight-val" id="pot-prob-val" style="color:var(--green);">88.5%</span>
+            <div class="progress-container" style="margin-top:6px;">
+              <div class="progress-bar-fill green" id="pot-prob-bar" style="width:88.5%;"></div>
+            </div>
+          </div>
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">WHO Guideline Violations</span>
+            <span class="metric-highlight-val" id="pot-violation-count" style="color:var(--accent);">0</span>
+            <span class="metric-highlight-sub" id="pot-violation-sub">Out of 9 tested parameters</span>
+          </div>
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Risk Category</span>
+            <span class="metric-highlight-val" id="pot-risk-text" style="font-size:16px;color:var(--green);">Low Risk</span>
+            <span class="metric-highlight-sub">Direct municipal safety level</span>
+          </div>
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Inference Status</span>
+            <span class="metric-highlight-val" style="font-size:16px;color:var(--text-primary);">Optimal</span>
+            <span class="metric-highlight-sub">Scaled &amp; Guardrailed</span>
+          </div>
+        </div>
+
+        <!-- Treatment recommendation alert -->
+        <div class="dispatch-banner" id="pot-rec-banner" style="background:var(--blue-50);border-color:var(--blue-100);margin-bottom:18px;">
+          <i class="fas fa-circle-info" style="color:var(--accent);margin-top:2px;font-size:16px;flex-shrink:0;"></i>
+          <div>
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:3px;">Operational Guidance &amp; Treatment Action:</div>
+            <div id="pot-recommendation-text" style="color:var(--text-secondary);line-height:1.6;">
+              Water complies with standard potable quality thresholds. Suitable for direct municipal distribution and consumption.
+            </div>
+          </div>
+        </div>
+
+        <!-- WHO parameter audit table -->
+        <h4 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">
+          <i class="fas fa-list-check" style="color:var(--accent);margin-right:6px;"></i> Detailed WHO Parameter Audit
+        </h4>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Measured Value</th>
+                <th>WHO Safe Range</th>
+                <th>Deviation</th>
+                <th>Compliance Status</th>
+              </tr>
+            </thead>
+            <tbody id="pot-compliance-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- DEMAND -->
-<div id="view-dem" style="display:none;">
+
+<!-- ========================================== -->
+<!-- TAB 2: MUNICIPAL WATER DEMAND FORECAST -->
+<!-- ========================================== -->
+<div id="portal-view-dem" style="display:none;">
+
+  <!-- Quick Operational Presets -->
+  <div class="portal-preset-bar">
+    <span class="portal-preset-title"><i class="fas fa-bolt"></i> Operational Scenarios:</span>
+    {% for preset in demand_presets %}
+    <button type="button" class="portal-preset-btn" onclick='loadDemPreset({{ preset.params | tojson }})'>
+      <i class="fas fa-chart-line"></i> {{ preset.name }}
+    </button>
+    {% endfor %}
+  </div>
+
   <div class="card accent-top-teal">
     <div class="card-header">
       <div class="card-header-title">
         <i class="fas fa-chart-bar card-icon" style="background:var(--teal-50);color:var(--teal);border-color:var(--teal-100);"></i>
-        <h3>Water Demand Forecast — Zone Conditions Input</h3>
+        <h3>Zone Operational &amp; Environmental Conditions</h3>
       </div>
-      <span class="header-badge teal">Next-Day kL Prediction</span>
+      <span class="header-badge teal">Next-Day Regression</span>
     </div>
     <div class="card-body">
-      <div class="coming-soon-banner" style="border:none;padding:28px 0 0;">
-        <div class="coming-soon-icon" style="background:var(--teal-50);color:var(--teal);"><i class="fas fa-chart-bar"></i></div>
-        <div class="coming-soon-title">Live Demand Forecast Form — In Development</div>
-        <div class="coming-soon-desc">
-          Select a zone (Z01–Z05), enter tomorrow's expected temperature, humidity, rainfall, and whether it is
-          a weekend or holiday. The trained regression model will output next-day water demand in kiloliters.
-        </div>
-      </div>
-      <div class="table-wrapper" style="margin-top:16px;">
-        <table>
-          <thead><tr><th>Input</th><th>Type</th><th>Example</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td style="font-weight:600;">Zone ID</td><td>Categorical</td><td>Z01 – Z05</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Temperature</td><td>Numeric</td><td>28.5 °C</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Humidity</td><td>Numeric</td><td>72 %</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Rainfall</td><td>Numeric</td><td>0.0 mm</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Is Weekend</td><td>Boolean</td><td>0 / 1</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Is Holiday</td><td>Boolean</td><td>0 / 1</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-            <tr><td style="font-weight:600;">Previous Day Demand</td><td>Numeric</td><td>780.0 kL</td><td><span class="badge-tag">Awaiting Input</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">
+        Directly configure zone selection, weather forecast, calendar variables, and prior consumption to generate next-day water demand with 95% confidence intervals.
+      </p>
 
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-title">
-      <i class="fas fa-code card-icon"></i>
-      <h3>REST API — Available Now</h3>
+      <form id="form-demand" onsubmit="event.preventDefault(); submitDemand();">
+        <div class="feature-grid-2">
+
+          <!-- Zone ID Selection -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-map-location-dot" style="color:#0d9488;"></i> Distribution Zone</span>
+              <span class="who-chip neutral">5 Zones Available</span>
+            </div>
+            <select class="select-box" id="dem-zone_id" name="zone_id" onchange="updateZoneBaselines()">
+              <option value="Z01">Z01 — Central Residential (Pop: 52,076 | Base: 785 kL)</option>
+              <option value="Z02">Z02 — North Suburbs (Pop: 40,812 | Base: 580 kL)</option>
+              <option value="Z03" selected>Z03 — Downtown Commercial (Pop: 67,516 | Base: 1,102 kL)</option>
+              <option value="Z04">Z04 — East Industrial Belt (Pop: 35,169 | Base: 496 kL)</option>
+              <option value="Z05">Z05 — South Mixed Municipal (Pop: 60,082 | Base: 931 kL)</option>
+            </select>
+            <span class="feature-hint" id="zone-infra-note">
+              <i class="fas fa-circle-info"></i> Pop: 67,516 | Active Connections: 17,113 | Baseline: 1,102.3 kL/day
+            </span>
+          </div>
+
+          <!-- Temperature -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-temperature-high" style="color:#0d9488;"></i> Avg Expected Temperature</span>
+              <span class="who-chip neutral">Meteorology</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="-10" max="60" class="input-box" id="dem-temperature" name="temperature" value="39.5" placeholder="39.5">
+              <span class="unit-label">°C</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Daily mean ambient temperature</span>
+          </div>
+
+          <!-- Relative Humidity -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-droplet-percent" style="color:#0d9488;"></i> Relative Humidity</span>
+              <span class="who-chip neutral">Meteorology</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.5" min="0" max="100" class="input-box" id="dem-humidity" name="humidity" value="42.0" placeholder="42.0">
+              <span class="unit-label">%</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Atmospheric moisture percentage</span>
+          </div>
+
+          <!-- Daily Rainfall -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-cloud-rain" style="color:#0d9488;"></i> Forecasted Rainfall</span>
+              <span class="who-chip neutral">Precipitation</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="500" class="input-box" id="dem-rainfall" name="rainfall" value="0.0" placeholder="0.0">
+              <span class="unit-label">mm</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Total expected 24h precipitation</span>
+          </div>
+
+          <!-- Month Selector -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-calendar-days" style="color:#0d9488;"></i> Month of Year</span>
+              <span class="who-chip neutral">Seasonal Component</span>
+            </div>
+            <select class="select-box" id="dem-month" name="month">
+              <option value="1">January (Winter)</option>
+              <option value="2">February (Winter)</option>
+              <option value="3">March (Summer)</option>
+              <option value="4">April (Summer)</option>
+              <option value="5" selected>May (Peak Summer)</option>
+              <option value="6">June (Monsoon)</option>
+              <option value="7">July (Monsoon)</option>
+              <option value="8">August (Monsoon)</option>
+              <option value="9">September (Monsoon)</option>
+              <option value="10">October (Post-Monsoon)</option>
+              <option value="11">November (Post-Monsoon)</option>
+              <option value="12">December (Winter)</option>
+            </select>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Influences seasonal water demand profiles</span>
+          </div>
+
+          <!-- Calendar Toggles -->
+          <div class="feature-box" style="justify-content:center;gap:10px;">
+            <div class="toggle-group" style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+              <span style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-mug-hot" style="color:#d97706;"></i> Weekend Consumption
+              </span>
+              <label class="switch">
+                <input type="checkbox" id="dem-is_weekend">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="toggle-group" style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+              <span style="font-weight:600;font-size:13px;color:#0f172a;display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-champagne-glasses" style="color:#7c3aed;"></i> Official Public Holiday
+              </span>
+              <label class="switch">
+                <input type="checkbox" id="dem-is_holiday">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Lag 1 Demand -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-clock-rotate-left" style="color:#0d9488;"></i> Yesterday's Demand (Lag-1)</span>
+              <span class="who-chip neutral">Autoregressive</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="5000" class="input-box" id="dem-lag_1" name="lag_1" value="1240.0" placeholder="1240.0">
+              <span class="unit-label">kL</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Previous day's actual recorded consumption</span>
+          </div>
+
+          <!-- Lag 7 Demand -->
+          <div class="feature-box">
+            <div class="feature-header">
+              <span class="feature-title"><i class="fas fa-calendar-week" style="color:#0d9488;"></i> Same Day Last Week (Lag-7)</span>
+              <span class="who-chip neutral">Weekly Cyclical</span>
+            </div>
+            <div class="input-row">
+              <input type="number" step="0.1" min="0" max="5000" class="input-box" id="dem-lag_7" name="lag_7" value="1210.0" placeholder="1210.0">
+              <span class="unit-label">kL</span>
+            </div>
+            <span class="feature-hint"><i class="fas fa-circle-info"></i> Prior week matching day consumption baseline</span>
+          </div>
+
+        </div>
+
+        <div class="action-btn-row">
+          <button type="submit" class="btn-action-teal" id="btn-submit-dem">
+            <div class="btn-spinner" id="spin-dem"></div>
+            <i class="fas fa-chart-line" id="icon-dem"></i>
+            <span>Generate Demand Forecast</span>
+          </button>
+          <button type="button" class="btn-action-reset" onclick="resetDemForm()">
+            <i class="fas fa-rotate-left"></i> Reset to Zone Baseline
+          </button>
+        </div>
+      </form>
+
+      <!-- Demand Output Display -->
+      <div id="dem-result-box" class="prediction-box">
+
+        <!-- Forecast Banner -->
+        <div class="verdict-header" id="dem-verdict-banner" style="background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-color:var(--teal-100);color:#115e59;">
+          <div class="verdict-title">
+            <div class="verdict-icon" style="color:var(--teal);">
+              <i class="fas fa-droplet"></i>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:0.85;">
+                Next-Day Consumption Forecast
+              </div>
+              <div style="font-size:28px;font-weight:800;font-family:monospace;letter-spacing:-.02em;" id="dem-forecast-kL">
+                1,248.5 kL
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div class="confidence-chip" style="background:#fff;color:var(--teal-700);border-color:var(--teal-100);">
+              <i class="fas fa-chart-area" style="color:var(--teal);"></i>
+              <span id="dem-ci-text">95% CI: [1,168.0 – 1,329.0] kL</span>
+            </div>
+            <span class="badge-tag" id="dem-pumping-badge" style="background:var(--red-bg);color:var(--red);">
+              SURGE CAPACITY REQUIRED
+            </span>
+          </div>
+        </div>
+
+        <!-- Metric highlights -->
+        <div class="metric-highlight-grid">
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Baseline Comparison</span>
+            <span class="metric-highlight-val" id="dem-deviation-pct" style="color:var(--red);">+13.3%</span>
+            <span class="metric-highlight-sub" id="dem-baseline-sub">vs Zone Normal (1,102 kL)</span>
+          </div>
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Target Zone</span>
+            <span class="metric-highlight-val" id="dem-zone-display" style="font-size:16px;">Zone 3</span>
+            <span class="metric-highlight-sub" id="dem-zone-pop-display">67,516 Residents</span>
+          </div>
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Per Capita Rate</span>
+            <span class="metric-highlight-val" id="dem-per-capita" style="color:var(--teal);">18.5 L</span>
+            <span class="metric-highlight-sub">Liters / Person / Day</span>
+          </div>
+          <div class="metric-highlight-card">
+            <span class="metric-highlight-label">Trained ML Model</span>
+            <span class="metric-highlight-val" id="dem-model-name" style="font-size:15px;color:var(--text-primary);">Gradient Boosting</span>
+            <span class="metric-highlight-sub">Holdout RMSE: 41.06 kL</span>
+          </div>
+        </div>
+
+        <!-- Operational Dispatch Directive Banner -->
+        <div class="dispatch-banner" id="dem-dispatch-banner" style="background:var(--amber-bg);border-color:var(--amber-border);">
+          <i class="fas fa-triangle-exclamation" id="dem-dispatch-icon" style="color:var(--amber);margin-top:2px;font-size:16px;flex-shrink:0;"></i>
+          <div>
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:3px;">
+              Pump Station Dispatch Directive:
+            </div>
+            <div id="dem-dispatch-note" style="color:var(--text-secondary);line-height:1.6;">
+              Demand forecasted +13.3% above baseline. Activate auxiliary pump station #2 and reserve 15% supplemental head in clearwater reservoirs.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
-    <span class="header-badge green">Live Endpoints</span>
   </div>
-  <div class="table-wrapper">
-    <table>
-      <thead><tr><th>Endpoint</th><th>Method</th><th>Description</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><code>/api/v1/health</code></td>
-          <td><span class="badge-tag blue">GET</span></td>
-          <td>System health check — datasets loaded, model status</td>
-        </tr>
-        <tr>
-          <td><code>/api/v1/linear/demand</code></td>
-          <td><span class="badge-tag blue">GET</span></td>
-          <td>Full demand model results JSON including metrics and convergence</td>
-        </tr>
-        <tr>
-          <td><code>/api/v1/linear/potability</code></td>
-          <td><span class="badge-tag blue">GET</span></td>
-          <td>Full potability classification results JSON including confusion matrix</td>
-        </tr>
-        <tr>
-          <td><code>/api/v1/predict/potability</code></td>
-          <td><span class="badge-tag warning">POST</span></td>
-          <td>Coming — submit 9 parameters, receive potability verdict + probability</td>
-        </tr>
-        <tr>
-          <td><code>/api/v1/predict/demand</code></td>
-          <td><span class="badge-tag warning">POST</span></td>
-          <td>Coming — submit zone conditions, receive next-day demand kL forecast</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+
 </div>
 
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-function switchTab(ds) {
-  ['pot','dem'].forEach(function(id) {
-    document.getElementById('view-' + id).style.display = (id === ds) ? '' : 'none';
-    document.getElementById('btn-' + id).classList.toggle('active-action', id === ds);
-  });
+// Zone database for client-side instant profile preview
+const ZONE_DATA = {
+  "Z01": {"name": "Zone 1 — Central Residential", "population": 52076, "connections": 13363, "base_demand": 785.35},
+  "Z02": {"name": "Zone 2 — North Suburbs", "population": 40812, "connections": 10936, "base_demand": 579.79},
+  "Z03": {"name": "Zone 3 — Downtown Commercial", "population": 67516, "connections": 17113, "base_demand": 1102.33},
+  "Z04": {"name": "Zone 4 — East Industrial Belt", "population": 35169, "connections": 9316, "base_demand": 496.41},
+  "Z05": {"name": "Zone 5 — South Mixed Municipal", "population": 60082, "connections": 15289, "base_demand": 931.44}
+};
+
+// Tab Switcher
+function switchPortalTab(tab) {
+  document.getElementById('portal-view-pot').style.display = (tab === 'pot') ? '' : 'none';
+  document.getElementById('portal-view-dem').style.display = (tab === 'dem') ? '' : 'none';
+  document.getElementById('tab-btn-pot').classList.toggle('active-action', tab === 'pot');
+  document.getElementById('tab-btn-dem').classList.toggle('active-action', tab === 'dem');
 }
+
+function updateZoneBaselines() {
+  const zid = document.getElementById('dem-zone_id').value;
+  const z = ZONE_DATA[zid] || ZONE_DATA['Z01'];
+  document.getElementById('zone-infra-note').innerHTML = 
+    `<i class="fas fa-circle-info"></i> Pop: ${z.population.toLocaleString()} | Active Connections: ${z.connections.toLocaleString()} | Baseline: ${z.base_demand.toFixed(1)} kL/day`;
+}
+
+// Preset Loaders
+function loadPotPreset(params) {
+  for (const [k, v] of Object.entries(params)) {
+    const input = document.getElementById('pot-' + k);
+    if (input) input.value = v;
+  }
+  submitPotability();
+}
+
+function loadDemPreset(params) {
+  if (params.zone_id) {
+    document.getElementById('dem-zone_id').value = params.zone_id;
+    updateZoneBaselines();
+  }
+  if (params.temperature !== undefined) {
+    document.getElementById('dem-temperature').value = params.temperature;
+  }
+  if (params.humidity !== undefined) {
+    document.getElementById('dem-humidity').value = params.humidity;
+  }
+  if (params.rainfall !== undefined) {
+    document.getElementById('dem-rainfall').value = params.rainfall;
+  }
+  if (params.month !== undefined) {
+    document.getElementById('dem-month').value = params.month;
+  }
+  if (params.is_weekend !== undefined) {
+    document.getElementById('dem-is_weekend').checked = Boolean(params.is_weekend);
+  }
+  if (params.is_holiday !== undefined) {
+    document.getElementById('dem-is_holiday').checked = Boolean(params.is_holiday);
+  }
+  if (params.lag_1 !== undefined) {
+    document.getElementById('dem-lag_1').value = params.lag_1;
+  }
+  if (params.lag_7 !== undefined) {
+    document.getElementById('dem-lag_7').value = params.lag_7;
+  }
+  submitDemand();
+}
+
+function resetPotForm() {
+  const defaults = {
+    "ph": 7.35, "Hardness": 185.0, "Solids": 320.0, "Chloramines": 2.8,
+    "Sulfate": 175.0, "Conductivity": 340.0, "Organic_carbon": 1.4,
+    "Trihalomethanes": 45.0, "Turbidity": 1.8
+  };
+  loadPotPreset(defaults);
+}
+
+function resetDemForm() {
+  document.getElementById('dem-zone_id').value = "Z03";
+  updateZoneBaselines();
+  document.getElementById('dem-temperature').value = 39.5;
+  document.getElementById('dem-humidity').value = 42.0;
+  document.getElementById('dem-rainfall').value = 0.0;
+  document.getElementById('dem-month').value = 5;
+  document.getElementById('dem-is_weekend').checked = false;
+  document.getElementById('dem-is_holiday').checked = false;
+  document.getElementById('dem-lag_1').value = 1240.0;
+  document.getElementById('dem-lag_7').value = 1210.0;
+  submitDemand();
+}
+
+// Potability API Call
+async function submitPotability() {
+  const btn = document.getElementById('btn-submit-pot');
+  const spin = document.getElementById('spin-pot');
+  const icon = document.getElementById('icon-pot');
+  if (spin) spin.style.display = 'inline-block';
+  if (icon) icon.style.display = 'none';
+  if (btn) btn.disabled = true;
+
+  const payload = {
+    ph: parseFloat(document.getElementById('pot-ph').value),
+    Hardness: parseFloat(document.getElementById('pot-Hardness').value),
+    Solids: parseFloat(document.getElementById('pot-Solids').value),
+    Chloramines: parseFloat(document.getElementById('pot-Chloramines').value),
+    Sulfate: parseFloat(document.getElementById('pot-Sulfate').value),
+    Conductivity: parseFloat(document.getElementById('pot-Conductivity').value),
+    Organic_carbon: parseFloat(document.getElementById('pot-Organic_carbon').value),
+    Trihalomethanes: parseFloat(document.getElementById('pot-Trihalomethanes').value),
+    Turbidity: parseFloat(document.getElementById('pot-Turbidity').value)
+  };
+
+  try {
+    const res = await fetch('/api/v1/predict/potability', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    renderPotabilityResult(data);
+  } catch (err) {
+    alert("Inference error: " + err.message);
+  } finally {
+    if (spin) spin.style.display = 'none';
+    if (icon) icon.style.display = 'inline-block';
+    if (btn) btn.disabled = false;
+  }
+}
+
+function renderPotabilityResult(data) {
+  const box = document.getElementById('pot-result-box');
+  box.style.display = 'block';
+
+  const banner = document.getElementById('pot-verdict-banner');
+  const icon = document.getElementById('pot-verdict-icon');
+  const vText = document.getElementById('pot-verdict-text');
+  const mLabel = document.getElementById('pot-model-label');
+  const confText = document.getElementById('pot-conf-text');
+  const riskBadge = document.getElementById('pot-risk-badge');
+  const probVal = document.getElementById('pot-prob-val');
+  const probBar = document.getElementById('pot-prob-bar');
+  const vCount = document.getElementById('pot-violation-count');
+  const rText = document.getElementById('pot-risk-text');
+  const recBanner = document.getElementById('pot-rec-banner');
+  const recText = document.getElementById('pot-recommendation-text');
+
+  mLabel.textContent = `Model: ${data.model_used}`;
+  confText.textContent = `${data.confidence_score}% Confidence`;
+  vCount.textContent = data.violation_count;
+  rText.textContent = data.risk_level;
+  rText.style.color = data.risk_color;
+  recText.textContent = data.recommendation;
+
+  probVal.textContent = `${data.potability_probability}%`;
+  probBar.style.width = `${data.potability_probability}%`;
+
+  if (data.is_potable && data.risk_level === 'LOW RISK') {
+    banner.className = 'verdict-header safe';
+    icon.innerHTML = '<i class="fas fa-shield-check" style="color:var(--green);"></i>';
+    vText.textContent = "SAFE TO DRINK (Potable)";
+    riskBadge.className = 'badge-tag success';
+    riskBadge.textContent = 'LOW RISK';
+    probBar.className = 'progress-bar-fill green';
+    recBanner.style.background = 'var(--green-bg)';
+    recBanner.style.borderColor = 'var(--green-border)';
+  } else if (data.risk_level.includes('HIGH')) {
+    banner.className = 'verdict-header unsafe';
+    icon.innerHTML = '<i class="fas fa-triangle-exclamation" style="color:var(--red);"></i>';
+    vText.textContent = data.verdict;
+    riskBadge.className = 'badge-tag danger';
+    riskBadge.textContent = 'HIGH RISK / CONTAMINATED';
+    probBar.className = 'progress-bar-fill red';
+    recBanner.style.background = 'var(--red-bg)';
+    recBanner.style.borderColor = 'var(--red-border)';
+  } else {
+    banner.className = 'verdict-header warning';
+    icon.innerHTML = '<i class="fas fa-circle-exclamation" style="color:var(--amber);"></i>';
+    vText.textContent = data.verdict;
+    riskBadge.className = 'badge-tag warning';
+    riskBadge.textContent = 'MODERATE RISK';
+    probBar.className = 'progress-bar-fill amber';
+    recBanner.style.background = 'var(--amber-bg)';
+    recBanner.style.borderColor = 'var(--amber-border)';
+  }
+
+  // Populate Compliance Audit Table
+  const tbody = document.getElementById('pot-compliance-tbody');
+  tbody.innerHTML = '';
+  data.compliance_details.forEach(item => {
+    const tr = document.createElement('tr');
+    let statusBadge = '<span class="badge-tag success"><i class="fas fa-check"></i> Compliant</span>';
+    let devText = '<span style="color:var(--text-muted);">—</span>';
+
+    if (!item.is_compliant) {
+      statusBadge = `<span class="badge-tag danger"><i class="fas fa-xmark"></i> ${item.status}</span>`;
+      devText = `<span style="color:var(--red);font-weight:700;">Violates Guideline</span>`;
+    }
+
+    tr.innerHTML = `
+      <td style="font-weight:600;">${item.label}</td>
+      <td style="font-family:monospace;font-weight:700;">${item.value} <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${item.unit}</span></td>
+      <td style="color:var(--text-secondary);">${item.safe_range} ${item.unit}</td>
+      <td>${devText}</td>
+      <td>${statusBadge}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  box.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+
+// Demand API Call
+async function submitDemand() {
+  const btn = document.getElementById('btn-submit-dem');
+  const spin = document.getElementById('spin-dem');
+  const icon = document.getElementById('icon-dem');
+  if (spin) spin.style.display = 'inline-block';
+  if (icon) icon.style.display = 'none';
+  if (btn) btn.disabled = true;
+
+  const payload = {
+    zone_id: document.getElementById('dem-zone_id').value,
+    temperature: parseFloat(document.getElementById('dem-temperature').value),
+    humidity: parseFloat(document.getElementById('dem-humidity').value),
+    rainfall: parseFloat(document.getElementById('dem-rainfall').value),
+    month: parseInt(document.getElementById('dem-month').value),
+    is_weekend: document.getElementById('dem-is_weekend').checked ? 1 : 0,
+    is_holiday: document.getElementById('dem-is_holiday').checked ? 1 : 0,
+    lag_1: parseFloat(document.getElementById('dem-lag_1').value),
+    lag_7: parseFloat(document.getElementById('dem-lag_7').value)
+  };
+
+  try {
+    const res = await fetch('/api/v1/predict/demand', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    renderDemandResult(data);
+  } catch (err) {
+    alert("Forecast error: " + err.message);
+  } finally {
+    if (spin) spin.style.display = 'none';
+    if (icon) icon.style.display = 'inline-block';
+    if (btn) btn.disabled = false;
+  }
+}
+
+function renderDemandResult(data) {
+  const box = document.getElementById('dem-result-box');
+  box.style.display = 'block';
+
+  document.getElementById('dem-forecast-kL').textContent = `${data.predicted_demand_kL.toLocaleString()} kL`;
+  document.getElementById('dem-ci-text').textContent = 
+    `95% CI: [${data.confidence_interval.lower_kL.toLocaleString()} – ${data.confidence_interval.upper_kL.toLocaleString()}] kL (±${data.confidence_interval.margin_kL} kL)`;
+
+  const pBadge = document.getElementById('dem-pumping-badge');
+  pBadge.textContent = data.pumping_status;
+
+  const banner = document.getElementById('dem-dispatch-banner');
+  const dIcon = document.getElementById('dem-dispatch-icon');
+  document.getElementById('dem-dispatch-note').textContent = data.dispatch_note;
+
+  const devPct = document.getElementById('dem-deviation-pct');
+  devPct.textContent = `${data.deviation_pct > 0 ? '+' : ''}${data.deviation_pct}%`;
+  document.getElementById('dem-baseline-sub').textContent = `vs Zone Normal (${data.baseline_demand_kL.toFixed(1)} kL)`;
+
+  document.getElementById('dem-zone-display').textContent = data.zone_id;
+  document.getElementById('dem-zone-pop-display').textContent = `${data.inputs.population.toLocaleString()} Residents`;
+
+  // Per capita liters per day: (predicted_demand_kL * 1000) / population
+  const perCapita = ((data.predicted_demand_kL * 1000) / data.inputs.population).toFixed(1);
+  document.getElementById('dem-per-capita').textContent = `${perCapita} L`;
+  document.getElementById('dem-model-name').textContent = data.model_used;
+
+  if (data.deviation_pct > 10.0) {
+    pBadge.className = 'badge-tag danger';
+    devPct.style.color = 'var(--red)';
+    banner.style.background = 'var(--red-bg)';
+    banner.style.borderColor = 'var(--red-border)';
+    dIcon.className = 'fas fa-triangle-exclamation';
+    dIcon.style.color = 'var(--red)';
+  } else if (data.deviation_pct < -8.0) {
+    pBadge.className = 'badge-tag teal';
+    devPct.style.color = 'var(--teal)';
+    banner.style.background = 'var(--teal-50)';
+    banner.style.borderColor = 'var(--teal-100)';
+    dIcon.className = 'fas fa-arrow-down-short-wide';
+    dIcon.style.color = 'var(--teal)';
+  } else {
+    pBadge.className = 'badge-tag success';
+    devPct.style.color = 'var(--green)';
+    banner.style.background = 'var(--green-bg)';
+    banner.style.borderColor = 'var(--green-border)';
+    dIcon.className = 'fas fa-circle-check';
+    dIcon.style.color = 'var(--green)';
+  }
+
+  box.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+
+// Initial automatic execution on page load for immediate interactivity
+document.addEventListener('DOMContentLoaded', function() {
+  submitPotability();
+  submitDemand();
+});
 </script>
 {% endblock %}
