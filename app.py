@@ -173,11 +173,24 @@ async def evaluation_view(request: Request):
 @app.get("/prediction", response_class=HTMLResponse)
 async def prediction_view(request: Request):
     """Interactive Inference & Prediction View."""
+    from src.models.prediction_service import (
+        POTABILITY_PRESETS,
+        DEMAND_PRESETS,
+        WHO_STANDARDS,
+        ZONE_PROFILES
+    )
     return templates.TemplateResponse(
         request=request,
         name="prediction.html",
-        context={"active_page": "prediction"}
+        context={
+            "active_page": "prediction",
+            "potability_presets": POTABILITY_PRESETS,
+            "demand_presets": DEMAND_PRESETS,
+            "who_standards": WHO_STANDARDS,
+            "zone_profiles": ZONE_PROFILES
+        }
     )
+
 
 
 @app.get("/deployment", response_class=HTMLResponse)
@@ -305,6 +318,48 @@ async def evaluation_api():
     return sanitize_numpy(data)
 
 
+@app.post("/api/v1/predict/potability")
+async def predict_potability_api(request: Request):
+    """Real-time Water Potability Inference API."""
+    try:
+        body = await request.json()
+        from src.models.prediction_service import predict_potability
+        result = predict_potability(body)
+        return sanitize_numpy(result)
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+
+
+@app.post("/api/v1/predict/demand")
+async def predict_demand_api(request: Request):
+    """Real-time Municipal Water Demand Forecasting API."""
+    try:
+        body = await request.json()
+        from src.models.prediction_service import predict_demand
+        result = predict_demand(body)
+        return sanitize_numpy(result)
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+
+
+@app.get("/api/v1/predict/presets")
+async def predict_presets_api():
+    """Pre-configured scenario presets for demo & testing."""
+    from src.models.prediction_service import (
+        POTABILITY_PRESETS,
+        DEMAND_PRESETS,
+        WHO_STANDARDS,
+        ZONE_PROFILES
+    )
+    return sanitize_numpy({
+        "potability_presets": POTABILITY_PRESETS,
+        "demand_presets": DEMAND_PRESETS,
+        "who_standards": WHO_STANDARDS,
+        "zone_profiles": ZONE_PROFILES
+    })
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+
