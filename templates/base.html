@@ -6,8 +6,9 @@
   <title>{% block title %}AquaSense{% endblock %} — AI Water Intelligence</title>
   <meta name="description" content="AquaSense — AI-Based Water Quality Assessment and Demand Forecasting.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="/static/css/style.css?v=20261006_2">
+  <link rel="stylesheet" href="/static/css/style.css?v=20261010_1">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -166,5 +167,12 @@
 </main>
 
 {% block extra_scripts %}{% endblock %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  });
+</script>
 </body>
 </html>

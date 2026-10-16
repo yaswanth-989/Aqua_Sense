@@ -298,7 +298,34 @@ body{
 .action-desc {font-size:11.5px;color:var(--text-muted);line-height:1.4}
 
 /* ════════════════════════════
-   CARDS
+   TAB SWITCHER (Pill Segmented Control)
+════════════════════════════ */
+.tab-switcher{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px;background:var(--slate-200);border-radius:var(--radius);
+  margin-bottom:22px;border:1px solid var(--border);
+  box-shadow:var(--shadow-xs);flex-wrap:wrap;
+}
+.tab-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 18px;border-radius:var(--radius-sm);
+  border:none;background:transparent;
+  color:var(--text-secondary);font-size:13px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:var(--transition);outline:none;user-select:none;
+}
+.tab-btn i,.tab-btn svg,.tab-btn svg.lucide{
+  width:15px;height:15px;font-size:14px;flex-shrink:0;
+}
+.tab-btn:hover:not(.active){
+  background:rgba(255,255,255,.6);color:var(--text-primary);
+}
+.tab-btn.active{
+  background:var(--surface);color:var(--accent);
+  font-weight:700;box-shadow:var(--shadow-sm);
+}
+
+/* ════════════════════════════
+   CARDS & HEADINGS
 ════════════════════════════ */
 .card{
   background:var(--surface);border:1px solid var(--border);
@@ -311,13 +338,20 @@ body{
 
 .card-header{
   display:flex;align-items:center;justify-content:space-between;
-  gap:10px;padding:12px 16px;
+  gap:10px;padding:12px 18px;
   border-bottom:1px solid var(--border);background:var(--slate-50);
 }
 .card-header-title{display:flex;align-items:center;gap:10px;min-width:0}
 .card-header h3,.card-header-title h3{
-  font-size:13px;font-weight:600;color:var(--text-primary);
+  font-size:13.5px;font-weight:700;color:var(--text-primary);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.card-title{
+  font-size:14px;font-weight:700;color:var(--text-primary);
+  display:flex;align-items:center;gap:8px;letter-spacing:-.01em;
+}
+.card-subtitle{
+  font-size:12px;color:var(--text-muted);font-weight:400;margin-top:3px;line-height:1.4;
 }
 .card-icon{
   font-size:13px;color:var(--accent);flex-shrink:0;
@@ -330,8 +364,18 @@ body{
 /* card used without card-header (has own padding) */
 .card.padded{padding:18px 20px}
 
-/* grid-2 */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* Grids */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+
+/* Lucide Icons */
+svg.lucide,i[data-lucide]{
+  width:16px;height:16px;stroke-width:2;display:inline-block;vertical-align:middle;flex-shrink:0;
+}
+.stat-icon-wrapper svg.lucide{
+  width:20px;height:20px;
+}
 
 /* ════════════════════════════
    WELCOME HERO
@@ -402,24 +446,38 @@ body{
 .btn-sm{padding:5px 12px;font-size:12.5px}
 
 /* ════════════════════════════
-   TABLES
+   TABLES & DATA TABLES
 ════════════════════════════ */
-.table-wrapper{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);background:#fff}
-.table-wrapper table{width:100%;border-collapse:collapse;font-size:13px;text-align:left;table-layout:auto}
-.table-wrapper thead th{
-  background:var(--slate-50);padding:9px 12px;
-  font-size:10.5px;font-weight:700;color:var(--text-muted);
-  text-transform:uppercase;letter-spacing:.07em;
-  border-bottom:1px solid var(--border);white-space:nowrap;
+.table-wrapper, .data-table-container{
+  overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);
+  background:#fff;margin-top:12px;margin-bottom:16px;box-shadow:var(--shadow-xs);
+}
+.table-wrapper table, .data-table{
+  width:100%;border-collapse:collapse;font-size:13px;text-align:left;table-layout:auto;
+}
+.table-wrapper thead th, .data-table thead th{
+  background:var(--slate-50);padding:11px 16px;
+  font-size:11px;font-weight:700;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1.5px solid var(--border);white-space:nowrap;
   vertical-align:middle;
 }
-.table-wrapper tbody td{
-  padding:10px 12px;border-bottom:1px solid var(--border-light);
+.table-wrapper tbody td, .data-table tbody td{
+  padding:11px 16px;border-bottom:1px solid var(--border-light);
   color:var(--text-primary);vertical-align:middle;
-  font-size:13px;line-height:1.4;
+  font-size:13px;line-height:1.5;
 }
-.table-wrapper tbody tr:last-child td{border-bottom:none}
-.table-wrapper tbody tr:hover td{background:var(--slate-50)}
+.table-wrapper tbody tr:last-child td, .data-table tbody tr:last-child td{
+  border-bottom:none;
+}
+.table-wrapper tbody tr:hover td, .data-table tbody tr:hover td{
+  background:var(--slate-50);
+}
+.data-table code{
+  font-family:monospace;background:var(--slate-100);
+  padding:2px 6px;border-radius:4px;font-size:12px;
+  color:var(--slate-700);font-weight:600;
+}
 
 /* ════════════════════════════
    RESULT-STAT TILES
